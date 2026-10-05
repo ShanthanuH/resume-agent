@@ -53,6 +53,9 @@ def is_verbatim(snippet: str, source: str) -> bool:
 RESUME_SYSTEM = """You split a resume into evidence lines.
 Return one line per bullet point or standalone fact (a degree, a skills row).
 Rules:
+- A bullet that wraps over several lines in the resume is ONE evidence line. Return
+  the whole bullet, with the wrapped parts joined by a single space. Never return
+  half a sentence.
 - text: copy the characters exactly from the resume. Do not fix typos, reword,
   shorten or merge. Leave out only the leading bullet symbol.
 - section: the section heading the line sits under, copied exactly.

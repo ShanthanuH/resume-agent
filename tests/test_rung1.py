@@ -96,24 +96,75 @@ EVIDENCE = [
 REQ = Requirement(id="R1", text="Python", priority="must_have")
 
 
-def test_search_evidence_drops_unknown_and_duplicate_ids(monkeypatch):
-    fake_llm(monkeypatch, tools._MatchDraft(evidence_ids=["E1", "E9", "E1"]))
-    assert tools.search_evidence(REQ, EVIDENCE) == ["E1"]
+def test_search_all_evidence_only_returns_real_ids(monkeypatch):
+    req2 = Requirement(id="R2", text="Go", priority="must_have")
+    fake_llm(
+        monkeypatch,
+        tools._MatchBatchDraft(
+            matches=[
+                # E9 does not exist and E1 is repeated.
+                tools._MatchDraft(requirement_id="R1", evidence_ids=["E1", "E9", "E1"]),
+                # R7 was never asked about.
+                tools._MatchDraft(requirement_id="R7", evidence_ids=["E2"]),
+            ]
+        ),
+    )
+    # R2 was left out by the model, so it must come back as "no evidence".
+    assert tools.search_all_evidence([REQ, req2], EVIDENCE) == {"R1": ["E1"], "R2": []}
 
 
-def test_rewrite_bullet_bookkeeping_comes_from_code(monkeypatch):
-    # The model points `replaces` at a line it was never given.
-    fake_llm(monkeypatch, tools._BulletDraft(text="Wrote Python", replaces="E2"))
-    bullet = tools.rewrite_bullet([EVIDENCE[0]], [REQ], bullet_id="B1")
-    assert bullet.source_ids == ["E1"]
-    assert bullet.requirement_ids == ["R1"]
-    assert bullet.replaces is None
-    assert bullet.status == "proposed"
+def test_search_all_evidence_caps_matches(monkeypatch):
+    many = [
+        EvidenceLine(id=f"E{n}", section="Experience", entry=Entry(), text="Python")
+        for n in range(1, 8)
+    ]
+    fake_llm(
+        monkeypatch,
+        tools._MatchBatchDraft(
+            matches=[
+                tools._MatchDraft(
+                    requirement_id="R1", evidence_ids=[e.id for e in many]
+                )
+            ]
+        ),
+    )
+    assert tools.search_evidence(REQ, many) == ["E1", "E2", "E3"]
+
+
+def test_rewrite_bullets_bookkeeping_comes_from_code(monkeypatch):
+    fake_llm(
+        monkeypatch,
+        tools._BulletBatchDraft(
+            bullets=[
+                # The model points `replaces` at a line this job was never given.
+                tools._BulletDraft(bullet_id="B1", text="Wrote Python", replaces="E2"),
+                # The model invents a job that was never asked for.
+                tools._BulletDraft(bullet_id="B9", text="Led a team", replaces=None),
+            ]
+        ),
+    )
+    jobs = [
+        tools.RewriteJob(bullet_id="B1", sources=[EVIDENCE[0]], requirements=[REQ]),
+        tools.RewriteJob(bullet_id="B2", sources=[EVIDENCE[1]], requirements=[REQ]),
+    ]
+    bullets = tools.rewrite_bullets(jobs)
+    # B9 is ignored, and B2 is absent because the model never answered it.
+    assert [b.id for b in bullets] == ["B1"]
+    assert bullets[0].source_ids == ["E1"]
+    assert bullets[0].requirement_ids == ["R1"]
+    assert bullets[0].replaces is None
+    assert bullets[0].status == "proposed"
 
 
 def test_rewrite_bullet_refuses_without_sources():
     with pytest.raises(ValueError):
         tools.rewrite_bullet([], [REQ], bullet_id="B1")
+
+
+def test_rewrite_bullet_raises_when_model_returns_nothing(monkeypatch):
+    fake_llm(monkeypatch, tools._BulletBatchDraft(bullets=[]))
+    with pytest.raises(ValueError):
+        tools.rewrite_bullet([EVIDENCE[0]], [REQ], bullet_id="B1")
 
 
 def test_extract_resume_pdf_returns_text_and_links(tmp_path):
