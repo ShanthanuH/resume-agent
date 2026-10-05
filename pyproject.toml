@@ -1,0 +1,25 @@
+[project]
+name = "resume-agent"
+version = "0.1.0"
+description = "Resume tailoring agent: every claim traces back to the original resume"
+authors = [
+    { name = "Shanthanu Hemanth", email = "shaanhem@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "google-genai>=2.28.0",
+    "pydantic>=2.13.5",
+    "pymupdf>=1.28.2",
+]
+
+[project.scripts]
+rung1 = "resume_agent.rung1:main"
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

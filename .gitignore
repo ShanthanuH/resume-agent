@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.pytest_cache/
+# API keys live here, never in git
+.env
+# local resumes and JDs are personal data, never in git
+data/
