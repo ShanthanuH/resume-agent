@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-rung1 = "resume_agent.rung1:main"
+demo = "resume_agent.demo:main"
 
 [build-system]
 requires = ["uv_build>=0.12.23,<0.13.0"]

@@ -1,8 +1,9 @@
-"""Rung 1 demo: resume PDF and JD in, tailored bullets with source IDs out.
+"""Demo: resume PDF and JD in, tailored bullets out, each one verified.
 
-This is a fixed straight-line script, not the agent loop. It makes no decisions,
-does no verification and never retries. It exists to try the tools on real input.
-It makes four model calls: parse resume, parse JD, match, rewrite.
+This is a fixed straight-line script, not the agent loop. It makes no decisions
+and never retries: a bullet that fails verification is only reported. It exists
+to try the tools on real input. It makes up to five model calls: parse resume,
+parse JD, match, rewrite, judge.
 """
 
 import argparse
@@ -12,6 +13,7 @@ from resume_agent import llm
 from resume_agent.extract import extract_resume_pdf
 from resume_agent.parsing import normalize, parse_jd, parse_resume
 from resume_agent.tools import RewriteJob, rewrite_bullets, search_all_evidence
+from resume_agent.verify import verify_claims
 
 
 def main() -> None:
@@ -59,20 +61,35 @@ def main() -> None:
     # Call 4: write every bullet at once.
     bullets = {b.id: b for b in rewrite_bullets(jobs)} if jobs else {}
 
+    def changed(job: RewriteJob) -> bool:
+        """True if the writer returned a bullet that differs from the original."""
+        bullet = bullets.get(job.bullet_id)
+        return bullet is not None and normalize(bullet.text) != normalize(
+            job.sources[0].text
+        )
+
+    # Call 5: verify the bullets that changed. An unchanged bullet is the resume's
+    # own words, so there is nothing new in it to check.
+    results = verify_claims(
+        [(bullets[job.bullet_id], job.sources) for job in jobs if changed(job)]
+    )
+
     for job in jobs:
         line = job.sources[0]
         req_ids = ", ".join(r.id for r in job.requirements)
-        bullet = bullets.get(job.bullet_id)
-        if bullet is None:
+        if job.bullet_id not in bullets:
             print(f"{job.bullet_id} [{line.id}] no bullet returned (for {req_ids})")
-        elif normalize(bullet.text) == normalize(line.text):
-            # Same words as the original, so there is nothing to propose.
+        elif not changed(job):
             print(f"{job.bullet_id} [{line.id}] kept as is (for {req_ids})")
             print(f"  {line.text}")
         else:
-            print(f"{job.bullet_id} [{line.id}] rewritten (for {req_ids})")
+            result = results[job.bullet_id]
+            verdict = "PASS" if result.passed else f"FAIL ({result.layer})"
+            print(f"{job.bullet_id} [{line.id}] rewritten, {verdict} (for {req_ids})")
             print(f"  old: {line.text}")
-            print(f"  new: {bullet.text}")
+            print(f"  new: {bullets[job.bullet_id].text}")
+            for violation in result.violations:
+                print(f"  ! {violation}")
         print()
 
     print("Requirements:")

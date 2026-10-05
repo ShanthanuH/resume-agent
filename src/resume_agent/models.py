@@ -1,4 +1,4 @@
-"""Data models from spec.md section 7 (the ones Rung 1 needs)."""
+"""Data models from spec.md section 7 (TraceStep comes with the agent loop)."""
 
 from typing import Literal
 
@@ -41,3 +41,11 @@ class TailoredBullet(BaseModel):
     requirement_ids: list[str]  # set in code from the requirements passed in
     replaces: str | None = None  # an EvidenceLine id, validated in code
     status: Literal["proposed", "approved", "rejected"] = "proposed"
+
+
+class Verification(BaseModel):
+    """The result of checking one bullet against its cited source lines."""
+
+    passed: bool
+    violations: list[str] = []  # one plain sentence per problem, fed to the retry
+    layer: Literal["rules", "judge"]  # which check produced this result

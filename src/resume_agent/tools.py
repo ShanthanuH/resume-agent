@@ -42,7 +42,7 @@ class RewriteJob(BaseModel):
     violations: list[str] = []  # filled only on a retry after a failed verification
 
 
-def _format_evidence(lines: list[EvidenceLine]) -> str:
+def format_evidence(lines: list[EvidenceLine]) -> str:
     """One line per EvidenceLine: id, where it comes from, then the text."""
     return "\n".join(
         f"{e.id} | {e.section} | {e.entry.title} | {e.entry.organization} | "
@@ -102,7 +102,7 @@ def search_all_evidence(
                 "requirement", "\n".join(f"{r.id} | {r.text}" for r in requirements)
             )
             + "\n"
-            + llm.wrap_untrusted("evidence", _format_evidence(evidence))
+            + llm.wrap_untrusted("evidence", format_evidence(evidence))
         ),
         schema=_MatchBatchDraft,
     )
@@ -130,7 +130,7 @@ def search_evidence(
 def _format_job(job: RewriteJob) -> str:
     text = (
         f'<job id="{job.bullet_id}">\n'
-        + llm.wrap_untrusted("evidence", _format_evidence(job.sources))
+        + llm.wrap_untrusted("evidence", format_evidence(job.sources))
         + "\n"
         + llm.wrap_untrusted("requirement", "\n".join(r.text for r in job.requirements))
     )

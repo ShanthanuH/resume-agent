@@ -1,0 +1,162 @@
+# Skill list for the rules verifier (spec section 5, layer 1).
+# One skill per line. Names after "|" are other spellings of the SAME skill, so a
+# bullet may say "K8s" when the resume says "Kubernetes".
+# A leading "=" means match the exact capitals only, for names that are also
+# ordinary words ("Go", "Spring", "Excel").
+# Capitalised tools missing from this list are still caught by the name check.
+# This list matters most for lowercase names and for alternative spellings.
+
+# Languages
+Python
+Java
+JavaScript | JS | ECMAScript
+TypeScript | TS
+=C
+C++ | CPP
+C# | CSharp
+=Go | Golang
+Rust
+Kotlin
+=Swift
+Ruby
+PHP
+Scala
+=R
+MATLAB
+SQL
+PL/SQL | PLSQL
+Bash | shell scripting
+HTML | HTML5
+CSS | CSS3
+=Dart
+Perl
+Haskell
+Solidity
+
+# Machine learning and data
+PyTorch | =Torch
+TensorFlow
+Keras
+scikit-learn | sklearn | scikit learn
+NumPy
+Pandas
+SciPy
+Matplotlib
+OpenCV
+XGBoost
+LightGBM
+JAX
+ONNX
+Hugging Face | HuggingFace
+=Transformers
+Sentence-Transformers | SentenceTransformers | sentence transformers
+spaCy
+NLTK
+YOLO | YOLOv5 | YOLOv8
+BERT
+LangChain
+LangGraph
+LlamaIndex
+OpenAI API
+Gemini | Gemini API
+Claude
+Ollama
+MLflow
+Weights & Biases | wandb
+Airflow
+dbt
+=Spark | PySpark | Apache Spark
+Hadoop
+Kafka
+Databricks
+=Snowflake
+BigQuery
+Tableau
+Power BI | PowerBI
+=Excel
+Jupyter
+CUDA
+BM25
+FAISS
+=Pinecone
+=Chroma | ChromaDB
+Weaviate
+Qdrant
+Milvus
+pgvector
+
+# Web and backend
+FastAPI
+Flask
+Django
+=Express | Express.js
+Node.js | NodeJS
+=React | React.js | ReactJS
+Next.js | NextJS
+Vue | Vue.js
+=Angular
+Svelte
+=Spring | Spring Boot
+=Rails | Ruby on Rails
+Laravel
+.NET | ASP.NET
+GraphQL
+=REST | RESTful
+gRPC
+Streamlit
+Gradio
+Tailwind | TailwindCSS
+PyQt5 | PyQt
+Pydantic
+=Celery
+Nginx
+WebSockets | WebSocket
+
+# Databases
+PostgreSQL | Postgres
+MySQL
+SQLite
+MongoDB | Mongo
+Redis
+Elasticsearch | Elastic Search
+Cassandra
+DynamoDB
+=Oracle
+Neo4j
+Firebase
+Supabase
+
+# Cloud and DevOps
+AWS | Amazon Web Services
+GCP | Google Cloud
+Azure
+Docker
+Kubernetes | K8s
+Terraform
+Ansible
+Jenkins
+GitHub Actions
+GitLab CI
+CI/CD
+Git
+GitHub
+GitLab
+Linux
+Vercel
+Heroku
+Prometheus
+Grafana
+Langfuse
+
+# Mobile and other
+Android
+iOS
+Flutter
+React Native
+=Unity
+Arduino
+Raspberry Pi
+ROS
+PLC
+Figma
+Jira
