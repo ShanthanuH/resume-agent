@@ -23,6 +23,10 @@ UNTRUSTED_NOTE = (
 
 T = TypeVar("T", bound=BaseModel)
 
+# Running totals per model: [calls, input tokens, output tokens]. Tokens are what
+# Gemini bills for, so this is how a run's cost is measured.
+USAGE: dict[str, list[int]] = {}
+
 
 @lru_cache  # build the client once and reuse it for every call
 def _client() -> genai.Client:
@@ -48,6 +52,15 @@ def generate_structured(*, model: str, system: str, user: str, schema: type[T]) 
             temperature=0,  # same input should give the same output
         ),
     )
+    meta = response.usage_metadata
+    if meta:  # count tokens even if the answer turns out to be unusable
+        totals = USAGE.setdefault(model, [0, 0, 0])
+        totals[0] += 1
+        totals[1] += meta.prompt_token_count or 0
+        # "Thinking" tokens are billed as output too, so they are added in.
+        totals[2] += (meta.candidates_token_count or 0) + (
+            meta.thoughts_token_count or 0
+        )
     if not response.text:  # empty when the model was blocked or returned nothing
         raise ValueError(f"Gemini returned no text for schema {schema.__name__}")
     # Validate ourselves instead of trusting response.parsed, which can be None.

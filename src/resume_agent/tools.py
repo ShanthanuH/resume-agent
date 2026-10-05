@@ -77,8 +77,10 @@ Rules:
 - Keep every number, metric and named tool that the source row has.
 - Never state a soft skill ("demonstrated ownership", "strong problem-solving").
   Let the facts show it.
-- Change as little as needed: reorder and tighten so the targeted requirements
-  stand out. If the source row already serves them well, return it unchanged.
+- Make the targeted requirements easy to spot: lead with the part of the row they
+  care about, cut detail that does not serve them, and use a requirement's own
+  term where the row clearly describes the same thing.
+- Return the row unchanged only when no such edit would help.
 - One line, starts with a verb in the same tense as the source row (usually past
   tense: "Built", not "Build"), no first person, no trailing period.
 - If a source row is a list and not a sentence (a skills or tools row), return its

@@ -8,6 +8,7 @@ It makes four model calls: parse resume, parse JD, match, rewrite.
 import argparse
 from pathlib import Path
 
+from resume_agent import llm
 from resume_agent.extract import extract_resume_pdf
 from resume_agent.parsing import normalize, parse_jd, parse_resume
 from resume_agent.tools import RewriteJob, rewrite_bullets, search_all_evidence
@@ -78,6 +79,10 @@ def main() -> None:
     for req in requirements:
         found = ", ".join(matches[req.id]) or "GAP"
         print(f"  {req.id} ({req.priority}): {req.text} -> {found}")
+
+    print("\nModel usage:")
+    for model, (calls, tokens_in, tokens_out) in llm.USAGE.items():
+        print(f"  {model}: {calls} calls, {tokens_in} tokens in, {tokens_out} out")
 
 
 if __name__ == "__main__":
