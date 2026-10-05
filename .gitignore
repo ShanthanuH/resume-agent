@@ -5,3 +5,5 @@ __pycache__/
 .env
 # local resumes and JDs are personal data, never in git
 data/
+# resume PDFs are personal data, never in git
+*.pdf
