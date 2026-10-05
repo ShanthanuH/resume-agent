@@ -13,6 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
+agent = "resume_agent.agent:main"
 demo = "resume_agent.demo:main"
 
 [build-system]

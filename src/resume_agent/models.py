@@ -1,6 +1,6 @@
-"""Data models from spec.md section 7 (TraceStep comes with the agent loop)."""
+"""Data models from spec.md section 7."""
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -49,3 +49,17 @@ class Verification(BaseModel):
     passed: bool
     violations: list[str] = []  # one plain sentence per problem, fed to the retry
     layer: Literal["rules", "judge"]  # which check produced this result
+
+
+class TraceStep(BaseModel):
+    """One line of the agent trace: what was called, what came back, what it cost."""
+
+    step: int  # 1, 2, 3, ... in the order things happened
+    tool: str  # a tool name, or "agent" for a turn of the deciding model
+    input: dict[str, Any]
+    output: dict[str, Any]
+    decision: str  # the outcome in a word or two: "keep", "retry", "gap", ...
+    latency_ms: int
+    tokens_in: int = 0
+    tokens_out: int = 0
+    cost: float | None = None  # US dollars; None while llm.PRICES has no price

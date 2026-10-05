@@ -277,8 +277,15 @@ Not supported means the bullet says something the sources do not:
 - a result, impact, scale, purpose or audience that is not stated
 - a tool, method, role, seniority or responsibility that is not stated
 - a soft skill or quality presented as fact ("demonstrated ownership")
+- praise or status the source does not give ("recognized", "award-winning",
+  "successful", "cutting-edge", "highly scalable")
 - a stronger verb than the source justifies ("led" when the source says "part of")
 Supported, so do NOT list it:
+- anything stated in ANY column of a source row. The title column often lists
+  the tools of a project ("Exam Helper | Python, Streamlit"), so "in Python" is
+  supported for every row of that project
+- tool names, numbers and proper names in general: code has already checked
+  each of them against the sources before you see the bullet
 - rewording, reordering, shortening, or leaving facts out
 - naming the obvious category of something the source describes
   ("machine learning" for a neural-network classifier)
@@ -296,7 +303,7 @@ def judge_bullets(checks: list[Check]) -> dict[str, Verification]:
     if not checks:
         return {}
     draft = llm.generate_structured(
-        model=llm.CHEAP_MODEL,
+        model=llm.JUDGE_MODEL,
         system=JUDGE_SYSTEM,
         user="\n".join(
             f'<check id="{bullet.id}">\n'
