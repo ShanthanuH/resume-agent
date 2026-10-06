@@ -21,10 +21,20 @@ JUDGE_MODEL = os.environ.get("GEMINI_JUDGE_MODEL", CHEAP_MODEL)
 # The agent decides what to do next, so it gets the stronger model by default.
 AGENT_MODEL = os.environ.get("GEMINI_AGENT_MODEL", STRONG_MODEL)
 
-# US dollars per million tokens as (input, output), keyed by model name. Left
-# empty on purpose: fill it from the current Gemini price list. While a model
-# has no entry, its cost is reported as unknown (None), never guessed.
-PRICES: dict[str, tuple[float, float]] = {}
+# US dollars per million tokens as (input, output), keyed by model name. Output
+# includes thinking tokens. Paid tier, standard rate, from
+# https://ai.google.dev/gemini-api/docs/pricing on 2026-10-06.
+# A model with no entry here has its cost reported as unknown (None), never guessed.
+_FLASH = (0.75, 3.75)  # Gemini 3.8 Flash. Doubles to (1.50, 7.50) on 2027-01-01.
+_FLASH_LITE = (0.30, 2.50)  # Gemini 3.5 Flash-Lite
+PRICES: dict[str, tuple[float, float]] = {
+    "gemini-3.8-flash": _FLASH,
+    "gemini-3.5-flash-lite": _FLASH_LITE,
+    # The "-latest" names are aliases. They pointed at the two models above on
+    # 2026-10-06; when Google moves them, these two lines need updating.
+    "gemini-flash-latest": _FLASH,
+    "gemini-flash-lite-latest": _FLASH_LITE,
+}
 
 # Appended to every system prompt. Resume and JD text can contain hidden
 # instructions (prompt injection), so the model is told to treat them as data.

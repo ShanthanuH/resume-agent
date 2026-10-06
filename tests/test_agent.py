@@ -405,3 +405,22 @@ def test_backoff_retries_temporary_errors_only(monkeypatch):
     with pytest.raises(APIError):
         llm._with_backoff(bad_request)
     assert waits == []  # a permanent error is not retried
+
+
+# --- cost ------------------------------------------------------------------------
+
+
+def test_usage_since_prices_only_what_was_used_after_the_snapshot(monkeypatch):
+    monkeypatch.setattr(llm, "PRICES", {"flash": (1.0, 4.0)})
+    monkeypatch.setattr(llm, "USAGE", {"flash": [1, 1000, 500]})
+    snapshot = llm.usage_snapshot()
+    llm.USAGE["flash"] = [2, 3000, 1500]  # one more call: 2000 in, 1000 out
+    tokens_in, tokens_out, cost = llm.usage_since(snapshot)
+    assert (tokens_in, tokens_out) == (2000, 1000)
+    assert cost == pytest.approx((2000 * 1.0 + 1000 * 4.0) / 1_000_000)
+
+
+def test_cost_is_unknown_when_a_model_has_no_price(monkeypatch):
+    monkeypatch.setattr(llm, "PRICES", {})
+    monkeypatch.setattr(llm, "USAGE", {"mystery": [1, 10, 10]})
+    assert llm.usage_since({})[2] is None

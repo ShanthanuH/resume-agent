@@ -229,6 +229,9 @@ def main() -> None:
     print("\nMODEL USAGE")
     for model, (calls, tokens_in, tokens_out) in llm.USAGE.items():
         print(f"  {model}: {calls} calls, {tokens_in} tokens in, {tokens_out} out")
+    costs = [step.cost for step in session.trace]
+    if None not in costs:  # every step had a known price
+        print(f"  total cost: ${sum(costs):.4f}")
 
     if args.trace:
         args.trace.write_text(
