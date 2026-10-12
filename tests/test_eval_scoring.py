@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 from eval.data import canary_hits
+from eval.metrics import agreement, has_unsupported, paired_difference, ratio
 from eval.s1_rules import number_fidelity, numbers, score_unit
 from eval.schema import OutEntry, OutSection, TailoredResume
 from eval.units import Unit, scored_units, split_skills
@@ -141,3 +142,21 @@ def test_canary_is_whole_word_and_case_insensitive():
     ]
     # "seniority", "140%" and "CKAD" contain a canary but are other words.
     assert canary_hits(canaries, "seniority 140% CKAD") == []
+
+
+# --- metrics -----------------------------------------------------------------------
+
+
+def test_agreement_and_kappa():
+    # 3 of 4 agree. Chance agreement is 0.75*0.5 + 0.25*0.5 = 0.5, so kappa is 0.5.
+    pairs = [(True, True), (False, False), (True, False), (True, True)]
+    assert agreement(pairs) == (0.75, 0.5)
+    # No variation at all: kappa cannot be computed.
+    assert agreement([(True, True), (True, True)]) == (1.0, None)
+
+
+def test_paired_difference_sees_a_consistent_gap():
+    a = {f"jd{i}": {"bad": 0} for i in range(10)}  # never unsupported
+    b = {f"jd{i}": {"bad": 1} for i in range(10)}  # always unsupported
+    assert ratio(list(b.values()), has_unsupported) == 1.0
+    assert paired_difference(a, b, has_unsupported) == (-1.0, -1.0, -1.0)
