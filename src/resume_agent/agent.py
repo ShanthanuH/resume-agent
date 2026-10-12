@@ -61,7 +61,11 @@ def declarations(session: Session) -> list[types.FunctionDeclaration]:
 
 
 def start_session(
-    resume_text: str, jd_text: str, links: list[Link], ask_user: AskUser
+    resume_text: str,
+    jd_text: str,
+    links: list[Link],
+    ask_user: AskUser,
+    verifier_on: bool = True,  # False is the eval's verifier-off ablation
 ) -> Session:
     """Parse both texts and return a Session ready for the agent.
 
@@ -83,6 +87,7 @@ def start_session(
         requirements={r.id: r for r in steps[1][2]},
         links=links,
         ask_user=ask_user,
+        verifier_on=verifier_on,
     )
     for tool, chars, items, elapsed_ms, (tokens_in, tokens_out, cost) in steps:
         session.log(
@@ -187,6 +192,11 @@ def main() -> None:
     parser.add_argument(
         "--no-questions", action="store_true", help="answer every ask_user with nothing"
     )
+    parser.add_argument(
+        "--no-verifier",
+        action="store_true",
+        help="ablation: pass every bullet without checking it",
+    )
     parser.add_argument("--trace", type=Path, help="write the full trace as JSON here")
     args = parser.parse_args()
 
@@ -197,7 +207,9 @@ def main() -> None:
         resume_text, links = args.resume.read_text(), []
     ask_user = (lambda question: "") if args.no_questions else _ask_in_terminal
 
-    session = start_session(resume_text, args.jd.read_text(), links, ask_user)
+    session = start_session(
+        resume_text, args.jd.read_text(), links, ask_user, not args.no_verifier
+    )
     run_agent(session)
 
     print("\nTRACE")

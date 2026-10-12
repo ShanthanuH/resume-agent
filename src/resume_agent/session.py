@@ -28,6 +28,7 @@ from resume_agent.models import (
     Requirement,
     TailoredBullet,
     TraceStep,
+    Verification,
 )
 from resume_agent.parsing import normalize
 from resume_agent.tools import RewriteJob, rewrite_bullets, search_all_evidence
@@ -132,6 +133,9 @@ class Session:
     requirements: dict[str, Requirement]
     links: list[Link]
     ask_user: AskUser
+    # False only for the eval's ablation (system A0): verify_claim then passes
+    # every bullet unchecked. The loop, tools and prompts stay exactly the same.
+    verifier_on: bool = True
     # field(default_factory=...) gives each Session its own empty container.
     confirmed: dict[str, EvidenceLine] = field(default_factory=dict)  # user answers
     # requirement ID -> evidence IDs. A key exists only once it was searched.
@@ -345,15 +349,22 @@ class Session:
                 outcomes[i] = "keep", {"passed": True}
             else:
                 todo.append((i, bullet))
-        results = verify_claims(
-            [(b, [self.line(s) for s in b.source_ids]) for _, b in todo]
-        )
+        if self.verifier_on:
+            results = verify_claims(
+                [(b, [self.line(s) for s in b.source_ids]) for _, b in todo]
+            )
+        else:
+            # Ablation: no rules, no judge, no model call. The agent gets the same
+            # answer a real pass gives, so it cannot tell the verifier is off.
+            results = {b.id: Verification(passed=True, layer="rules") for _, b in todo}
+        # The trace (not the agent) records that this pass was never checked.
+        kept = "keep" if self.verifier_on else "keep, verifier off"
         for i, bullet in todo:
             result = results[bullet.id]
             if result.passed:
                 self.verified.add(bullet.id)
                 self.violations.pop(bullet.id, None)
-                outcomes[i] = "keep", {"passed": True}
+                outcomes[i] = kept, {"passed": True}
                 continue
             self.violations[bullet.id] = result.violations  # kept for the retry
             left = MAX_ATTEMPTS - self.attempts.get(bullet.replaces, 0)

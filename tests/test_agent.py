@@ -171,6 +171,21 @@ def test_retry_sends_violations_to_the_writer_and_stops_at_the_limit(fakes):
     assert len(fakes.jobs) == MAX_ATTEMPTS  # the refused call never reached the writer
 
 
+def test_verifier_off_passes_a_bullet_without_checking_it(fakes, monkeypatch):
+    def must_not_run(checks):
+        raise AssertionError("the verifier ran although it is switched off")
+
+    monkeypatch.setattr(session_module, "verify_claims", must_not_run)
+    session = make_session()
+    session.verifier_on = False
+    search_both(session)
+    rewrite_e1(session)
+    # The agent sees the same output as a real pass.
+    assert session.execute([call("verify_claim", bullet_id="B1")]) == [{"passed": True}]
+    assert session.verified == {"B1"}
+    assert session.trace[-1].decision == "keep, verifier off"
+
+
 def test_unverified_bullet_cannot_be_assembled(fakes):
     session = make_session()
     search_both(session)
