@@ -63,3 +63,18 @@ Each entry: the decision, the alternative, and why the alternative lost.
 - **Decision:** the reference coverage is measured by sending the original resume through the same coverage call as every output.
 - **Alternative:** define it as 100%, since "supportable" already means the resume has evidence.
 - **Why it lost:** "has evidence" and "clearly addresses" are two judgements. Measuring both the same way keeps the reference comparable.
+
+### D13. The judge moved to Claude Sonnet through the CLI (replaces the judge in D8)
+- **Decision:** S2 and coverage run on `claude -p --model sonnet` on the Pro plan: one call at a time, a pause after each, a clean stop on a usage limit.
+- **Alternative:** the Gemini Pro judge from the first plan.
+- **Why it lost:** it cost about as much as the runs themselves and the credit could not be topped up. Claude is also a different provider from every system tested, which removes the "judge favours its own family" threat. The cost: no temperature control, and a subscription alias instead of a pinned model.
+
+### D14. A0 and B3 dropped, one run per JD
+- **Decision:** run only B1, B2 and A1, once each, on all 40 JDs.
+- **Alternative:** keep all five systems on fewer JDs.
+- **Why it lost:** the headline question is A1 against B2, and its interval is over JDs. Fewer JDs would widen it; fewer systems only removes side questions. The losses (no verifier ablation, no stronger-model baseline, no consistency) are listed in EVAL_PLAN.md.
+
+### D15. The spend cap stops before it is reached
+- **Decision:** the runner stops starting cases when spend + (workers x the dearest case so far) would pass the cap. Cheap systems run first.
+- **Alternative:** stop when spend reaches the cap.
+- **Why it lost:** cases already running cannot be stopped, so that rule overshoots by up to one case per worker. A cap that can be passed is not a hard cap. Known gap: tokens of a try that crashed are not counted.

@@ -1,17 +1,19 @@
-"""Score every saved output. Run: uv run --env-file .env python -m eval.score
+"""Score every saved output. Run: uv run python -m eval.score
 
 Per output: the scored units, S1 flags and S2 verdicts for each, number
 fidelity, canary hits (adversarial JDs) and coverage (real JDs). Scores are
 saved one file per output, so scoring is resumable like the runs are.
+
+The judge is Claude on a flat subscription, so calls go one at a time with a
+pause in between, and scoring stops cleanly when the usage limit is hit.
 """
 
-import argparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from pydantic import BaseModel
 
 from eval import config, s1_rules, s2_judge, store
+from eval.claude_cli import UsageLimit
 from eval.data import Case, canary_hits, load_cases, load_resume
 from eval.gemini import Usage
 from eval.s1_rules import Flag
@@ -40,15 +42,16 @@ class ScoreRecord(BaseModel):
     numbers_total: int
     canary_hits: list[str] = []  # adversarial JDs only
     addressed: list[str] = []  # real JDs only: supportable must-have IDs addressed
-    judge_tokens_in: int = 0
+    judge_model: str = ""  # the exact model that judged, as the CLI reports it
+    judge_tokens_in: int = 0  # no money figure: the judge runs on a flat subscription
     judge_tokens_out: int = 0
-    judge_cost: float = 0.0
 
 
 class CoverageList(BaseModel):
     """The must-haves of one real JD. Made once; every system is scored against it."""
 
     case_id: str
+    judge_model: str
     must_haves: list[MustHave]
     original_addressed: list[str]  # the reference: what the untailored resume addresses
     tokens_in: int
@@ -69,6 +72,7 @@ def make_coverage_list(case: Case) -> CoverageList:
     used = [u for u in (usage, usage2) if u]
     return CoverageList(
         case_id=case.id,
+        judge_model=usage.version,
         must_haves=must_haves,
         original_addressed=addressed,
         tokens_in=sum(u.tokens_in for u in used),
@@ -101,34 +105,39 @@ def score_output(record: RunRecord, case: Case) -> ScoreRecord:
         coverage = CoverageList.model_validate_json(_coverage_path(case.id).read_text())
         score.addressed, usage = s2_judge.judge_coverage(coverage.must_haves, body)
         used += [usage] if usage else []
+    score.judge_model = used[0].version if used else ""
     score.judge_tokens_in = sum(u.tokens_in for u in used)
     score.judge_tokens_out = sum(u.tokens_out for u in used)
-    score.judge_cost = sum(config.cost(u.model, u.tokens_in, u.tokens_out) or 0 for u in used)
     return score
 
 
-def _run_and_save(jobs: dict[Path, tuple], work, workers: int) -> int:
-    """Run work(*args) for every job in threads and save each result. Returns failures."""
-    failed = 0
-    # Threads are fine here: these are plain model calls that keep no global state.
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(work, *args): target for target, args in jobs.items()}
-        for done, future in enumerate(as_completed(futures), start=1):
-            target = futures[future]
-            try:
-                store.save(target, future.result())
-            except Exception as err:  # noqa: BLE001  stays unsaved, so it is retried next time
-                failed += 1
-                print(f"[{done}/{len(jobs)}] FAILED {target.parent.name}/{target.stem}: {err}")
-                continue
-            print(f"[{done}/{len(jobs)}] scored {target.parent.name}/{target.stem}")
-    return failed
+def _run_and_save(jobs: dict[Path, tuple], work) -> int:
+    """Run work(*args) for every job, one at a time, and save each result.
+
+    Returns how many jobs are still unsaved. A job that fails stays unsaved, so
+    the next start tries it again.
+    """
+    for done, (target, args) in enumerate(jobs.items(), start=1):
+        name = f"{target.parent.name}/{target.stem}"
+        try:
+            store.save(target, work(*args))
+        except UsageLimit as err:
+            # Nothing more can run until the limit resets. Everything done so
+            # far is saved; starting the scorer again carries on from here.
+            print(f"USAGE LIMIT at {name}: {err}\nStopped. Run the same command again later.")
+            return len(jobs) - done + 1
+        except Exception as err:  # noqa: BLE001
+            print(f"[{done}/{len(jobs)}] FAILED {name}: {err}", flush=True)
+            continue
+        print(f"[{done}/{len(jobs)}] scored {name}", flush=True)
+    return sum(not target.exists() for target in jobs)
 
 
-def score_all(workers: int) -> int:
-    """Score every saved output that has no score yet. Returns how many failed."""
+def score_all() -> int:
+    """Score every saved output that has no score yet. Returns how many are left."""
     cases = {case.id: case for case in load_cases()}
-    outputs = sorted(config.RUNS_DIR.glob("*/*.json"))
+    # Only the systems of this eval: older folders (the A0 smoke runs) are ignored.
+    outputs = sorted(p for s in config.SYSTEMS for p in (config.RUNS_DIR / s).glob("*.json"))
     records = [RunRecord.model_validate_json(p.read_text()) for p in outputs]
 
     # Step 1: one must-have list per real JD, before any output is scored, so
@@ -139,9 +148,9 @@ def score_all(workers: int) -> int:
         for case_id in sorted(needed)
         if not _coverage_path(case_id).exists()
     }
-    failed = _run_and_save(lists, make_coverage_list, workers)
-    if failed:
-        return failed  # outputs cannot be scored without their list
+    left = _run_and_save(lists, make_coverage_list)
+    if left:
+        return left  # outputs cannot be scored without their list
 
     # Step 2: the outputs.
     todo = {
@@ -149,11 +158,9 @@ def score_all(workers: int) -> int:
         for r in records
         if not store.path(config.SCORES_DIR, r.system, r.case_id, r.run).exists()
     }
-    print(f"{len(todo)} outputs to score, {len(records) - len(todo)} already scored")
-    return _run_and_save(todo, score_output, workers)
+    print(f"{len(todo)} outputs to score, {len(records) - len(todo)} already scored", flush=True)
+    return _run_and_save(todo, score_output)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Score the saved eval outputs.")
-    parser.add_argument("--workers", type=int, default=config.WORKERS)
-    raise SystemExit(1 if score_all(parser.parse_args().workers) else 0)
+    raise SystemExit(1 if score_all() else 0)

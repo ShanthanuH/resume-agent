@@ -14,18 +14,21 @@ llm.CHEAP_MODEL = llm.JUDGE_MODEL = "gemini-3.5-flash-lite"  # parsing, search, 
 
 BASELINE_MODEL = llm.STRONG_MODEL  # B1 and B2: same model as the agent's rewriting
 BASELINE_TEMPERATURE = 0.0  # same temperature as the agent's rewriting step
-# S2 and coverage: the strongest Gemini model, and not one the agent uses.
-JUDGE_MODEL = "gemini-3.1-pro-preview"
-B3_MODEL = "sonnet"  # the Claude Code CLI alias; the exact name is read from its output
+# S2 and coverage: Claude Sonnet through the Claude Code CLI, on a flat
+# subscription. A different provider from every system under test. "sonnet" is
+# the CLI's alias; the exact model name is read from each call's output.
+JUDGE_MODEL = "sonnet"
 
-# US dollars per million tokens (input, output), paid tier, from
-# https://ai.google.dev/gemini-api/docs/pricing on 2026-10-12.
-PRICES = {**llm.PRICES, JUDGE_MODEL: (2.00, 12.00)}
+PRICES = llm.PRICES  # US dollars per million tokens (input, output), Gemini only
 
 # --- runs ----------------------------------------------------------------------
-SYSTEMS = ["B1", "B2", "A0", "A1"]  # B3 runs separately, last and one at a time
-RUNS = {"B1": 3, "B2": 3, "A0": 3, "A1": 3, "B3": 1}  # runs per (system, JD)
-WORKERS = 4  # cases run at the same time
+# A0 (verifier off) and B3 (careful prompt on Claude) were dropped for budget.
+# The cheap systems come first, so a spend cap can only ever cut A1 cases.
+SYSTEMS = ["B1", "B2", "A1"]
+RUNS = {"B1": 1, "B2": 1, "A0": 1, "A1": 1}  # runs per (system, JD)
+WORKERS = 3  # cases run at the same time
+INR_PER_USD = 88  # assumed exchange rate, used only to turn the cap into dollars
+SPEND_CAP_USD = 350 / INR_PER_USD  # hard cap on Gemini spend for the full run
 CASE_TRIES = 3  # times one case is started before it is reported as failed
 RETRY_WAIT_S = 30  # wait before try 2; doubled before try 3
 

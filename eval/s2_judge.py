@@ -1,4 +1,4 @@
-"""S2, the LLM judge, and the coverage judge. Both run on config.JUDGE_MODEL.
+"""S2, the LLM judge, and the coverage judge. Both run on Claude (config.JUDGE_MODEL).
 
 The judge never sees which system wrote a resume. For S2 it sees only the
 original resume and the scored units (spec A5). The prompts here are written
@@ -9,7 +9,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from eval import config, gemini
+from eval import claude_cli, config
 from eval.gemini import Usage
 from eval.units import Unit
 
@@ -71,7 +71,7 @@ def judge_units(units: list[Unit], original_text: str) -> tuple[list[Verdict], U
         return [], None  # nothing changed: nothing to judge, no call, no cost
     # IDs are made here in code (L1, L2, ...), never by the model.
     lines = "\n".join(f"L{n} | {u.kind} | {u.text}" for n, u in enumerate(units, start=1))
-    answer, usage = gemini.ask(
+    answer, usage = claude_cli.ask(
         model=config.JUDGE_MODEL,
         system=f"{S2_SYSTEM}\n\n{DATA_NOTE}",
         user=f"<original_resume>\n{original_text}\n</original_resume>\n<lines>\n{lines}\n</lines>",
@@ -117,7 +117,7 @@ MUST_HAVE_SYSTEM = """You read a job description and a candidate's resume.
 
 
 def extract_must_haves(jd_text: str, original_text: str) -> tuple[list[MustHave], Usage]:
-    answer, usage = gemini.ask(
+    answer, usage = claude_cli.ask(
         model=config.JUDGE_MODEL,
         system=f"{MUST_HAVE_SYSTEM}\n\n{DATA_NOTE}",
         user=(
@@ -156,7 +156,7 @@ def judge_coverage(must_haves: list[MustHave], resume_text: str) -> tuple[list[s
     if not targets:
         return [], None
     requirements = "\n".join(f"{m.id} | {m.text}" for m in targets)
-    answer, usage = gemini.ask(
+    answer, usage = claude_cli.ask(
         model=config.JUDGE_MODEL,
         system=f"{COVERAGE_SYSTEM}\n\n{DATA_NOTE}",
         user=(
