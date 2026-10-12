@@ -9,3 +9,4 @@ data/
 *.pdf
 # except the example page's PDF, which is a fictional resume
 !web/public/example.pdf
+.vercel
