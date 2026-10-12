@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { startRun } from "@/lib/api";
 import {
@@ -33,6 +34,7 @@ export function TryFlow() {
   const [jdText, setJdText] = useState("");
   const [token, setToken] = useState("");
   const [error, setError] = useState("");
+  const [limitHit, setLimitHit] = useState(false); // adds a link to the example
   const [status, setStatus] = useState("");
   const [steps, setSteps] = useState<Step[]>([]);
   const [result, setResult] = useState<Result | null>(null);
@@ -72,6 +74,7 @@ export function TryFlow() {
     event.preventDefault(); // stop the browser's own form post and page reload
     const found = problem();
     setError(found);
+    setLimitHit(false);
     if (found) return;
 
     const form = new FormData();
@@ -97,8 +100,9 @@ export function TryFlow() {
           setStage("review");
           window.scrollTo({ top: 0 });
         },
-        onFailed: (message) => {
+        onFailed: (message, limit) => {
           setError(message);
+          setLimitHit(Boolean(limit));
           setStage("input");
         },
       },
@@ -226,7 +230,17 @@ export function TryFlow() {
       {/* role="alert" makes screen readers read the error as soon as it shows. */}
       {error && (
         <p role="alert" className="mt-4 rounded-md border border-reject bg-reject-soft p-3 text-sm text-reject">
-          {error}
+          {limitHit ? (
+            // The second sentence of the limit message is the link itself.
+            <>
+              Demo limit reached for today.{" "}
+              <Link href="/example" className="font-medium underline underline-offset-4">
+                See the full example.
+              </Link>
+            </>
+          ) : (
+            error
+          )}
         </p>
       )}
 

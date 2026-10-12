@@ -38,7 +38,7 @@ const FAQ = [
   },
   {
     q: "Is it free?",
-    a: "Yes. To keep costs under control there is a limit of a few runs per person per day, and a daily limit for everyone together.",
+    a: "Yes. It is a demo, so only a few live runs are available each day for everyone together. The example page shows a full run at any time.",
   },
 ];
 
@@ -83,20 +83,23 @@ export default function LandingPage() {
             asks for and you do not have is listed plainly, not made up.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/try"
-              className="flex min-h-12 items-center justify-center rounded-md bg-accent px-6 font-medium text-white hover:bg-ink"
-            >
-              Try it
-            </Link>
+            {/* The example comes first: it always works and costs nothing to show. */}
             <Link
               href="/example"
+              className="flex min-h-12 items-center justify-center rounded-md bg-accent px-6 font-medium text-white hover:bg-ink"
+            >
+              See the full example
+            </Link>
+            <Link
+              href="/try"
               className="flex min-h-12 items-center justify-center rounded-md border border-ink px-6 font-medium hover:bg-ink hover:text-paper"
             >
-              See an example
+              Try it on your resume
             </Link>
           </div>
-          <p className="mt-4 text-sm text-muted">Free. No account. Your resume is not stored.</p>
+          <p className="mt-4 text-sm text-muted">
+            A free demo with a few live runs a day. No account. Your resume is not stored.
+          </p>
         </div>
         <Specimen />
       </section>

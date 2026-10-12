@@ -5,7 +5,8 @@ type Handlers = {
   onStatus: (message: string) => void;
   onStep: (step: Step) => void;
   onDone: (result: Result) => void;
-  onFailed: (message: string) => void;
+  // limit is true when the daily demo limit stopped the run.
+  onFailed: (message: string, limit?: boolean) => void;
 };
 
 const OFFLINE = "Could not reach the server. Check your connection and try again.";
@@ -29,7 +30,8 @@ export async function startRun(form: FormData, handlers: Handlers, signal: Abort
   if (!response.ok || !response.body) {
     // Validation and limit errors come back as plain JSON with a message.
     const body = await response.json().catch(() => null);
-    handlers.onFailed(body?.message ?? "Something went wrong. Please try again.");
+    // 429 is the HTTP status for "too many requests": the demo limit.
+    handlers.onFailed(body?.message ?? "Something went wrong. Please try again.", response.status === 429);
     return;
   }
   const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();

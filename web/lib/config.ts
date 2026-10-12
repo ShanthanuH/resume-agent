@@ -1,5 +1,6 @@
 // Site-wide settings. The product name lives here only, so renaming is one line.
-export const SITE_NAME = "Traceline";
+export const SITE_NAME = "HonestCV";
+export const SITE_TITLE = "HonestCV: free resume tailor that never invents experience";
 export const PROMISE =
   "Tailor your resume to any job. Every claim traces back to your original. Nothing invented.";
 

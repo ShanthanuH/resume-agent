@@ -12,7 +12,9 @@ from datetime import UTC, datetime
 
 import httpx
 
-DAILY_RUN_CAP = int(os.environ.get("DAILY_RUN_CAP", "100"))  # all visitors together
+# This is a demo, not a public tool: three live runs a day for the whole site
+# keeps the model bill near zero. The example page carries everyone else.
+DAILY_RUN_CAP = int(os.environ.get("DAILY_RUN_CAP", "3"))  # all visitors together
 RUNS_PER_IP = int(os.environ.get("RUNS_PER_IP", "3"))  # one visitor, per day
 # How many proxies sit between the internet and this app. See client_ip.
 TRUSTED_PROXY_HOPS = int(os.environ.get("TRUSTED_PROXY_HOPS", "1"))
@@ -30,6 +32,9 @@ APP_ENV = os.environ.get("APP_ENV", "production")
 # A random value made at start-up and mixed into every IP hash. The counts then
 # hold no IP addresses, and a hash cannot be turned back into one.
 _SALT = secrets.token_bytes(16)
+
+
+LIMIT_MESSAGE = "Demo limit reached for today. See the full example."
 
 
 class LimitReached(Exception):
@@ -66,16 +71,9 @@ class RunCounter:
         """Count one run for this visitor, or raise LimitReached."""
         self._roll_over()
         key = hashlib.sha256(_SALT + ip.encode()).hexdigest()
-        if self.total >= DAILY_RUN_CAP:
-            raise LimitReached(
-                "Today's free runs are used up. The limit resets at midnight UTC. "
-                "The example page shows a full run in the meantime."
-            )
-        if self.per_ip.get(key, 0) >= RUNS_PER_IP:
-            raise LimitReached(
-                f"You have used your {RUNS_PER_IP} runs for today. "
-                "The limit resets at midnight UTC."
-            )
+        # One message for both limits. The browser adds a link to the example page.
+        if self.total >= DAILY_RUN_CAP or self.per_ip.get(key, 0) >= RUNS_PER_IP:
+            raise LimitReached(LIMIT_MESSAGE)
         self.total += 1
         self.per_ip[key] = self.per_ip.get(key, 0) + 1
 

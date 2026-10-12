@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
 import Link from "next/link";
-import { GITHUB_URL, PROMISE, SITE_NAME, SITE_URL } from "@/lib/config";
+import { GITHUB_URL, PROMISE, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/config";
 import "./globals.css";
 
 // next/font downloads these at build time and serves them from our own domain,
@@ -12,10 +12,10 @@ const mono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], w
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL), // turns relative image paths into full URLs
-  title: { default: `${SITE_NAME}: resume tailoring that cites itself`, template: `%s | ${SITE_NAME}` },
+  title: { default: SITE_TITLE, template: `%s | ${SITE_NAME}` },
   description: PROMISE,
-  openGraph: { title: SITE_NAME, description: PROMISE, type: "website", siteName: SITE_NAME },
-  twitter: { card: "summary_large_image", title: SITE_NAME, description: PROMISE },
+  openGraph: { title: SITE_TITLE, description: PROMISE, type: "website", siteName: SITE_NAME },
+  twitter: { card: "summary_large_image", title: SITE_TITLE, description: PROMISE },
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#faf7f0" };
@@ -32,11 +32,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <sup className="ml-0.5 font-mono text-[0.6em] font-medium text-accent">[1]</sup>
             </Link>
             <div className="flex items-center gap-4 text-sm">
-              <Link href="/example" className="py-2 underline-offset-4 hover:underline">
-                Example
-              </Link>
-              <Link href="/try" className="rounded-md bg-ink px-3 py-2 font-medium text-paper hover:bg-accent">
+              {/* The example is the main path: live runs are limited to a few a day. */}
+              <Link href="/try" className="py-2 underline-offset-4 hover:underline">
                 Try it
+              </Link>
+              <Link href="/example" className="rounded-md bg-ink px-3 py-2 font-medium text-paper hover:bg-accent">
+                Example
               </Link>
             </div>
           </nav>

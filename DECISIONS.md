@@ -68,5 +68,9 @@ Each entry: the decision, the alternative, and why the alternative lost.
 - **Alternative:** hand-written sample data.
 - **Why it lost:** the page says "real and unedited", so it must be. The same JSON also drives `REPLAY_FILE`, which replays it through the API for free frontend testing.
 
+### Demo, not a public tool: 3 live runs a day for the whole site
+- **Alternative:** 100 runs a day with 3 per IP, sized for ad traffic.
+- **Why it lost:** budget. At about $0.05 a run, a cap of 3 bounds the model bill at roughly $5 a month in the worst case. The example page is now the main path on the landing page, and the limit message links to it. The per-IP limit stays in the code but cannot bind while both are 3.
+
 ### Cut for tonight
 Dark mode, DOCX upload, the "Questions for you" panel, the Playwright test, analytics events and the "report a false claim" button. `ask_user` answers with nothing, as in the eval.

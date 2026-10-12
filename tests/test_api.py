@@ -101,10 +101,10 @@ def test_per_ip_limit_and_global_cap(monkeypatch):
     counter = limits.RunCounter()
     counter.claim("a")
     counter.claim("a")
-    with pytest.raises(limits.LimitReached, match="your 2 runs"):
+    with pytest.raises(limits.LimitReached, match="Demo limit reached"):
         counter.claim("a")
     counter.claim("b")
-    with pytest.raises(limits.LimitReached, match="Today's free runs"):
+    with pytest.raises(limits.LimitReached, match="Demo limit reached"):
         counter.claim("c")  # a new visitor, but the global cap is reached
     counter.refund("b")
     counter.claim("c")  # the refund freed one run
