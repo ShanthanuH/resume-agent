@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* The whole palette. One accent (evidence green) plus a rust for rejections.
+   Change a colour here and every screen follows. */
+@theme inline {
+  --color-paper: #faf7f0; /* page background: warm, like resume paper */
+  --color-sheet: #ffffff; /* cards and the resume preview */
+  --color-ink: #1b1a17; /* main text */
+  --color-muted: #6b675e; /* secondary text */
+  --color-rule: #ddd7c9; /* borders and dividers */
+  --color-accent: #0b6b4f; /* evidence green: links, citations, verified */
+  --color-accent-soft: #e2f0ea; /* tint behind added words and citation chips */
+  --color-reject: #a8321c; /* verifier rejections and errors */
+  --color-reject-soft: #f7e6e1;
+  --font-sans: var(--font-plex-sans);
+  --font-serif: var(--font-newsreader);
+  --font-mono: var(--font-plex-mono);
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* A visible focus ring everywhere, for keyboard users. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* New trace steps slide in, unless the visitor asked for less motion. */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.step-in {
+  animation: step-in 0.25s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .step-in {
+    animation: none;
+  }
+}

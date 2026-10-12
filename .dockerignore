@@ -1,0 +1,9 @@
+# Keep secrets, personal data and the frontend out of the backend image.
+.env
+.venv
+.git
+data
+eval
+web
+tests
+*.pdf

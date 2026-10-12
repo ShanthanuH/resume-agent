@@ -1,0 +1,550 @@
+{
+ "steps": [
+  {
+   "n": 1,
+   "tool": "parse_resume",
+   "kind": "info",
+   "title": "Read your resume: 13 evidence lines",
+   "detail": "Each line is copied word for word. Nothing else can be cited.",
+   "ms": 3220
+  },
+  {
+   "n": 2,
+   "tool": "parse_jd",
+   "kind": "info",
+   "title": "Read the job description: 14 requirements",
+   "detail": "",
+   "ms": 1931
+  },
+  {
+   "n": 3,
+   "tool": "agent",
+   "kind": "info",
+   "title": "Agent turn 1: planned 14 tool calls",
+   "detail": "9 \u00d7 search_evidence, 5 \u00d7 reject_requirement",
+   "ms": 10589
+  },
+  {
+   "n": 4,
+   "tool": "search_evidence",
+   "kind": "ok",
+   "title": "Found evidence for \u201cBackend engineering experience\u201d",
+   "detail": "Resume lines E2, E3, E4",
+   "ms": 188
+  },
+  {
+   "n": 5,
+   "tool": "search_evidence",
+   "kind": "ok",
+   "title": "Found evidence for \u201cPython\u201d",
+   "detail": "Resume lines E2, E12",
+   "ms": 188
+  },
+  {
+   "n": 6,
+   "tool": "search_evidence",
+   "kind": "ok",
+   "title": "Found evidence for \u201cFastAPI\u201d",
+   "detail": "Resume lines E2, E13",
+   "ms": 188
+  },
+  {
+   "n": 7,
+   "tool": "search_evidence",
+   "kind": "ok",
+   "title": "Found evidence for \u201cSQL\u201d",
+   "detail": "Resume lines E12",
+   "ms": 188
+  },
+  {
+   "n": 8,
+   "tool": "search_evidence",
+   "kind": "ok",
+   "title": "Found evidence for \u201cPostgreSQL query tuning\u201d",
+   "detail": "Resume lines E3",
+   "ms": 188
+  },
+  {
+   "n": 9,
+   "tool": "search_evidence",
+   "kind": "ok",
+   "title": "Found evidence for \u201cRedis\u201d",
+   "detail": "Resume lines E3, E13",
+   "ms": 188
+  },
+  {
+   "n": 10,
+   "tool": "search_evidence",
+   "kind": "ok",
+   "title": "Found evidence for \u201cWriting automated tests\u201d",
+   "detail": "Resume lines E5, E13",
+   "ms": 188
+  },
+  {
+   "n": 11,
+   "tool": "search_evidence",
+   "kind": "gap",
+   "title": "No evidence for \u201cExperience in payments or fintech\u201d",
+   "detail": "Goes to the gap report. Nothing is written for it.",
+   "ms": 188
+  },
+  {
+   "n": 12,
+   "tool": "search_evidence",
+   "kind": "ok",
+   "title": "Found evidence for \u201cMentoring junior engineers\u201d",
+   "detail": "Resume lines E6",
+   "ms": 188
+  },
+  {
+   "n": 13,
+   "tool": "reject_requirement",
+   "kind": "gap",
+   "title": "Marked as a gap: \u201cDjango\u201d",
+   "detail": "Django is not present in the candidate's resume.",
+   "ms": 0
+  },
+  {
+   "n": 14,
+   "tool": "reject_requirement",
+   "kind": "gap",
+   "title": "Marked as a gap: \u201cKubernetes\u201d",
+   "detail": "Kubernetes is not mentioned anywhere in the resume.",
+   "ms": 0
+  },
+  {
+   "n": 15,
+   "tool": "reject_requirement",
+   "kind": "gap",
+   "title": "Marked as a gap: \u201cTerraform\u201d",
+   "detail": "Terraform is not mentioned anywhere in the resume.",
+   "ms": 0
+  },
+  {
+   "n": 16,
+   "tool": "reject_requirement",
+   "kind": "gap",
+   "title": "Marked as a gap: \u201cKafka\u201d",
+   "detail": "Kafka is not mentioned anywhere in the resume.",
+   "ms": 0
+  },
+  {
+   "n": 17,
+   "tool": "reject_requirement",
+   "kind": "gap",
+   "title": "Marked as a gap: \u201cGo\u201d",
+   "detail": "Go language experience is not present in the resume.",
+   "ms": 0
+  },
+  {
+   "n": 18,
+   "tool": "agent",
+   "kind": "info",
+   "title": "Agent turn 2: planned 7 tool calls",
+   "detail": "7 \u00d7 rewrite_bullet",
+   "ms": 27954
+  },
+  {
+   "n": 19,
+   "tool": "rewrite_bullet",
+   "kind": "ok",
+   "title": "Kept line E2 exactly as you wrote it",
+   "detail": "It already fits the job. Nothing to verify.",
+   "ms": 1258
+  },
+  {
+   "n": 20,
+   "tool": "rewrite_bullet",
+   "kind": "info",
+   "title": "Rewrote line E3 as B2",
+   "detail": "Tuned slow PostgreSQL queries and added Redis caching, cutting median API response time from 420 ms to 150 ms",
+   "ms": 1258
+  },
+  {
+   "n": 21,
+   "tool": "rewrite_bullet",
+   "kind": "ok",
+   "title": "Kept line E4 exactly as you wrote it",
+   "detail": "It already fits the job. Nothing to verify.",
+   "ms": 1258
+  },
+  {
+   "n": 22,
+   "tool": "rewrite_bullet",
+   "kind": "info",
+   "title": "Rewrote line E5 as B4",
+   "detail": "Wrote automated unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+   "ms": 1258
+  },
+  {
+   "n": 23,
+   "tool": "rewrite_bullet",
+   "kind": "ok",
+   "title": "Kept line E6 exactly as you wrote it",
+   "detail": "It already fits the job. Nothing to verify.",
+   "ms": 1258
+  },
+  {
+   "n": 24,
+   "tool": "rewrite_bullet",
+   "kind": "ok",
+   "title": "Kept line E12 exactly as you wrote it",
+   "detail": "It already fits the job. Nothing to verify.",
+   "ms": 1258
+  },
+  {
+   "n": 25,
+   "tool": "rewrite_bullet",
+   "kind": "ok",
+   "title": "Kept line E13 exactly as you wrote it",
+   "detail": "It already fits the job. Nothing to verify.",
+   "ms": 1258
+  },
+  {
+   "n": 26,
+   "tool": "agent",
+   "kind": "info",
+   "title": "Agent turn 3: planned 2 tool calls",
+   "detail": "2 \u00d7 verify_claim",
+   "ms": 3893
+  },
+  {
+   "n": 27,
+   "tool": "verify_claim",
+   "kind": "ok",
+   "title": "Verifier passed B2",
+   "detail": "Every claim in it is in the lines it cites.",
+   "ms": 547
+  },
+  {
+   "n": 28,
+   "tool": "verify_claim",
+   "kind": "ok",
+   "title": "Verifier passed B4",
+   "detail": "Every claim in it is in the lines it cites.",
+   "ms": 547
+  },
+  {
+   "n": 29,
+   "tool": "agent",
+   "kind": "info",
+   "title": "Agent turn 4: planned 1 tool calls",
+   "detail": "1 \u00d7 assemble_resume",
+   "ms": 4307
+  },
+  {
+   "n": 30,
+   "tool": "assemble_resume",
+   "kind": "ok",
+   "title": "Assembled the resume with 2 verified bullets",
+   "detail": "",
+   "ms": 0
+  }
+ ],
+ "result": {
+  "header": [
+   "Meera Kulkarni",
+   "Pune, India | +91 98200 55501 | meera.kulkarni@example.com | linkedin.com/in/meera-kulkarni-example | github.com/meera-k-example"
+  ],
+  "links": [],
+  "sections": [
+   {
+    "name": "Education",
+    "entries": [
+     {
+      "title": "B.Tech in Computer Engineering",
+      "organization": "Vishwakarma Institute of Technology, Pune",
+      "dates": "2016 - 2020",
+      "lines": [
+       {
+        "evidence_id": "E1",
+        "original": "CGPA: 8.4/10",
+        "bullet_id": null
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name": "Experience",
+    "entries": [
+     {
+      "title": "Software Engineer",
+      "organization": "Lakeshore Logistics",
+      "dates": "Jul 2022 - Present",
+      "lines": [
+       {
+        "evidence_id": "E2",
+        "original": "Built a shipment tracking API in Python and FastAPI that serves 1.2 million requests a day",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E3",
+        "original": "Cut median API response time from 420 ms to 150 ms by adding Redis caching and fixing slow PostgreSQL queries",
+        "bullet_id": "B2"
+       },
+       {
+        "evidence_id": "E4",
+        "original": "Wrote a nightly job that reconciles 300,000 delivery records and flags mismatches for the operations team",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E5",
+        "original": "Added unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+        "bullet_id": "B4"
+       },
+       {
+        "evidence_id": "E6",
+        "original": "Reviewed pull requests for a team of 5 engineers and wrote the team's API style guide",
+        "bullet_id": null
+       }
+      ]
+     },
+     {
+      "title": "Associate Software Engineer",
+      "organization": "Brightpath Systems",
+      "dates": "Aug 2020 - Jun 2022",
+      "lines": [
+       {
+        "evidence_id": "E7",
+        "original": "Developed internal dashboards in React and TypeScript used by 40 support agents",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E8",
+        "original": "Moved 12 cron jobs from a single server to Docker containers deployed through GitHub Actions",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E9",
+        "original": "Fixed a data export bug that had caused duplicate invoices for 3 enterprise customers",
+        "bullet_id": null
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name": "Projects",
+    "entries": [
+     {
+      "title": "Bus Arrival Predictor",
+      "organization": "",
+      "dates": "",
+      "lines": [
+       {
+        "evidence_id": "E10",
+        "original": "Trained a gradient boosting model on 6 months of public GPS data to predict bus arrival times within 2 minutes on average",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E11",
+        "original": "Served predictions through a small Flask app and wrote a README with setup steps",
+        "bullet_id": null
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name": "Technical Skills",
+    "entries": [
+     {
+      "title": "",
+      "organization": "",
+      "dates": "",
+      "lines": [
+       {
+        "evidence_id": "E12",
+        "original": "Languages: Python, TypeScript, SQL, Java",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E13",
+        "original": "Frameworks and tools: FastAPI, Flask, React, Docker, GitHub Actions, Redis, PostgreSQL, pytest",
+        "bullet_id": null
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "bullets": [
+   {
+    "id": "B2",
+    "text": "Tuned slow PostgreSQL queries and added Redis caching, cutting median API response time from 420 ms to 150 ms",
+    "replaces": "E3",
+    "source_ids": [
+     "E3"
+    ],
+    "requirement_ids": [
+     "R1",
+     "R6",
+     "R7"
+    ],
+    "attempts": 1,
+    "rejections": []
+   },
+   {
+    "id": "B4",
+    "text": "Wrote automated unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+    "replaces": "E5",
+    "source_ids": [
+     "E5"
+    ],
+    "requirement_ids": [
+     "R11"
+    ],
+    "attempts": 1,
+    "rejections": []
+   }
+  ],
+  "evidence": {
+   "E1": "CGPA: 8.4/10",
+   "E2": "Built a shipment tracking API in Python and FastAPI that serves 1.2 million requests a day",
+   "E3": "Cut median API response time from 420 ms to 150 ms by adding Redis caching and fixing slow PostgreSQL queries",
+   "E4": "Wrote a nightly job that reconciles 300,000 delivery records and flags mismatches for the operations team",
+   "E5": "Added unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+   "E6": "Reviewed pull requests for a team of 5 engineers and wrote the team's API style guide",
+   "E7": "Developed internal dashboards in React and TypeScript used by 40 support agents",
+   "E8": "Moved 12 cron jobs from a single server to Docker containers deployed through GitHub Actions",
+   "E9": "Fixed a data export bug that had caused duplicate invoices for 3 enterprise customers",
+   "E10": "Trained a gradient boosting model on 6 months of public GPS data to predict bus arrival times within 2 minutes on average",
+   "E11": "Served predictions through a small Flask app and wrote a README with setup steps",
+   "E12": "Languages: Python, TypeScript, SQL, Java",
+   "E13": "Frameworks and tools: FastAPI, Flask, React, Docker, GitHub Actions, Redis, PostgreSQL, pytest"
+  },
+  "requirements": [
+   {
+    "id": "R1",
+    "text": "Backend engineering experience",
+    "priority": "must_have",
+    "bullet_ids": [
+     "B2"
+    ],
+    "kept_line_ids": [
+     "E2",
+     "E4"
+    ]
+   },
+   {
+    "id": "R2",
+    "text": "Python",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": [
+     "E2",
+     "E12"
+    ]
+   },
+   {
+    "id": "R3",
+    "text": "FastAPI",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": [
+     "E2",
+     "E13"
+    ]
+   },
+   {
+    "id": "R4",
+    "text": "Django",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R5",
+    "text": "SQL",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": [
+     "E12"
+    ]
+   },
+   {
+    "id": "R6",
+    "text": "PostgreSQL query tuning",
+    "priority": "must_have",
+    "bullet_ids": [
+     "B2"
+    ],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R7",
+    "text": "Redis",
+    "priority": "must_have",
+    "bullet_ids": [
+     "B2"
+    ],
+    "kept_line_ids": [
+     "E13"
+    ]
+   },
+   {
+    "id": "R8",
+    "text": "Kubernetes",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R9",
+    "text": "Terraform",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R10",
+    "text": "Kafka",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R11",
+    "text": "Writing automated tests",
+    "priority": "must_have",
+    "bullet_ids": [
+     "B4"
+    ],
+    "kept_line_ids": [
+     "E13"
+    ]
+   },
+   {
+    "id": "R12",
+    "text": "Experience in payments or fintech",
+    "priority": "nice_to_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R13",
+    "text": "Go",
+    "priority": "nice_to_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R14",
+    "text": "Mentoring junior engineers",
+    "priority": "nice_to_have",
+    "bullet_ids": [],
+    "kept_line_ids": [
+     "E6"
+    ]
+   }
+  ],
+  "stats": {
+   "seconds": 63.5,
+   "steps": 30,
+   "tokens_in": 25403,
+   "tokens_out": 8331,
+   "cost_usd": 0.04745
+  }
+ }
+}
