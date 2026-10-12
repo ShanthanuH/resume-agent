@@ -76,7 +76,7 @@ export default function LandingPage() {
       <section className="grid items-center gap-10 py-12 sm:py-20 lg:grid-cols-2">
         <div>
           <h1 className="font-serif text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-            Tailor your resume to any job. Nothing invented.
+            Tailor your resume to any job. Built to never invent experience.
           </h1>
           <p className="mt-5 text-lg text-muted">
             Every rewritten line points back to the line on your resume it came from. What the job

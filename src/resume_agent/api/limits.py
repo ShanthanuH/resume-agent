@@ -16,7 +16,8 @@ import httpx
 # This is a demo, not a public tool: three live runs a day for the whole site
 # keeps the model bill near zero. The example page carries everyone else.
 DAILY_RUN_CAP = int(os.environ.get("DAILY_RUN_CAP", "3"))  # all visitors together
-RUNS_PER_IP = int(os.environ.get("RUNS_PER_IP", "3"))  # one visitor, per day
+# One run per visitor, so a single person cannot use up the whole day.
+RUNS_PER_IP = int(os.environ.get("RUNS_PER_IP", "1"))
 # How many proxies sit between the internet and this app. See client_ip.
 TRUSTED_PROXY_HOPS = int(os.environ.get("TRUSTED_PROXY_HOPS", "1"))
 

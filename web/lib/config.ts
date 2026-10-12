@@ -1,8 +1,9 @@
 // Site-wide settings. The product name lives here only, so renaming is one line.
-export const SITE_NAME = "HonestCV";
-export const SITE_TITLE = "HonestCV: free resume tailor that never invents experience";
+export const SITE_NAME = "SwooshCV";
+// "Built to", not "never": the claim stays a design goal until the eval measures it.
+export const SITE_TITLE = "SwooshCV: resume tailoring built to never invent experience";
 export const PROMISE =
-  "Tailor your resume to any job. Every claim traces back to your original. Nothing invented.";
+  "Tailor your resume to any job. Every claim traces back to your original. Built to never invent experience.";
 
 // NEXT_PUBLIC_ variables are baked into the browser bundle at build time.
 // Where the FastAPI backend lives. On Vercel it is served from this same
