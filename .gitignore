@@ -7,3 +7,8 @@ __pycache__/
 data/
 # resume PDFs are personal data, never in git
 *.pdf
+# eval outputs hold resume text: runs, scores, judge caches and the labelling sheet
+eval/runs/
+eval/scores/
+eval/cache/
+eval/labels/
