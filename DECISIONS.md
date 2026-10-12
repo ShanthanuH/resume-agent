@@ -78,3 +78,18 @@ Each entry: the decision, the alternative, and why the alternative lost.
 - **Decision:** the runner stops starting cases when spend + (workers x the dearest case so far) would pass the cap. Cheap systems run first.
 - **Alternative:** stop when spend reaches the cap.
 - **Why it lost:** cases already running cannot be stopped, so that rule overshoots by up to one case per worker. A cap that can be passed is not a hard cap. Known gap: tokens of a try that crashed are not counted.
+
+### D16. The labelling sheet deals rows evenly over system x resume
+- **Decision:** 200 rows, dealt one at a time from each of the 9 (system, resume) cells, then shuffled with a fixed seed. System names live only in `key.csv`. `label.html` shows the right original resume beside each row.
+- **Alternative:** a plain random sample of all changed lines.
+- **Why it lost:** B1 changes about ten times more lines than B2 or A1, so a plain sample would be nearly all B1 and judge-human agreement per system could not be measured.
+
+### D17. Systems are compared only on JDs all of them finished
+- **Decision:** every table uses the JDs that B1, B2 and A1 all finished. The adversarial table is shown twice: on the 4 shared JDs and on everything each system finished.
+- **Alternative:** score each system on whatever it finished.
+- **Why it lost:** A1 is missing 6 adversarial JDs (the credit ran out). Comparing 4 JDs against 10 would mix "which system" with "which JDs".
+
+### D18. One claim per unsupported line, typed by the judge first
+- **Decision:** metric 3 counts one claim per unsupported line. Its type is the judge's when S2 flagged it, otherwise the first S1 flag's.
+- **Alternative:** count every S1 flag and the S2 verdict as separate claims.
+- **Why it lost:** S1 and S2 often flag the same words, so that would count one invented fact twice.

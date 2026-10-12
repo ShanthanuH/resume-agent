@@ -52,7 +52,10 @@ def _call(model: str, system: str, user: str, schema: type[BaseModel]) -> dict:
     if _LIMIT.search(done.stdout + done.stderr) and (done.returncode or '"is_error":true' in done.stdout):
         raise UsageLimit((done.stdout or done.stderr)[-300:])
     if done.returncode:
-        raise RuntimeError(f"claude exited with {done.returncode}: {done.stderr[-300:]}")
+        # The CLI often puts its error in the JSON on stdout, not on stderr.
+        raise RuntimeError(
+            f"claude exited with {done.returncode}: {done.stderr[-300:]} {done.stdout[-600:]}"
+        )
     result = json.loads(done.stdout)
     if result.get("is_error"):
         raise RuntimeError(f"claude returned an error: {str(result.get('result'))[:300]}")

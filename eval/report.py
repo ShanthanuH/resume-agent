@@ -223,9 +223,9 @@ def main() -> None:
     real = {s: {i: r for i, r in real[s].items() if i in shared} for s in config.SYSTEMS}
     out: list[str] = ["# Results (Rung 4)\n"]
     out.append(
-        f"Agent frozen at tag `eval-v1`. {len(shared)} real JDs and "
-        f"{min(len(adversarial[s]) for s in config.SYSTEMS)} adversarial JDs finished by all three systems, "
-        "one run each. Judge: Claude Sonnet "
+        f"Agent frozen at tag `eval-v1`. {len(shared)} real JDs finished by all three systems, one run "
+        f"each. Adversarial JDs finished: {', '.join(f'{s} {len(adversarial[s])}' for s in config.SYSTEMS)} of 10 "
+        "(the Gemini credit ran out during the agent's adversarial runs). Judge: Claude Sonnet "
         f"(`{next(iter(real['B1'].values()))['score'].judge_model}`). Plan and definitions: `EVAL_PLAN.md`. "
         "Intervals are 95% bootstrap intervals over JDs.\n"
     )
@@ -285,14 +285,25 @@ def main() -> None:
 
     out.append("## 6. Adversarial JDs (all on R1)\n")
     passed = lambda r: not r["score"].canary_hits and r["bad"] == 0  # noqa: E731
-    body = []
-    for attack in ATTACKS + ["all"]:
-        cells = []
-        for s in config.SYSTEMS:
-            group = [r for r in adversarial[s].values() if attack in (r["case"].attack, "all")]
-            cells.append(f"{sum(passed(r) for r in group)} of {len(group)}")
-        body.append([attack] + cells)
-    out.append(table(["Attack (passes)"] + [NAMES[s] for s in config.SYSTEMS], body))
+    # The agent did not finish every adversarial JD (see EVAL_PLAN.md, "Changes
+    # after approval"). The fair comparison is on the JDs all systems finished.
+    shared_bait = set.intersection(*(set(adversarial[s]) for s in config.SYSTEMS))
+    for title, keep in [
+        (f"On the {len(shared_bait)} JDs that all three systems finished", lambda i: i in shared_bait),
+        ("On every JD a system finished", lambda i: True),
+    ]:
+        body = []
+        for attack in ATTACKS + ["all"]:
+            cells = []
+            for s in config.SYSTEMS:
+                group = [
+                    r for i, r in adversarial[s].items()
+                    if keep(i) and attack in (r["case"].attack, "all")
+                ]
+                cells.append(f"{sum(passed(r) for r in group)} of {len(group)}")
+            body.append([attack] + cells)
+        out.append(f"{title}:\n")
+        out.append(table(["Attack (passes)"] + [NAMES[s] for s in config.SYSTEMS], body))
     out.append(
         table(
             ["Why runs failed"] + [NAMES[s] for s in config.SYSTEMS],
