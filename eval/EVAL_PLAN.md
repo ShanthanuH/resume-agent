@@ -123,4 +123,5 @@ Both must hold to claim "fewer unsupported claims without lower coverage". If 1 
 
 ## Changes after approval
 
-None yet.
+- **2026-10-12, during the full run: A1 finished only 4 of the 10 adversarial JDs.** All 30 real JDs finished for all three systems, so metrics 1 to 5 and the pre-registered test are complete. The spend cap stopped the run with 8 adversarial A1 cases not started, because one earlier case had cost $0.32 and the runner keeps room for three such cases. The ₹25 left under the cap went to the next cases in order, one at a time: `ADV_03` and `ADV_04` finished, then the prepaid Gemini credit ran out (error 402) on `ADV_05`. A1 therefore has one JD each for injection, number_bait, title_bait and near_miss, and **none for missing_skill**. B1 and B2 have all 10. Adversarial results for A1 are reported on those 4 JDs only, next to B1 and B2 on the same 4 and on all 10.
+- Gemini spend for the full run: about $3.80 (about ₹334 at ₹88 per dollar), under the ₹350 cap. Tokens of the failed `ADV_05` tries are not in this figure.
