@@ -9,6 +9,15 @@ type Handlers = {
   onFailed: (message: string, limit?: boolean) => void;
 };
 
+export const OWNER_COOKIE = "owner_key";
+
+/** The owner's key as a request header, if this browser has it. See /owner. */
+function ownerHeaders(): Record<string, string> {
+  // document.cookie is one string: "name=value; other=value".
+  const match = document.cookie.match(new RegExp(`(?:^|; )${OWNER_COOKIE}=([^;]+)`));
+  return match ? { "x-owner-key": decodeURIComponent(match[1]) } : {};
+}
+
 const OFFLINE = "Could not reach the server. Check your connection and try again.";
 
 /**
@@ -22,7 +31,12 @@ const OFFLINE = "Could not reach the server. Check your connection and try again
 export async function startRun(form: FormData, handlers: Handlers, signal: AbortSignal) {
   let response: Response;
   try {
-    response = await fetch(`${API_URL}/api/run`, { method: "POST", body: form, signal });
+    response = await fetch(`${API_URL}/api/run`, {
+      method: "POST",
+      body: form,
+      signal,
+      headers: ownerHeaders(),
+    });
   } catch {
     if (!signal.aborted) handlers.onFailed(OFFLINE);
     return;

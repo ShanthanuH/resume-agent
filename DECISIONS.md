@@ -72,5 +72,9 @@ Each entry: the decision, the alternative, and why the alternative lost.
 - **Alternative:** 100 runs a day with 3 per IP, sized for ad traffic.
 - **Why it lost:** budget. At about $0.05 a run, a cap of 3 bounds the model bill at roughly $5 a month in the worst case. The example page is now the main path on the landing page, and the limit message links to it. Each IP address gets 1 run a day, so one visitor cannot use the whole quota.
 
+### Owner bypass: a secret key in a cookie, sent as the x-owner-key header
+- **Alternative:** raise the limits while testing, or reset the Redis counts by hand each time.
+- **Why it lost:** both are easy to forget and leave the site open or closed by mistake. The owner visits `/owner#key=...` once; the page stores the key in a cookie and the run request sends it as a header. A matching key skips the daily cap and the per-IP limit, but not the bot check. The key is compared in constant time and never logged. It is read from the URL fragment (after `#`), which browsers do not send to the server, so it stays out of request logs; `?key=` also works but does reach those logs. With `OWNER_KEY` unset there is no bypass at all.
+
 ### Cut for tonight
 Dark mode, DOCX upload, the "Questions for you" panel, the Playwright test, analytics events and the "report a false claim" button. `ask_user` answers with nothing, as in the eval.

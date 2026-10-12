@@ -160,6 +160,23 @@ def test_run_is_blocked_without_a_bot_check_in_production(client, monkeypatch):
     assert response.status_code == 403
 
 
+def test_owner_key_skips_the_limits_and_nothing_else_does(client, monkeypatch):
+    # A saved run is replayed, so no model is called. Every claim is refused.
+    monkeypatch.setattr(app_module, "REPLAY_FILE", "web/public/example.json")
+    monkeypatch.setattr(app_module, "counter", limits.ClosedCounter())
+    monkeypatch.setattr(limits, "OWNER_KEY", "s3cret-owner-key")
+    body = {"resume_text": "x" * 300, "jd_text": "y" * 300}
+
+    def status(headers: dict) -> int:
+        return client.post("/api/run", data=body, headers=headers).status_code
+
+    assert status({}) == 429
+    assert status({"x-owner-key": "wrong"}) == 429
+    assert status({"x-owner-key": "s3cret-owner-key"}) == 200
+    monkeypatch.setattr(limits, "OWNER_KEY", "")  # no key configured
+    assert status({"x-owner-key": ""}) == 429  # an empty header must not match
+
+
 def test_pdf_endpoint_returns_a_pdf_and_its_page_count(client):
     response = client.post("/api/pdf", json=make_doc(2).model_dump())
     assert response.status_code == 200

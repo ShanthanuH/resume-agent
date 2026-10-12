@@ -7,6 +7,7 @@ more runs through than the cap allows. In development the counts live in memory.
 """
 
 import hashlib
+import hmac
 import os
 import secrets
 from datetime import UTC, datetime
@@ -49,6 +50,20 @@ def _ip_key(ip: str) -> str:
 
 def _today() -> str:
     return datetime.now(UTC).date().isoformat()
+
+
+# A password for the site's owner. A request that carries it in the x-owner-key
+# header skips the run limits (not the bot check). Empty means no bypass exists.
+OWNER_KEY = os.environ.get("OWNER_KEY", "")
+
+
+def is_owner(header: str | None) -> bool:
+    """True if the request carries the owner key. The key is never logged."""
+    if not OWNER_KEY or not header:
+        return False  # no key configured, or none sent: nobody is the owner
+    # compare_digest takes the same time whether the strings differ at the first
+    # character or the last, so response timing cannot be used to guess the key.
+    return hmac.compare_digest(header.encode(), OWNER_KEY.encode())
 
 
 LIMIT_MESSAGE = "Demo limit reached for today. See the full example."

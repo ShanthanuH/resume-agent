@@ -38,7 +38,7 @@ const SECTIONS = [
     body: [
       "Hosting: the website and the agent both run on Vercel. Like any host, it sees your IP address and the requests you make.",
       "Bot check: before a run, Cloudflare Turnstile checks that you are a person. Cloudflare sees your IP address and some browser details to do that.",
-      "We set no cookies of our own and run no advertising trackers on this site.",
+      "We set no cookies for visitors and run no advertising trackers on this site.",
     ],
   },
 ];

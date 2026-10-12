@@ -137,12 +137,16 @@ async def run(
     ip = limits.client_ip(request.headers.get("x-forwarded-for"), peer)
     if not await limits.passes_bot_check(turnstile_token, ip):
         return _error(403, "The bot check did not pass. Reload the page and try again.")
-    try:
-        await counter.claim(ip)
-    except limits.LimitReached as reached:
-        return _error(429, str(reached))
+    # The owner's test runs are not counted. counted_ip is None for them, which
+    # also tells _live_run there is nothing to refund if the run fails.
+    counted_ip = None if limits.is_owner(request.headers.get("x-owner-key")) else ip
+    if counted_ip is not None:
+        try:
+            await counter.claim(counted_ip)
+        except limits.LimitReached as reached:
+            return _error(429, str(reached))
 
-    stream = _replay() if REPLAY_FILE else _live_run(resume_text, jd_text, links, ip)
+    stream = _replay() if REPLAY_FILE else _live_run(resume_text, jd_text, links, counted_ip)
     return StreamingResponse(
         stream,
         media_type="text/event-stream",
@@ -152,7 +156,7 @@ async def run(
 
 
 async def _live_run(
-    resume_text: str, jd_text: str, links: list[Link], ip: str
+    resume_text: str, jd_text: str, links: list[Link], ip: str | None
 ) -> AsyncIterator[str]:
     """Run the agent in a worker thread and stream its trace as it grows."""
     run_id = uuid.uuid4().hex[:8]  # only for matching log lines; says nothing about the user
@@ -202,7 +206,8 @@ async def _live_run(
             # here so the next run does not start while it still uses the counter.
             log.warning("run %s timed out after %.0fs", run_id, seconds)
             yield _sse("failed", {"message": "This run took too long and was stopped. Please try again."})
-            await counter.refund(ip)
+            if ip is not None:  # None: an owner run, which was never counted
+                await counter.refund(ip)
             await asyncio.wait([task])
             return
         error = task.exception()
@@ -210,7 +215,7 @@ async def _live_run(
             # Log the error's type only: its message could quote resume text.
             log.warning("run %s failed: %s", run_id, type(error).__name__)
             nothing_parsed = isinstance(error, NothingParsed)
-            if not nothing_parsed:
+            if not nothing_parsed and ip is not None:
                 await counter.refund(ip)  # our fault or the model's, not the visitor's
             yield _sse(
                 "failed",
