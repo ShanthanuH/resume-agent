@@ -56,7 +56,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-counter = limits.RunCounter()
+counter = limits.make_counter()
 # llm.USAGE is one counter for the whole process, so two runs at once would mix
 # their token counts and report wrong costs. One run at a time keeps them right.
 run_slot = asyncio.Semaphore(1)
@@ -88,7 +88,12 @@ def _read_pdf(data: bytes) -> tuple[str, list[Link]]:
 
 @app.get("/health")
 def health() -> dict[str, Any]:
-    return {"ok": True, "bot_check": limits.bot_check_enabled(), "replay": bool(REPLAY_FILE)}
+    return {"ok": True, "bot_check": limits.bot_check_enabled(),
+        "replay": bool(REPLAY_FILE),
+        # Which counter is in use: RedisCounter in production, ClosedCounter if
+        # Redis is not set up yet. Handy for checking a deploy.
+        "counter": type(counter).__name__,
+    }
 
 
 @app.post("/api/run")
@@ -133,7 +138,7 @@ async def run(
     if not await limits.passes_bot_check(turnstile_token, ip):
         return _error(403, "The bot check did not pass. Reload the page and try again.")
     try:
-        counter.claim(ip)
+        await counter.claim(ip)
     except limits.LimitReached as reached:
         return _error(429, str(reached))
 
@@ -197,7 +202,7 @@ async def _live_run(
             # here so the next run does not start while it still uses the counter.
             log.warning("run %s timed out after %.0fs", run_id, seconds)
             yield _sse("failed", {"message": "This run took too long and was stopped. Please try again."})
-            counter.refund(ip)
+            await counter.refund(ip)
             await asyncio.wait([task])
             return
         error = task.exception()
@@ -206,7 +211,7 @@ async def _live_run(
             log.warning("run %s failed: %s", run_id, type(error).__name__)
             nothing_parsed = isinstance(error, NothingParsed)
             if not nothing_parsed:
-                counter.refund(ip)  # our fault or the model's, not the visitor's
+                await counter.refund(ip)  # our fault or the model's, not the visitor's
             yield _sse(
                 "failed",
                 {

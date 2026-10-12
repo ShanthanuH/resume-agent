@@ -4,9 +4,13 @@ Each entry: the decision, the alternative, and why the alternative lost.
 
 ## Rung 5: product (2026-10-12)
 
-### Hosting: Vercel for the frontend, Hugging Face Spaces (Docker) for the backend
-- **Alternative:** Cloud Run, Render or Fly.io for the backend.
-- **Why it lost:** Render's free tier sleeps and takes most of a minute to wake. Cloud Run cold-starts on each idle period unless a paid warm instance is kept. Fly.io has no free tier. Spaces is free, builds the image remotely (no local Docker needed), and only sleeps after 48 hours without traffic. The landing, example and privacy pages are static on Vercel, so an ad visitor's first load never waits on the backend.
+### Hosting: one Vercel project with two services (Next.js and FastAPI)
+- **Alternative:** FastAPI in Docker on Hugging Face Spaces, Cloud Run, Render or Fly.io.
+- **Why it lost:** Hugging Face now needs a paid plan for Docker Spaces (found on the first deploy attempt). Cloud Run needs a Google Cloud billing account and a second platform. Render's free tier takes most of a minute to wake. Fly.io has no free tier. Vercel runs FastAPI as a Python function on the free plan, with a 300 s limit against a 60 s run. Both services ship in one deployment on one address, so there is no CORS and no version skew. The cost: a cold start of a few seconds on the first live run after idle, and no Docker (the spec asked for it). The landing, example and privacy pages are static, so they never wait on the backend.
+
+### Run counts live in Redis (Upstash); with no Redis, production refuses every run
+- **Alternative:** count in memory.
+- **Why it lost:** a serverless function loses its memory whenever an idle instance is stopped, so the count would reset and the cap of 3 would leak. The counter uses Redis INCR, which is atomic, over Upstash's HTTPS API with the httpx client already installed (no new dependency). IPs are stored only as salted hashes and expire after two days. If Redis is missing or unreachable the run is refused: a config mistake must not mean unlimited paid model calls. In development the count stays in memory.
 
 ### The run streams over a POST response, not EventSource
 - **Alternative:** `POST /runs` returns an ID, then `GET /runs/{id}/events` with the browser's EventSource.
@@ -43,10 +47,6 @@ Each entry: the decision, the alternative, and why the alternative lost.
 ### The header (name, contact line) is taken from the resume text in code
 - **Alternative:** have the parser return it.
 - **Why it lost:** the parser prompt skips it on purpose and prompts are core logic. The lines above the first parsed line are the header.
-
-### Limits are counted in memory
-- **Alternative:** Redis or a database.
-- **Why it lost:** one server process, so memory is enough, free, and stores nothing on disk. A restart resets the counts, which only allows a few extra runs. IPs are salted and hashed, with a salt that changes on every start.
 
 ### The visitor's IP is read from the right of X-Forwarded-For
 - **Alternative:** take the first entry.

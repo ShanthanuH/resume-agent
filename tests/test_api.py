@@ -1,5 +1,7 @@
 """Tests for the web API's own code: redaction, limits, rendering. No model is called."""
 
+import asyncio
+
 import pymupdf
 import pytest
 from fastapi.testclient import TestClient
@@ -99,15 +101,39 @@ def test_per_ip_limit_and_global_cap(monkeypatch):
     monkeypatch.setattr(limits, "RUNS_PER_IP", 2)
     monkeypatch.setattr(limits, "DAILY_RUN_CAP", 3)
     counter = limits.RunCounter()
-    counter.claim("a")
-    counter.claim("a")
+    claim = lambda ip: asyncio.run(counter.claim(ip))  # the methods are async
+    claim("a")
+    claim("a")
     with pytest.raises(limits.LimitReached, match="Demo limit reached"):
-        counter.claim("a")
-    counter.claim("b")
+        claim("a")
+    claim("b")
     with pytest.raises(limits.LimitReached, match="Demo limit reached"):
-        counter.claim("c")  # a new visitor, but the global cap is reached
-    counter.refund("b")
-    counter.claim("c")  # the refund freed one run
+        claim("c")  # a new visitor, but the global cap is reached
+    asyncio.run(counter.refund("b"))
+    claim("c")  # the refund freed one run
+
+
+def test_redis_counter_refuses_and_undoes_the_count_over_the_cap(monkeypatch):
+    monkeypatch.setattr(limits, "DAILY_RUN_CAP", 3)
+    sent: list[list[str]] = []
+
+    async def fake_send(self, *commands):
+        sent.extend(commands)
+        return [4, 1, 1, 1]  # Redis says: this was the 4th run today
+
+    monkeypatch.setattr(limits.RedisCounter, "_send", fake_send)
+    with pytest.raises(limits.LimitReached, match="Demo limit reached"):
+        asyncio.run(limits.RedisCounter().claim("203.0.113.9"))
+    assert [c[0] for c in sent] == ["INCR", "INCR", "EXPIRE", "EXPIRE", "DECR", "DECR"]
+    assert "203.0.113.9" not in " ".join(sent[1])  # the IP itself is never sent to Redis
+
+
+def test_no_redis_in_production_refuses_every_run(monkeypatch):
+    monkeypatch.setattr(limits, "APP_ENV", "production")
+    monkeypatch.setattr(limits, "REDIS_URL", "")
+    counter = limits.make_counter()
+    with pytest.raises(limits.LimitReached, match="not available"):
+        asyncio.run(counter.claim("a"))
 
 
 @pytest.fixture

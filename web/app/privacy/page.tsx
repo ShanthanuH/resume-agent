@@ -30,13 +30,13 @@ const SECTIONS = [
     title: "What our logs hold",
     body: [
       "For each run: how long it took, how many steps and tokens it used, what it cost us, and how many changes it proposed. No resume text, no job text.",
-      "To enforce the daily limit we count runs per IP address. The count is kept in memory under a scrambled form of the address and is cleared every day.",
+      "To enforce the daily limit we count runs per IP address. The count is kept for up to two days in a small database (Upstash Redis), under a scrambled form of the address that cannot be turned back into it.",
     ],
   },
   {
     title: "Other companies involved",
     body: [
-      "Hosting: the website is served by Vercel and the agent runs on Hugging Face Spaces. Like any host, they see your IP address and the requests you make.",
+      "Hosting: the website and the agent both run on Vercel. Like any host, it sees your IP address and the requests you make.",
       "Bot check: before a run, Cloudflare Turnstile checks that you are a person. Cloudflare sees your IP address and some browser details to do that.",
       "We set no cookies of our own and run no advertising trackers on this site.",
     ],
