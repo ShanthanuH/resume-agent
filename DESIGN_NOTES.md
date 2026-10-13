@@ -1,7 +1,7 @@
 # Design notes: the redesign
 
-One line per call made without asking. Each is "what, because why". The words
-on the site are a first draft: change them in `web/content/copy.yaml`.
+One line per design decision. Each is "what, because why". Every word on the
+site lives in `web/content/copy.yaml`.
 
 ## How to look at it
 
@@ -22,8 +22,7 @@ has its own address on a replay build: open `/states`.
 ## 1. Replay mode and the fixture
 
 - The fixture is the saved run in `web/public/example.json`, re-encoded, with no model call: it already held every step and each step's latency, and the latencies add up to the run's 63.5 s.
-- The one allowed Gemini run was not used: the saved run was enough.
-- The saved run has only 2 changed lines, not the brief's "6": it is the real result, and a real small number beats an invented big one.
+- The saved run has only 2 changed lines: it is the real result, and a real small number beats an invented big one.
 - Each step now carries `at`, the moment it reached the browser: steps of one model call arrive together, so the replay moves in the same bursts as a live run.
 - The replay is played in the browser, not by the server: it then works with the backend asleep, paused or out of runs, which is exactly when it is needed.
 - The server's own `REPLAY_FILE` replay is kept: it tests the real upload, bot check and limits for free.
@@ -54,17 +53,17 @@ has its own address on a replay build: open `/states`.
 - One reducer (`lib/run-machine.ts`) holds the whole flow: idle, ready, running, done, error, limited, paused. It is pure; the hook `useRun` does the side effects.
 - The progress element is five bars, one per stage, with a slow light passing through the current one: a stage is something we know, a percentage would be made up.
 - The sentence moves to the next stage as soon as a stage's results are all in, not when the next stage's first result arrives: otherwise "Finding what matches" would sit there for 28 seconds after matching ended.
-- The last sentence is "Putting your resume together", not the brief's "Making your PDF": the PDF is made when the button is pressed, so the brief's wording would not be true.
+- The last sentence is "Putting your resume together", not "Making your PDF": the PDF is made when the button is pressed.
 - "Show steps" leaves out the run's internal planning steps: they say nothing a visitor needs.
 - A failed check shows as "A rewrite said more than your resume does. Redoing it.": the honest moment is worth showing, the checker's own wording is jargon.
-- Every rewrite starts applied, and each can be undone with "Keep my original" inside the trace. This replaces the old accept/reject cards: the resume comes first as asked, and the visitor keeps the last word.
+- Every rewrite starts applied, and each can be undone with "Keep my original" inside the trace. This replaces the old accept/reject cards: the resume comes first, and the visitor keeps the last word.
 - Highlighting is a standard word diff (longest common subsequence), written in 60 lines instead of using a library: it is the signature, so it should be ours, small and tested.
 - A phrase that only moved is highlighted too: moving words can change what a sentence claims, so it should draw the eye.
 - The original line is shown plain, with no strike-through marks: marking moved words as "removed" would mislead.
 - Under the original line the trace also says which job requirements the line serves: it is what makes the change make sense.
 - The trace opens on hover (mouse), tap or Enter; only one is open at a time; a closed panel is `inert`, so Tab never lands inside it.
-- The summary says "Each one was checked against your resume", not the brief's "Nothing added that isn't in your resume": the first is a fact about this run, the second is the claim the eval has not measured yet.
-- The match score ("covers 7 of 11 must-haves") is gone from the result: the brief lists what the result holds, and the chips already say what is missing.
+- The summary says "Each one was checked against your resume", not "Nothing added that isn't in your resume": the first is a fact about this run, the second is the claim the eval has not measured yet.
+- The match score ("covers 7 of 11 must-haves") is gone from the result: the chips already say what is missing.
 - On a phone the Download button sticks to the bottom of the screen: the resume is first and long, and the main button should stay one tap away.
 - The recorded run's download is the saved `example.pdf`; a live result, or one with a line kept, is drawn by `/api/pdf` as before.
 - A file is refused in the browser when it is over 2 MB or not a PDF; a scanned PDF can only be caught by the server, which answers before any run is counted.
@@ -88,12 +87,12 @@ has its own address on a replay build: open `/states`.
 - The logo, the favicon and the link-preview image all use the same highlight: the signature is the brand.
 - Headline shape: two short sentences, the second in italics on its own line.
 - The headline says "Keep it true.", an aim, not "Nothing made up.", a claim: same reason the site said "built to" before.
-- No speed claim in the hero (the old spec forbids unmeasured ones); the facts line is "Free. No account. Nothing stored."
+- No speed claim in the hero: none has been measured. The facts line is "Free. No account. Nothing stored."
 - "How it works" is three numbered lines with no icons and no cards.
 - "Does it work?" and privacy sit side by side as two one-line sections with one link each.
-- The eval link points at `/tree/main/eval` on GitHub. The repo is private today, so the link is a 404 for visitors until it is public.
+- The eval link points at `/tree/main/eval` on GitHub. The eval folder is not on `main` yet, so the link is a 404 until the eval branch is merged.
 - FAQ uses `<details>`: it works without JavaScript and costs nothing.
-- No dark mode: the look is paper, and the old notes had already cut it.
+- No dark mode: the look is paper.
 
 ## 5. Other pages, icons, link preview
 
@@ -121,7 +120,6 @@ has its own address on a replay build: open `/states`.
 
 ## Not done
 
-- Not merged and not in production: the work is on the `worktree-redesign` branch, shown only as a Vercel preview.
 - The questions card only shows the questions. Answering them in the page would need the server to hold a run open while it waits for the visitor, which the "nothing is kept between requests" design rules out for now.
 - The PDF layout is unchanged apart from the header fix.
-- No analytics, no dark mode, no DOCX upload: not in this brief.
+- No analytics, no dark mode, no DOCX upload: not built yet.

@@ -20,7 +20,7 @@ const SOURCE = join(WEB, "content/copy.yaml");
 const TARGET = join(WEB, "lib/copy.gen.ts");
 const CODE_FOLDERS = ["app", "components", "lib"]; // where pages and components live
 
-// Words the brief bans, because they are the sound of a template.
+// Banned words, because they are the sound of a template.
 export const BANNED = ["unlock", "supercharge", "seamless", "elevate", "effortless", "powerful", "leverage"];
 
 // Pages with a word limit. `counts` picks the keys a visitor sees without

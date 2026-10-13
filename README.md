@@ -51,7 +51,7 @@ All 30 real job posts finished for all three systems. The adversarial agent run 
 
 Not measured: the agent with its verifier off, the careful prompt on a stronger model, and run-to-run consistency (one run per job post). All three were cut for budget.
 
-The full plan, written before the run, is [eval/EVAL_PLAN.md](eval/EVAL_PLAN.md). The eval code and the plan are on the `worktree-eval` branch and are not merged into this branch yet.
+The full plan, written before the run, is [eval/EVAL_PLAN.md](eval/EVAL_PLAN.md). The eval code and the plan are on the eval branch and are not merged into this branch yet.
 
 ## Key decisions
 

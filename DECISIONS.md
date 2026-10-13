@@ -2,11 +2,11 @@
 
 Each entry: the decision, the alternative, and why the alternative lost.
 
-## Rung 5: product (2026-10-12)
+## Product (2026-10-12)
 
 ### Hosting: one Vercel project with two services (Next.js and FastAPI)
 - **Alternative:** FastAPI in Docker on Hugging Face Spaces, Cloud Run, Render or Fly.io.
-- **Why it lost:** Hugging Face now needs a paid plan for Docker Spaces (found on the first deploy attempt). Cloud Run needs a Google Cloud billing account and a second platform. Render's free tier takes most of a minute to wake. Fly.io has no free tier. Vercel runs FastAPI as a Python function on the free plan, with a 300 s limit against a 60 s run. Both services ship in one deployment on one address, so there is no CORS and no version skew. The cost: a cold start of a few seconds on the first live run after idle, and no Docker (the spec asked for it). The landing, example and privacy pages are static, so they never wait on the backend.
+- **Why it lost:** Hugging Face now needs a paid plan for Docker Spaces (found on the first deploy attempt). Cloud Run needs a Google Cloud billing account and a second platform. Render's free tier takes most of a minute to wake. Fly.io has no free tier. Vercel runs FastAPI as a Python function on the free plan, with a 300 s limit against a 60 s run. Both services ship in one deployment on one address, so there is no CORS and no version skew. The cost: a cold start of a few seconds on the first live run after idle, and no Docker image. The landing, example and privacy pages are static, so they never wait on the backend.
 
 ### Run counts live in Redis (Upstash); with no Redis, production refuses every run
 - **Alternative:** count in memory.
@@ -18,11 +18,11 @@ Each entry: the decision, the alternative, and why the alternative lost.
 
 ### The stream polls the session's trace; the agent loop is untouched
 - **Alternative:** add a callback to `Session.log` so each step is pushed as it happens.
-- **Why it lost:** the spec forbids changing core logic without asking. The agent runs in a worker thread and the stream reads new trace entries every 0.3 s. Steps arrive per batch (all searches at once), so "requirement 3 of 9" style progress is not possible without changing the loop.
+- **Why it lost:** the agent loop is frozen for the eval, so the API reads from it and does not change it. The agent runs in a worker thread and the stream reads new trace entries every 0.3 s. Steps arrive per batch (all searches at once), so "requirement 3 of 9" style progress is not possible without changing the loop.
 
 ### One agent run at a time per server
 - **Alternative:** run requests concurrently.
-- **Why it lost:** `llm.USAGE` is one process-wide counter, so concurrent runs would mix their token counts and log wrong costs. A semaphore queues runs. Fixing this properly means per-run usage tracking in `llm.py`, which is core code.
+- **Why it lost:** `llm.USAGE` is one process-wide counter, so concurrent runs would mix their token counts and log wrong costs. A semaphore queues runs. Fixing this properly means per-run usage tracking in `llm.py`, which is part of the frozen agent.
 
 ### The browser holds the result and sends it back for the PDF
 - **Alternative:** keep the session on the server and render from it.
@@ -46,7 +46,7 @@ Each entry: the decision, the alternative, and why the alternative lost.
 
 ### The header (name, contact line) is taken from the resume text in code
 - **Alternative:** have the parser return it.
-- **Why it lost:** the parser prompt skips it on purpose and prompts are core logic. The lines above the first parsed line are the header.
+- **Why it lost:** the parser prompt skips it on purpose, and changing that prompt would change the agent the eval measures. The lines above the first parsed line are the header.
 
 ### The visitor's IP is read from the right of X-Forwarded-For
 - **Alternative:** take the first entry.
@@ -76,5 +76,5 @@ Each entry: the decision, the alternative, and why the alternative lost.
 - **Alternative:** raise the limits while testing, or reset the Redis counts by hand each time.
 - **Why it lost:** both are easy to forget and leave the site open or closed by mistake. The owner visits `/owner#key=...` once; the page stores the key in a cookie and the run request sends it as a header. A matching key skips the daily cap and the per-IP limit, but not the bot check. The key is compared in constant time and never logged. It is read from the URL fragment (after `#`), which browsers do not send to the server, so it stays out of request logs; `?key=` also works but does reach those logs. With `OWNER_KEY` unset there is no bypass at all.
 
-### Cut for tonight
+### Not built yet
 Dark mode, DOCX upload, the "Questions for you" panel, the Playwright test, analytics events and the "report a false claim" button. `ask_user` answers with nothing, as in the eval.
