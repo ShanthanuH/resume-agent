@@ -61,7 +61,7 @@ export default function HomePage() {
               </span>
             </h1>
           </div>
-          <div className="enter mt-auto pt-8 lg:ml-auto lg:w-[26rem]" style={{ "--i": 4 } as React.CSSProperties}>
+          <div className="stagger mt-auto pt-8 lg:ml-auto lg:w-[26rem]">
             <p className="lead">{copy.home_lead}</p>
             <SiteLink href="/try" className={`${primaryButton} mt-6 w-full`}>
               {copy.home_cta}

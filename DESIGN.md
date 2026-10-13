@@ -47,7 +47,8 @@ One family: **Jost** (400, 500, 700), served from our own domain by
 
 | Step | Size | Set as | Used for |
 | --- | --- | --- | --- |
-| display | `clamp(2.1rem, 9.3vw, 8.5rem)` | 700, uppercase, tracking -0.03em, leading 0.9 | the home headline only |
+| display | 10.2% of the page width, at most 8.5rem | 700, uppercase, tracking -0.03em, leading 0.9 | the home headline only: its longer line always fits on one line |
+| poster | `clamp(2rem, 8.4vw, 7.5rem)` | as head | the one title of a screen that is only a title: the form, a notice, the 404 page |
 | head | `clamp(2rem, 1.3rem + 3.2vw, 4rem)` | 700, uppercase, tracking -0.03em, leading 0.95 | page and chapter titles (short ones) |
 | statement | `clamp(1.5rem, 1.1rem + 1.9vw, 2.75rem)` | 700, sentence case, tracking -0.02em, leading 1.05 | full-sentence headings: the wait, the demo's resume lines |
 | lead | `clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem)` | 500, leading 1.3 | the sentence under a title, the result summary |
@@ -76,18 +77,19 @@ focus rings. One decision, no exceptions.
 ## Motion
 
 - One easing: `cubic-bezier(0.16, 1, 0.3, 1)` (fast start, soft landing).
-- Durations: 120 ms press, 240 ms a panel opening, 500 ms an entrance,
+- Durations: 120 ms press, 240 ms a panel opening, 500 ms an entrance (things that come in on page load move but do not fade),
   900 ms the home headline.
 - **Signature move:** each line of the home headline rises from behind its own
   baseline on load, the second 110 ms after the first.
-- The highlight is drawn in left to right (300 ms), then the original line's
-  mint field opens under it (240 ms).
-- Parts of a chapter rise 24 px as they scroll into view, staggered 70 ms.
+- The highlight lands: its colour comes in behind the words (300 ms), one
+  changed line after the other. Then the original line opens under it on mint
+  (240 ms).
+- Parts of a chapter rise 28 px as they scroll into view, one after the other. The blocks of the name in the footer rise the same way.
   This is CSS only (`animation-timeline: view()`); a browser without it shows
   everything in place.
 - Buttons move 2 px down when pressed. Colour fields never fade into each
   other.
-- Only `transform`, `opacity`, `background-size` and `grid-template-rows` are
+- Only `transform`, `opacity`, `background-color` (the highlight) and `grid-template-rows` are
   animated.
 - `prefers-reduced-motion`: every animation and transition is cut to nothing;
   the content is the same.
@@ -99,8 +101,9 @@ focus rings. One decision, no exceptions.
   next to it is a text link with a thick underline, never an outlined button.
 - **Link:** underlined, 2 px, in the text's own colour.
 - **Focus:** a 3 px solid ring, 3 px away, white on black and black on colour.
-- **Highlight (`mark`):** lemon, square, black text. Darker lemon outline is
-  not used: the open line is shown by the mint field under it.
+- **Highlight (`mark`):** lemon, square, black text. While its line is open
+  (or the mouse is over it) it has a 3 px black bar under it, and the original
+  line shows on a mint field below.
 - **Field:** a filled block, no border. The resume box is white (it is the
   sheet); the job post box is a `tile`. A problem turns the note under it
   orange and puts a 4 px orange bar on the box's left edge.
@@ -113,7 +116,7 @@ focus rings. One decision, no exceptions.
 
 | Screen | Fields, top to bottom |
 | --- | --- |
-| Home | black (headline, two inks) → white (the resume, running, tappable) → cornflower / black split (how it works, a slider) → orange band (what the run refused to add) → black (does it work, privacy) → black (questions as tiles) → cyan (start) → black (the name, built from blocks) |
+| Home | black (headline in two inks; on wide screens the top of the real PDF) → white (the resume, running, tappable) → cornflower / black split (how it works, a slider) → orange band (what the run refused to add) → black (does it work, privacy) → black (questions as tiles) → cyan (start) → black (the name, built from blocks) |
 | Form | black, with the white resume box and the cyan button |
 | Wait | cornflower band (recorded run) → lemon field with the sentence |
 | Result | black summary → white resume → black: download, orange "not on your resume" |

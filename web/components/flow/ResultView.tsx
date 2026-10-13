@@ -82,7 +82,7 @@ export function ResultView({ result, steps, source, onAgain, againLabel, staticP
         <h1
           tabIndex={-1}
           data-focus
-          className="statement enter order-first pb-4 text-[clamp(1.25rem,4.6vw,4.5rem)] outline-none lg:col-span-12 lg:pb-10"
+          className="statement settle order-first pb-4 text-[clamp(1.25rem,4.6vw,4.5rem)] outline-none lg:col-span-12 lg:pb-10"
         >
           {summaryOf(result, changed)}
         </h1>

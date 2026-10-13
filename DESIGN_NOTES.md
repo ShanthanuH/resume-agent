@@ -1,7 +1,30 @@
 # Design notes: the redesign
 
 One line per design decision. Each is "what, because why". Every word on the
-site lives in `web/content/copy.yaml`.
+site lives in `web/content/copy.yaml`. The rules of the look (colours, type,
+spacing, radius, motion) are in `DESIGN.md`. The list of problems the previous
+paper-and-serif design had is in `docs/redesign/AUDIT.md`, with its screenshots
+in `docs/redesign/before/`.
+
+## The direction: colour chapters
+
+The taste-skill plugin dealt three directions: "Dressed as something else"
+(sell the product in the style of another category), "Colour chapters" (every
+section is a full-width field of one flat colour, like posters hung in a row)
+and "The quiet instrument" (a narrow column, small type, lots of empty space).
+I picked **Colour chapters**. The product's promise is that there are always
+two versions of a line, the one you wrote and the one it became, and that you
+can see both. Flat colour can carry exactly that: a changed word is lemon, the
+line you wrote is mint, something left out is orange, and those meanings hold
+on every screen, so the colour is the explanation and no legend is needed.
+It also suits the people who use it: big flat fields and heavy type read on a
+phone in daylight and still read when the page is a thumbnail in an X post.
+And of the three it sits furthest from the old look. "The quiet instrument" is
+the old page with a different font (small, calm, lots of cream); "Dressed as
+something else" needs a borrowed category, and nothing borrowed says "nothing
+invented" better than the product's own two colours do. Colour chapters swaps
+every habit of the paper design: black for cream, one heavy geometric sans for
+a light serif, hard edges for soft shadows, square corners for rounded ones.
 
 ## How to look at it
 
@@ -51,7 +74,7 @@ has its own address on a replay build: open `/states`.
 ## 3. The run flow and its states
 
 - One reducer (`lib/run-machine.ts`) holds the whole flow: idle, ready, running, done, error, limited, paused. It is pure; the hook `useRun` does the side effects.
-- The progress element is five bars, one per stage, with a slow light passing through the current one: a stage is something we know, a percentage would be made up.
+- The progress element is five solid blocks, one per stage, with a block passing through the current one: a stage is something we know, a percentage would be made up.
 - The sentence moves to the next stage as soon as a stage's results are all in, not when the next stage's first result arrives: otherwise "Finding what matches" would sit there for 28 seconds after matching ended.
 - The last sentence is "Putting your resume together", not "Making your PDF": the PDF is made when the button is pressed.
 - "Show steps" leaves out the run's internal planning steps: they say nothing a visitor needs.
@@ -78,41 +101,56 @@ has its own address on a replay build: open `/states`.
 - The bot check is set to show only when Cloudflare wants a click (`interaction-only`): most visitors never see it, and the form stays three steps.
 - Pressing the button before the bot check has finished starts the run by itself when it does; if it never answers, after 20 seconds the server's refusal is shown instead of a stuck button.
 - Leaving mid-run is guarded twice: the browser's own "Leave site?" box for closing the tab, and a question on in-site links. Only for a live run.
-- The header button is hidden on `/try`: it leads to the page you are on.
+- The header button is hidden on `/try` (it leads to the page you are on) and on the home page (the same button is the first thing there).
+- The wait is one whole screen of lemon, the colour of a changed word, with the sentence as large as two lines allow: a minute is a long time to look at a small bar.
+- Under the progress blocks the newest step is shown as it arrives ("Not on your resume, left out: Kafka."): watching the run refuse things is the most convincing part, and it used to be hidden behind "Show steps". It is hidden from screen readers, which already get the sentence above and the list below.
+- The result opens with one lemon block per changed line, showing the words that changed. A tap opens that line and scrolls to it: on a phone the changed lines used to sit below the first screen.
+- A line where you kept your original is shown on mint, and its panel shows the rewrite on lemon: the two colours keep their meaning in both directions.
+- The last chapter of the home page is the flow's first step, already open. A file chosen there is handed to the flow page in memory (`lib/handoff.ts`), so the visitor lands on the form with the file in. Nothing is stored or sent.
+- Error screens are orange (went wrong), limit and pause screens are cornflower (they lead to the recorded run): the colour says what kind of stop it is before the words are read.
 
 ## 4. The landing page
 
-- Type: Fraunces (headlines) with Hanken Grotesk (everything else), chosen from eight pairings set side by side.
-- Palette: cream paper, a pine-green ink that is nearly black, and one accent, highlighter yellow. Plain black on white read as a template; the green gives the page a colour of its own without adding a second accent.
-- The yellow marks changed words, the logo, the stroke under the headline's second sentence and the button on the closing panel. Nothing else.
-- A faint yellow glow sits in the top right corner of every page, and the demo has a long soft shadow: depth without decoration.
-- The page ends on one dark panel with a yellow button: the only dark block, so the eye lands on it.
-- The logo, the favicon and the link-preview image all use the same highlight: the signature is the brand.
-- Headline shape: two short sentences, the second in italics on its own line.
+- The page is a row of chapters, each one flat colour from edge to edge. `DESIGN.md` lists what each colour means; no colour is used for decoration.
+- Type: Jost in three weights, for everything. One heavy geometric sans holds the page together while the colours change.
+- Palette: black ground, white for the resume, and five flat colours that each mean one thing (lemon changed, mint yours, orange left out, cyan action, cornflower recorded). The palette was dealt by the plugin ("Candy on black"); the meanings are ours.
+- No gradients, shadows, hairlines or rounded corners anywhere: two things are told apart by a change of colour or by space.
 - The headline is "Resume? Tailored. You? Hired.": two question-and-answer beats that rhyme. It states the aim, not a measured result; the "Does it work?" section below says what has been measured.
+- The two sentences are two lines in two inks, white and lemon. Its size is tied to the width of the page, so the longer line always fits on one line.
+- The black hero is kept shorter than the screen: the white chapter, where the recorded run plays, starts on the first screen on a phone and on a laptop. (The demo only starts when it is in view, and the browser tests check that it does without scrolling.)
+- On wide screens the top of the real tailored PDF rises out of the white chapter into the hero: it is the one real picture the product has, and it shows what you get.
+- The demo's three resume lines are set at 20 to 34 px: the tap-to-see-your-line gesture is the product, so it gets the room of a headline.
 - No speed claim in the hero: none has been measured. The facts line is "Free. No account. Nothing stored."
-- "How it works" is three numbered lines with no icons and no cards.
-- "Does it work?" and privacy sit side by side as two one-line sections with one link each.
+- "How it works" is a slider with three stops. The left field shows the stage in a few large words, the right field shows the piece of the real interface for it. It works by drag, arrow keys or a tap on a stage name, and never depends on scrolling.
+- The orange band is the proof of "nothing invented": the skills the recorded job asked for and the example resume did not show, moving past as one long line. The run left every one out. The line is drawn by CSS from an attribute, and screen readers get it once as a plain list.
+- "Does it work?" and privacy sit side by side, black and mint, one link each.
 - The eval link points at `/tree/main/eval` on GitHub. The eval folder is not on `main` yet, so the link is a 404 until the eval branch is merged.
-- FAQ uses `<details>`: it works without JavaScript and costs nothing.
-- No dark mode: the look is paper.
+- Questions are filled tiles made with `<details>` (no JavaScript); they share a `name`, so opening one closes the other, and the open one turns cyan. "What happens in between" is the first tile.
+- The footer is the name built from eight blocks in the site's colours. The letters are drawn by CSS, so the name is not repeated in the page's text.
+- No light mode: the look is black.
 
 ## 5. Other pages, icons, link preview
 
-- `/example` is now the recorded run playing in the real flow, not a separate page design.
-- The link-preview image is drawn at build time from copy.yaml (`app/opengraph-image.tsx`), so it follows the words without anyone redrawing it.
-- Its fonts are three `.ttf` files in `web/assets/fonts` (open licence): the image library cannot use the fonts the pages load.
-- The favicon is three lines with the middle one highlighted.
-- Added a 404 page and an error page in the same shape as the notices.
+- `/example` is the recorded run playing in the real flow, not a separate page design.
+- Privacy opens on a mint field (mint is "yours"), then each section has its title on the left and its points on the right.
+- The link-preview image is drawn at build time from copy.yaml (`app/opengraph-image.tsx`), so it follows the words without anyone redrawing it. It is the home page's first screen made small: the two-ink headline on black, one resume line on white with its changed words in lemon. Large flat shapes still read at thumbnail size.
+- Its fonts are two `.ttf` files in `web/assets/fonts` (open licence): the image library cannot use the fonts the pages load.
+- The favicon is three lines on black with the middle one lemon.
+- The 404 page and the crash page are one field of colour with one large line, in the same shape as the notices.
 
 ## 6. Cleanup, speed, accessibility
 
-- CSS for all motion, no animation library: one easing, 150 to 300 ms, and one rule that switches it all off for reduced motion.
-- The headline font is two small local files (38 KB together) cut from Fraunces at optical size 72, not the 150 KB variable font: on a slow phone the headline waited on that download.
+- CSS for all motion, no animation library: one easing, 120 to 900 ms, and one rule that switches it all off for reduced motion.
+- Parts of a chapter rise as they scroll into view with `animation-timeline: view()`, which is CSS only. A browser without it shows everything in place, so nothing can stay hidden if a script fails.
+- Things that come in when a page loads only move, they do not fade. A fade from nothing delayed the browser's "largest paint" by 0.7 s on the form and the notices.
+- Focus rings are 3 px and take the ink of the field they are on (white on black, black on colour), through one CSS variable set by the `field-*` classes.
+- Every text and background pair is black on a colour or white or light grey on black; the lowest contrast in use is 8.6:1.
+- The field and type classes sit in Tailwind's `components` layer, so a utility written next to them (`font-bold`, `open:bg-action`) wins.
 - The clock is its own component: a tick re-draws four characters, not the whole screen.
 - Removed the `diff` dependency and the old `Trace`, `TryFlow` and `Workspace` components.
 - Headings that receive focus from code show no ring (they are not controls); every control does.
-- Lighthouse mobile on the production build, over several runs: performance 94 to 97 on the home page, 94 to 96 on the flow, 91 to 97 on the recorded run, 98 on privacy. Accessibility 100 and layout shift 0 on all four.
+- Lighthouse mobile on the production build in replay mode, one run per page: performance 96 to 98 on the home page, the form, the recorded run, the result, privacy and the notices. Accessibility 100 on all of them, layout shift 0 (0.006 on the limit screen).
+- The taste-skill inspector passes the home page with no failures. On the other screens its one remaining failure is "fewer than four pictures": that rule is written for landing pages, and a form, a result or an error screen has no honest place for photographs.
 
 ## 7. API glue and PDF
 

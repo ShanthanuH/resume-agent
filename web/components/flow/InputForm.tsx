@@ -66,8 +66,8 @@ export function InputForm({ state, dispatch, onSubmit, onToken, waiting }: Props
       className={`${page} grid gap-x-10 gap-y-8 pb-[var(--chapter)] pt-6 lg:grid-cols-12 lg:pt-14`}
     >
       {/* The title runs the full width, as large as it can be on one line. */}
-      <h1 className="head poster enter lg:col-span-12">{copy.flow_title}</h1>
-      <div className="enter min-w-0 lg:col-span-5">
+      <h1 className="head poster settle lg:col-span-12">{copy.flow_title}</h1>
+      <div className="settle min-w-0 lg:col-span-5">
         {REPLAY_ONLY && <p className="field-recorded max-w-md px-4 py-3">{copy.flow_preview_note}</p>}
       </div>
 

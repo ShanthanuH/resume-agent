@@ -241,9 +241,18 @@ mark {
 }
 
 /* The parts of a screen coming in one after another: title, text, controls.
-   Put on the box that holds them. */
-.stagger > * {
-  animation: enter 500ms var(--ease-swoosh) backwards;
+   Put on the box that holds them (.settle does the same for one element).
+   They only move, they do not fade: the main text of a screen is then on show
+   from the very first frame, which is what the browser times as "largest
+   paint" (a fade from nothing made that number 0.7 s worse). */
+.stagger > *,
+.settle {
+  animation: settle 500ms var(--ease-swoosh) backwards;
+}
+@keyframes settle {
+  from {
+    transform: translateY(20px);
+  }
 }
 .stagger > *:nth-child(2) {
   animation-delay: 70ms;
