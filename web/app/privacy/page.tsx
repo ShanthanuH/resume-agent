@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { page, quietLink } from "@/components/ui";
+import { chapter, page, quietLink } from "@/components/ui";
 import { GITHUB_URL } from "@/lib/config";
 import { copy } from "@/lib/copy";
 
@@ -26,29 +26,34 @@ const SECTIONS = [
 
 export default function PrivacyPage() {
   return (
-    <div className={`${page} pt-6 sm:pt-12`}>
-      <div className="max-w-2xl">
-        <h1 className="display text-[2.6rem] sm:text-[3.5rem]">{copy.privacy_title}</h1>
-        <p className="mt-4 text-lg text-soft sm:text-xl">{copy.privacy_lead}</p>
+    <>
+      {/* Mint is the site's colour for "what you wrote, what is yours". */}
+      <section className="field-yours">
+        <div className={`${page} flex min-h-[46svh] flex-col justify-end pb-10 pt-[var(--chapter)]`}>
+          <h1 className="head text-[clamp(3.25rem,13vw,11rem)]">{copy.privacy_title}</h1>
+          <p className="lead mt-6 max-w-[38ch]">{copy.privacy_lead}</p>
+        </div>
+      </section>
+      {/* Each section: its title on the left, its points on the right. Space
+          alone separates one from the next. */}
+      <div className={`${page} ${chapter} space-y-[var(--chapter)]`}>
         {SECTIONS.map((section) => (
-          <section key={section.title} className="mt-12 border-t border-rule pt-8">
-            <h2 className="display text-[1.75rem]">{section.title}</h2>
-            <ul className="mt-4 space-y-4">
+          <section key={section.title} className="arrive grid gap-x-10 gap-y-5 lg:grid-cols-12">
+            <h2 className="statement lg:col-span-5">{section.title}</h2>
+            <ul className="max-w-[62ch] space-y-5 lg:col-span-7">
               {section.points.map((point) => (
-                <li key={point} className="text-soft">
-                  {point}
-                </li>
+                <li key={point}>{point}</li>
               ))}
             </ul>
           </section>
         ))}
-        <p className="mt-12 border-t border-rule pt-6 text-soft">
+        <p className="lead">
           {copy.privacy_code}{" "}
-          <a href={GITHUB_URL} className={`${quietLink} font-medium text-ink`}>
+          <a href={GITHUB_URL} className={`${quietLink} font-bold`}>
             {copy.privacy_code_link}
           </a>
         </p>
       </div>
-    </div>
+    </>
   );
 }

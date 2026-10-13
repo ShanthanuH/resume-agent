@@ -8,18 +8,20 @@ import { EXAMPLE_RUN } from "@/lib/example";
 // The picture X, LinkedIn and chat apps show when someone shares the site.
 // Next.js draws it once, at build time, from the JSX below. Its words come
 // from content/copy.yaml, so it follows the copy without anyone redrawing it.
+//
+// It is the home page's first screen made small: the headline in two inks on
+// black, and under it one line of the resume on white with its changed words
+// in lemon. Large flat shapes, so it still reads at thumbnail size.
 
 export const alt = copy.og_alt;
 export const size = { width: 1200, height: 630 }; // the size every platform expects
 export const contentType = "image/png";
 
 // The colours of app/globals.css. The image library cannot read CSS variables.
-const PAPER = "#f8f4ea";
-const SHEET = "#fffefb";
-const INK = "#10261f";
-const SOFT = "#4c5249";
-const RULE = "#e0d9c6";
-const MARK = "#ffe27a";
+const GROUND = "#000000";
+const INK = "#ffffff";
+const SHEET = "#ffffff";
+const CHANGED = "#f3ea7a";
 
 const font = (file: string) => readFile(join(process.cwd(), "assets/fonts", file));
 
@@ -29,11 +31,7 @@ const original = bullet?.replaces ? (EXAMPLE_RUN.result.evidence[bullet.replaces
 const pieces = bullet ? diffWords(original, bullet.text) : [];
 
 export default async function Image() {
-  const [regular, italic, sans] = await Promise.all([
-    font("Fraunces-72pt-Regular.ttf"),
-    font("Fraunces-72pt-Italic.ttf"),
-    font("HankenGrotesk-Regular.ttf"),
-  ]);
+  const [medium, bold] = await Promise.all([font("Jost-500.ttf"), font("Jost-700.ttf")]);
   return new ImageResponse(
     (
       // This library lays out with flexbox only, and every element that has
@@ -45,81 +43,76 @@ export default async function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "56px 72px",
-          background: PAPER,
+          background: GROUND,
           color: INK,
-          fontFamily: "Hanken",
+          fontFamily: "Jost",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          {/* The name, with the highlighter stroke under it. */}
-          <div style={{ display: "flex", fontFamily: "Fraunces", fontSize: 34 }}>
-            <span style={{ backgroundImage: `linear-gradient(transparent 62%, ${MARK} 62%)`, padding: "0 4px" }}>
-              {copy.nav_brand}
-            </span>
+        <div style={{ display: "flex", flexDirection: "column", padding: "44px 56px 0" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 30, fontWeight: 700 }}>
+            <span style={{ textTransform: "uppercase", letterSpacing: -1 }}>{copy.nav_brand}</span>
+            <span style={{ fontWeight: 500 }}>{copy.og_line}</span>
           </div>
+          {/* Two sentences, one per line, the second in lemon. */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              marginTop: 34,
-              fontFamily: "Fraunces",
-              fontSize: 82,
-              lineHeight: 1.04,
-              letterSpacing: -2,
+              marginTop: 30,
+              fontSize: 126,
+              fontWeight: 700,
+              lineHeight: 0.92,
+              letterSpacing: -4,
+              textTransform: "uppercase",
             }}
           >
             <span>{copy.og_title_1}</span>
-            <span style={{ fontStyle: "italic" }}>{copy.og_title_2}</span>
+            <span style={{ color: CHANGED }}>{copy.og_title_2}</span>
           </div>
         </div>
 
-        {/* A piece of the resume: one line with its changed words highlighted. */}
+        {/* A piece of the resume, edge to edge: one line with its changed words in lemon. */}
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexWrap: "wrap",
             background: SHEET,
-            border: `1px solid ${RULE}`,
-            borderRadius: 10,
-            padding: "22px 28px",
-            fontSize: 25,
-            lineHeight: 1.45,
+            color: GROUND,
+            padding: "30px 56px 34px",
+            fontSize: 37,
+            fontWeight: 500,
+            lineHeight: 1.36,
           }}
         >
           {/* Words are laid out one by one, because a highlight in the middle
               of a wrapping sentence is not something this library can do. */}
-          <div style={{ display: "flex", flexWrap: "wrap" }}>
-            {pieces.flatMap((piece, p) =>
-              piece.text.split(" ").map((word, w) => (
-                <span
-                  key={`${p}-${w}`}
-                  style={{
-                    background: piece.changed ? MARK : "transparent",
-                    // The gap after a word is padding, so that a highlight
-                    // runs on unbroken from one changed word to the next.
-                    paddingRight: 7,
-                    // A highlight starts a little before its first letter.
-                    // The negative margin keeps that letter where it was.
-                    paddingLeft: w === 0 && piece.changed ? 5 : 0,
-                    marginLeft: w === 0 && piece.changed ? -5 : 0,
-                  }}
-                >
-                  {word}
-                </span>
-              )),
-            )}
-          </div>
-          <div style={{ display: "flex", marginTop: 12, color: SOFT, fontSize: 20 }}>{copy.og_line}</div>
+          {pieces.flatMap((piece, p) =>
+            piece.text.split(" ").map((word, w) => (
+              <span
+                key={`${p}-${w}`}
+                style={{
+                  background: piece.changed ? CHANGED : "transparent",
+                  // The gap after a word is padding, so that a highlight
+                  // runs on unbroken from one changed word to the next.
+                  paddingRight: 10,
+                  // A highlight starts a little before its first letter.
+                  // The negative margin keeps that letter where it was.
+                  paddingLeft: w === 0 && piece.changed ? 6 : 0,
+                  marginLeft: w === 0 && piece.changed ? -6 : 0,
+                }}
+              >
+                {word}
+              </span>
+            )),
+          )}
         </div>
       </div>
     ),
     {
       ...size,
       fonts: [
-        { name: "Fraunces", data: regular, weight: 400, style: "normal" },
-        { name: "Fraunces", data: italic, weight: 400, style: "italic" },
-        { name: "Hanken", data: sans, weight: 400, style: "normal" },
+        { name: "Jost", data: medium, weight: 500, style: "normal" },
+        { name: "Jost", data: bold, weight: 700, style: "normal" },
       ],
     },
   );
