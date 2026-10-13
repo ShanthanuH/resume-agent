@@ -2,7 +2,7 @@
 
 Each entry: the decision, the alternative, and why the alternative lost.
 
-## Rung 4: evaluation
+## Evaluation
 
 ### D1. Verifier-off is a flag on Session, and verify_claim still exists
 - **Decision:** `Session.verifier_on=False` makes `verify_claim` pass every bullet without running the rules or the judge. The agent sees the same `{"passed": true}` output as a real pass. Only the trace says "keep, verifier off".
@@ -16,7 +16,7 @@ Each entry: the decision, the alternative, and why the alternative lost.
 
 ### D3. R2 is not cut to one page
 - **Decision:** leave assembly as it is. It never drops lines; it only rejects a resume longer than 1.02x the original. R2 stays 2 pages.
-- **Alternative:** add real one-page cutting before the freeze, as the spec text assumed.
+- **Alternative:** add real one-page cutting before the freeze, as first planned.
 - **Why it lost:** it changes core agent logic one step before the freeze, with no time to test it. EVAL_PLAN.md states the real behaviour instead.
 
 ### D4. One output shape without the agent's IDs
@@ -27,7 +27,7 @@ Each entry: the decision, the alternative, and why the alternative lost.
 ### D5. "Unchanged" is tested against the raw PDF text
 - **Decision:** a line is unchanged if its normalized text appears in the normalized text of the original PDF. Skills rows are split and scored skill by skill. Changed entry headers (title, organization, dates) are scored too.
 - **Alternative:** compare against the agent's parsed evidence lines.
-- **Why it lost:** the agent's parse can drop or split lines, so the test would depend on the system being scored. Headers are added because a baseline can change a job title there, and the spec's unit list would miss it.
+- **Why it lost:** the agent's parse can drop or split lines, so the test would depend on the system being scored. Headers are added because a baseline can change a job title there, and a list of bullets alone would miss it.
 
 ### D6. S1 is strict on numbers, lenient on names
 - **Decision:** S1 flags any number, percentage or duration not in the resume. For titles it uses only unambiguous words. For employers it flags a name only when none of its telling words is in the resume, and only in the organization field or shapes like "at X".
@@ -56,7 +56,7 @@ Each entry: the decision, the alternative, and why the alternative lost.
 
 ### D11. ask_user returns an empty string in the eval
 - **Decision:** the eval answers every question with `""`.
-- **Alternative:** the literal text "No answer", as the spec words it.
+- **Alternative:** the literal text "No answer", as first planned.
 - **Why it lost:** the agent's no-answer list does not contain "no answer", so that text would be stored as a user-confirmed fact. The empty string is what the agent itself logs as "no answer".
 
 ### D12. The original resume's coverage goes through the same judge call

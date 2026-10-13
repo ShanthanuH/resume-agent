@@ -42,7 +42,7 @@ def _call(model: str, system: str, user: str, schema: type[BaseModel]) -> dict:
         "--output-format", "json",  # one JSON object with the answer and the usage
         "--no-session-persistence",  # nothing is saved to disk
     ]  # fmt: skip
-    # Run in an empty folder, so no CLAUDE.md or project file of this repo can
+    # Run in an empty folder, so no project file of this repo can
     # leak into the judge's context. The prompt goes in on stdin, not as an
     # argument, because a resume plus a JD is too long for a command line.
     with tempfile.TemporaryDirectory() as empty:
