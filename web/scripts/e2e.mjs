@@ -97,8 +97,12 @@ await check("flow: pressing the button with nothing in says what is missing, and
   await page.getByRole("button", { name: /recorded run|Tailor my resume/ }).click();
   // Counted inside the form: Next.js keeps a hidden "alert" of its own in every page.
   expect((await page.locator("form").getByRole("alert").count()) === 2, "expected one message per empty field");
-  const focused = await page.evaluate(() => document.activeElement?.getAttribute("type"));
-  expect(focused === "file", "focus should be on the resume file input");
+  // The page moves focus one animation frame after the click, so wait for it
+  // (up to 2 s) instead of reading it at once.
+  const focused = await page
+    .waitForFunction(() => document.activeElement?.getAttribute("type") === "file", null, { timeout: 2000 })
+    .then(() => true, () => false);
+  expect(focused, "focus should be on the resume file input");
   await page.context().close();
 });
 
