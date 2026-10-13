@@ -12,7 +12,7 @@ import { Paper } from "./flow/Paper";
 import { ProgressBar } from "./flow/ProgressBar";
 import { useRun } from "./flow/useRun";
 import { SiteLink } from "./SiteLink";
-import { quietLink } from "./ui";
+import { chapter, page, quietLink } from "./ui";
 
 // The recorded run took about a minute. Nobody watches a landing page for a
 // minute, so here it plays 16 times faster and says so. The same recording at
@@ -31,10 +31,11 @@ const TOTAL_SECONDS = Math.round(EXAMPLE_RUN.result.stats.seconds);
 const TOTAL = clock(TOTAL_SECONDS);
 
 /**
- * The picture in the hero: the recorded run, playing in the same progress bar
- * and on the same paper the real flow uses. First the lines as they were
- * written, then the run, then the changed words highlighted, then the
- * original line sliding in under the first of them. No paragraph needed.
+ * The second chapter of the home page: the recorded run, playing in the same
+ * progress bar and on the same white sheet the real flow uses. First the lines
+ * as they were written, then the run, then the changed words in lemon, then
+ * the original line opening on mint under the first of them. The lines are set
+ * large: this gesture is the product, so it gets the room of a headline.
  */
 export function HeroDemo() {
   const { state, startReplay, skip } = useRun({ checkAvailability: false });
@@ -62,7 +63,7 @@ export function HeroDemo() {
           if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) skip();
         }, START_AFTER_MS);
       },
-      { threshold: 0.35 }, // about a third of it is on screen
+      { threshold: 0.1 }, // its top part is on screen (it is taller than a phone)
     );
     watcher.observe(element);
     return () => {
@@ -89,30 +90,30 @@ export function HeroDemo() {
     : PHASE_SENTENCE[phase];
 
   return (
-    <figure ref={stage} aria-label={copy.home_demo_region} className="w-full">
-      {/* The long soft shadow lifts the demo off the page, like a sheet on a desk. */}
-      <div className="rounded-2xl border border-rule bg-desk p-3 shadow-[0_32px_64px_-36px_rgb(16_38_31/0.45)] sm:p-4">
-        <div className="flex items-center justify-between gap-3 px-1">
-          <span className="label flex items-center gap-2">
-            <span aria-hidden className={`h-1.5 w-1.5 rounded-full bg-ink ${running ? "breathe" : ""}`} />
-            {copy.home_demo_label}
-          </span>
-          {/* Sped up like the run, so it shows the run's real time. At the end
-              it stands still on the real length. */}
-          <Clock
-            startedAt={running ? state.startedAt : null}
-            speed={SPEED}
-            fixed={done ? TOTAL_SECONDS : undefined}
-            className="text-xs text-muted"
-          />
-        </div>
-        {/* Two lines are kept free for the sentence, so a longer one moves nothing. */}
-        <p className="mt-3 flex min-h-[2.75em] items-end px-1 pb-2 text-[0.95rem] font-medium leading-snug">
-          <span key={sentence} className="enter inline-block">
-            {sentence}
-          </span>
-        </p>
-        <div className="px-1 pb-3">
+    // One white field, edge to edge: the resume. The run's status sits beside
+    // the lines on a wide screen and above them on a phone.
+    <section className="field-sheet">
+      <figure
+        ref={stage}
+        aria-label={copy.home_demo_region}
+        className={`${page} ${chapter} grid gap-x-10 gap-y-8 lg:grid-cols-12 lg:grid-rows-[auto_1fr]`}
+      >
+        <div className="lg:col-span-4 lg:col-start-9">
+          <div className="small flex items-center justify-between gap-3">
+            <span className="flex items-center gap-2">
+              <span aria-hidden className={`h-2.5 w-2.5 bg-black ${running ? "breathe" : ""}`} />
+              {copy.home_demo_label}
+            </span>
+            {/* Sped up like the run, so it shows the run's real time. At the end
+                it stands still on the real length. */}
+            <Clock startedAt={running ? state.startedAt : null} speed={SPEED} fixed={done ? TOTAL_SECONDS : undefined} />
+          </div>
+          {/* Two lines are kept free for the sentence, so a longer one moves nothing. */}
+          <p className="lead mt-4 flex min-h-[2.6em] items-end pb-3 font-bold">
+            <span key={sentence} className="enter inline-block">
+              {sentence}
+            </span>
+          </p>
           <ProgressBar phase={phase} finished={done} sentence={sentence} />
         </div>
         <Paper
@@ -122,27 +123,27 @@ export function HeroDemo() {
           pending={!done}
           openId={openId}
           onOpen={setOpenId}
-          compact
-          // Room for one original line to slide in without the page below moving.
-          className="min-h-[24.5rem] sm:min-h-[19.5rem]"
+          large
+          // Room for one original line to open without the page below moving.
+          className="min-h-[40rem] sm:min-h-[30rem] lg:col-span-8 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:min-h-[34rem]"
         />
-      </div>
-      <figcaption className="mt-3 px-1 text-xs text-muted">
-        <p>{fill(copy.home_demo_speed, { time: TOTAL, speed: SPEED })}</p>
-        {/* Shown once the run has ended. Until then it is invisible but keeps
-            its place, so nothing below jumps when it appears. */}
-        <div className={`flex flex-wrap items-center justify-between gap-x-4 ${done ? "" : "invisible"}`}>
-          <p className="py-1 text-[0.8125rem] text-soft">{copy.home_demo_hint}</p>
-          <p className="flex gap-x-4">
-            <button type="button" onClick={again} className={quietLink}>
-              {copy.home_demo_again}
-            </button>
-            <SiteLink href="/example" className={quietLink}>
-              {copy.home_demo_full}
-            </SiteLink>
-          </p>
-        </div>
-      </figcaption>
-    </figure>
+        <figcaption className="small lg:col-span-4 lg:col-start-9 lg:self-end">
+          <p className="font-normal">{fill(copy.home_demo_speed, { time: TOTAL, speed: SPEED })}</p>
+          {/* Shown once the run has ended. Until then it is invisible but keeps
+              its place, so nothing below jumps when it appears. */}
+          <div className={done ? "" : "invisible"}>
+            <p className="mt-1 font-bold">{copy.home_demo_hint}</p>
+            <p className="flex flex-wrap gap-x-6">
+              <button type="button" onClick={again} className={quietLink}>
+                {copy.home_demo_again}
+              </button>
+              <SiteLink href="/example" className={quietLink}>
+                {copy.home_demo_full}
+              </SiteLink>
+            </p>
+          </div>
+        </figcaption>
+      </figure>
+    </section>
   );
 }

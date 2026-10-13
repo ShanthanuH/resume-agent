@@ -1,144 +1,165 @@
 import { HeroDemo } from "@/components/HeroDemo";
+import { HowItWorks } from "@/components/HowItWorks";
 import { SiteLink } from "@/components/SiteLink";
-import { accentButton, page, primaryButton, quietLink } from "@/components/ui";
+import { StartHere } from "@/components/StartHere";
+import { chapter, halfLeft, halfRight, page, plus, primaryButton, quietLink } from "@/components/ui";
 import { EVAL_URL } from "@/lib/config";
 import { copy } from "@/lib/copy";
+import { EXAMPLE_RUN } from "@/lib/example";
+import { gaps } from "@/lib/resume";
 
-// The home page shows the product working and says very little: under 150
-// visible words, not counting the FAQ (scripts/copy.mjs enforces that). Every
-// section has one idea, in one or two short lines, and the same shape:
-// a small label or heading, a line, a link.
+// The home page is a row of chapters. Each chapter is one flat field of
+// colour, edge to edge, and holds one idea; the colour says what the chapter
+// is about (DESIGN.md lists what each colour means). The page shows the
+// product working and says very little: under 150 visible words, not counting
+// the FAQ (scripts/copy.mjs enforces that).
 
-const STEPS = [copy.home_how_1, copy.home_how_2, copy.home_how_3];
-const DETAILS = [copy.home_more_how_1, copy.home_more_how_2, copy.home_more_how_3];
-const FAQ = [
-  [copy.faq_1_q, copy.faq_1_a],
-  [copy.faq_2_q, copy.faq_2_a],
-  [copy.faq_3_q, copy.faq_3_a],
-  [copy.faq_4_q, copy.faq_4_a],
-  [copy.faq_5_q, copy.faq_5_a],
+// Each tile: what it says when closed, and the paragraphs it opens to. The
+// first one is the longer account of how a run works.
+const FAQ: [string, string[]][] = [
+  [copy.home_how_toggle, [copy.home_more_how_1, copy.home_more_how_2, copy.home_more_how_3]],
+  [copy.faq_1_q, [copy.faq_1_a]],
+  [copy.faq_2_q, [copy.faq_2_a]],
+  [copy.faq_3_q, [copy.faq_3_a]],
+  [copy.faq_4_q, [copy.faq_4_a]],
+  [copy.faq_5_q, [copy.faq_5_a]],
 ];
 
-// The heading every section below the hero shares.
-const sectionTitle = "display text-[1.75rem] sm:text-[2.25rem]";
-// A toggle row: the question or label on the left, a plus that turns into a
-// minus on the right. "group-open" is true while the <details> is open.
-const toggleRow = "flex min-h-12 items-center justify-between gap-4 py-3 font-medium";
-const plus =
-  "relative h-3 w-3 shrink-0 before:absolute before:inset-x-0 before:top-1/2 before:h-px before:bg-ink " +
-  "after:absolute after:inset-y-0 after:left-1/2 after:w-px after:bg-ink after:transition-transform after:duration-200 " +
-  "after:ease-swoosh group-open:after:scale-y-0";
+// What the job in the recorded run asked for and the example resume did not
+// show. The run left every one of them out. Here they are, as one long line.
+const LEFT_OUT = gaps(EXAMPLE_RUN.result).map((req) => req.text);
+const LEFT_OUT_LINE = LEFT_OUT.map((name) => `${name} ● `).join("");
 
 export default function HomePage() {
   return (
-    <div className={page}>
-      {/* --- Hero: headline, one line, the main button, and the product. --- */}
-      <section className="grid gap-10 pb-16 pt-8 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,31rem)] lg:items-center lg:gap-14 lg:pb-24">
-        <div>
-          <h1 className="display text-[2.6rem] sm:text-[3.5rem] lg:text-[4rem]">
-            {/* The second sentence sits on its own line: two short sentences, one shape. */}
-            {copy.home_title_1}{" "}
-            <em className="block">
-              {/* The highlighter stroke under these words is drawn in on load. */}
-              <span className="stroke">{copy.home_title_2}</span>
-            </em>
-          </h1>
-          <p className="mt-5 max-w-md text-lg text-soft sm:text-xl">{copy.home_lead}</p>
-          <div className="mt-8 flex flex-col gap-x-5 gap-y-3 sm:flex-row sm:items-center">
-            <SiteLink href="/try" className={primaryButton}>
+    <>
+      {/* --- Black: the headline in two inks, one line, the main button. --- */}
+      <section className="field-ground">
+        {/* The field is kept shorter than the screen on purpose: the white
+            chapter below, where the product runs, starts on the first screen. */}
+        <div className={`${page} relative flex flex-col pb-8 lg:min-h-[calc(76svh-4.25rem)] lg:pb-10`}>
+          {/* A real picture of what comes out: the top of the recorded run's
+              PDF, rising from the white chapter below. Wide screens only: a
+              phone has no room for it, and (being lazy and hidden there) never
+              downloads it. */}
+          <div className="absolute bottom-0 left-10 hidden h-52 w-[33rem] overflow-hidden lg:block">
+            {/* A plain img: the file is already small, and next/image would add a
+                script-driven loader for no gain. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/example-pdf-top.webp" alt={copy.pdf_preview_alt} width={1040} height={587} loading="lazy" className="w-full" />
+          </div>
+          <div className="headline-box pt-6 lg:pt-[5svh]">
+            {/* Two sentences, one per line. The second is lemon, the colour of
+                a changed word: the break reads as a change of voice. Each line
+                rises from behind its own baseline on load. */}
+            <h1 className="headline">
+              <span className="line">
+                <span>{copy.home_title_1}</span>
+              </span>{" "}
+              <span className="line text-changed">
+                <span>{copy.home_title_2}</span>
+              </span>
+            </h1>
+          </div>
+          <div className="enter mt-auto pt-8 lg:ml-auto lg:w-[26rem]" style={{ "--i": 4 } as React.CSSProperties}>
+            <p className="lead">{copy.home_lead}</p>
+            <SiteLink href="/try" className={`${primaryButton} mt-6 w-full`}>
               {copy.home_cta}
             </SiteLink>
-            <p className="text-sm text-muted">{copy.home_facts}</p>
+            <p className="small mt-3 text-muted">{copy.home_facts}</p>
           </div>
         </div>
-        <HeroDemo />
       </section>
 
-      {/* --- How it works: three steps, details behind a toggle. --- */}
-      <section aria-labelledby="how" className="border-t border-rule py-14 sm:py-20">
-        <h2 id="how" className="label">
-          {copy.home_how_title}
-        </h2>
-        <ol className="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-10">
-          {STEPS.map((step, index) => (
-            <li key={step} className="flex items-baseline gap-4 sm:block">
-              <span aria-hidden className="display text-[2.5rem] italic text-ink/40 sm:text-[3.5rem]">
-                {index + 1}
-              </span>
-              <p className={`${sectionTitle} sm:mt-2`}>{step}</p>
-            </li>
-          ))}
-        </ol>
-        <details className="group mt-8 max-w-2xl border-y border-rule">
-          <summary className={toggleRow}>
-            {copy.home_how_toggle}
-            <span aria-hidden className={plus} />
-          </summary>
-          <div className="space-y-3 pb-5 text-soft">
-            {DETAILS.map((line) => (
-              <p key={line}>{line}</p>
-            ))}
+      {/* --- White: the resume, with the recorded run playing on it. --- */}
+      <HeroDemo />
+
+      {/* --- Cornflower and black: how it works, driven by a slider. --- */}
+      <HowItWorks />
+
+      {/* --- Orange: what the recorded run refused to add. Proof, not a claim. --- */}
+      <section aria-label={copy.gaps_title}>
+        {/* The moving line is a picture of the names: CSS draws it (twice, for
+            the loop) from data-names. Screen readers get the plain list in
+            aria-label instead, once. */}
+        <div role="img" aria-label={LEFT_OUT.join(", ")} className="field-left-out overflow-hidden">
+          <p
+            data-names={LEFT_OUT_LINE}
+            className="band whitespace-pre py-[0.32em] text-[15vw] font-bold uppercase leading-none tracking-[-0.03em] sm:text-[8vw]"
+          />
+        </div>
+        <div className={`${page} py-10`}>
+          <p className="lead max-w-[36ch]">{copy.gaps_text}</p>
+        </div>
+      </section>
+
+      {/* --- Black and mint: two honest lines. Does it work, and privacy. --- */}
+      <div className="grid lg:grid-cols-2">
+        <section aria-labelledby="proof" className={`field-ground ${halfLeft} ${chapter}`}>
+          <div className="arrive">
+            <h2 id="proof" className="head">
+              {copy.home_proof_title}
+            </h2>
+            <p className="lead mt-6 max-w-[30ch]">{copy.home_proof_text}</p>
+            <a href={EVAL_URL} className={`${quietLink} mt-4`}>
+              {copy.home_proof_link}
+            </a>
           </div>
-        </details>
-      </section>
-
-      {/* --- Two honest lines, side by side: does it work, and privacy. --- */}
-      <div className="grid border-t border-rule sm:grid-cols-2">
-        <section aria-labelledby="proof" className="py-14 sm:py-20 sm:pr-10">
-          <h2 id="proof" className={sectionTitle}>
-            {copy.home_proof_title}
-          </h2>
-          <p className="mt-3 max-w-sm text-lg text-soft">{copy.home_proof_text}</p>
-          <a href={EVAL_URL} className={`${quietLink} mt-2 font-medium`}>
-            {copy.home_proof_link}
-          </a>
         </section>
-        <section
-          aria-labelledby="privacy"
-          className="border-t border-rule py-14 sm:border-l sm:border-t-0 sm:py-20 sm:pl-10"
-        >
-          <h2 id="privacy" className={sectionTitle}>
-            {copy.home_privacy_title}
-          </h2>
-          <p className="mt-3 max-w-sm text-lg text-soft">{copy.home_privacy_text}</p>
-          <SiteLink href="/privacy" className={`${quietLink} mt-2 font-medium`}>
-            {copy.home_privacy_link}
-          </SiteLink>
+        <section aria-labelledby="privacy" className={`field-yours ${halfRight} ${chapter}`}>
+          <div className="arrive">
+            <h2 id="privacy" className="head">
+              {copy.home_privacy_title}
+            </h2>
+            <p className="lead mt-6 max-w-[30ch]">{copy.home_privacy_text}</p>
+            <SiteLink href="/privacy" className={`${quietLink} mt-4`}>
+              {copy.home_privacy_link}
+            </SiteLink>
+          </div>
         </section>
       </div>
 
-      {/* --- FAQ: five at most, closed to begin with. --- */}
-      <section aria-labelledby="faq" className="border-t border-rule py-14 sm:py-20">
-        <h2 id="faq" className="label">
-          {copy.home_faq_title}
-        </h2>
-        <div className="mt-4 max-w-2xl divide-y divide-rule border-y border-rule">
-          {FAQ.map(([question, answer]) => (
-            // details/summary is a built-in toggle: no JavaScript is needed.
-            <details key={question} className="group">
-              <summary className={toggleRow}>
-                {question}
-                <span aria-hidden className={plus} />
-              </summary>
-              <p className="pb-5 pr-8 text-soft">{answer}</p>
-            </details>
-          ))}
+      {/* --- Black: the questions, as filled tiles. The open one turns cyan. --- */}
+      <section aria-labelledby="faq" className="field-ground">
+        <div className={`${page} ${chapter} grid gap-x-10 gap-y-8 lg:grid-cols-12`}>
+          <h2 id="faq" className="head self-start lg:sticky lg:top-10 lg:col-span-4">
+            {copy.home_faq_title}
+          </h2>
+          <div className="arrive space-y-2 lg:col-span-8">
+            {FAQ.map(([question, answers]) => (
+              // details/summary is a built-in toggle: no JavaScript is needed.
+              // The shared name makes the browser close one when another opens.
+              <details
+                key={question}
+                name="faq"
+                className="group field-tile open:bg-action open:text-black open:[--ring:#000000]"
+              >
+                <summary className="flex min-h-18 items-center justify-between gap-4 px-5 py-4 text-[1.25rem] font-medium leading-tight sm:px-6">
+                  {question}
+                  <span aria-hidden className={plus} />
+                </summary>
+                <div className="max-w-[52ch] space-y-3 px-5 pb-6 sm:px-6">
+                  {answers.map((answer) => (
+                    <p key={answer}>{answer}</p>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* --- The same main button once more, for those who read to the end. --- */}
-      {/* It is the one dark panel on the page, so the eye ends up on it. */}
-      <section
-        aria-labelledby="end"
-        className="on-ink flex flex-col items-start justify-between gap-6 rounded-3xl bg-ink px-6 py-12 text-paper sm:flex-row sm:items-center sm:px-12 sm:py-16"
-      >
-        <h2 id="end" className="display text-[2rem] sm:text-[2.75rem]">
-          {copy.home_end_title}
-        </h2>
-        <SiteLink href="/try" className={`${accentButton} shrink-0`}>
-          {copy.home_cta}
-        </SiteLink>
+      {/* --- Cyan: the first step of the flow, already open. --- */}
+      <section aria-labelledby="end" className="field-action">
+        <div className={`${page} ${chapter} grid min-h-[80svh] gap-10 lg:grid-cols-12`}>
+          <h2 id="end" className="head text-[clamp(2.75rem,7vw,7rem)] lg:col-span-7 lg:self-end">
+            {copy.home_end_title}
+          </h2>
+          <div className="self-end lg:col-span-5 lg:col-start-8">
+            <StartHere />
+          </div>
+        </div>
       </section>
-    </div>
+    </>
   );
 }

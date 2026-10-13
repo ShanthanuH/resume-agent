@@ -206,6 +206,30 @@ home_how_3:
   text: >-
     Download your tailored PDF.
 
+pdf_preview_alt:
+  where: Home page, wide screens, read by screen readers for the picture of the PDF under the headline
+  max: 80
+  text: >-
+    The top of the example resume as a tailored PDF
+
+home_how_stop_1:
+  where: Home page, "How it works" slider, the name under its first stop
+  max: 12
+  text: >-
+    Resume
+
+home_how_stop_2:
+  where: Home page, "How it works" slider, the name under its second stop
+  max: 12
+  text: >-
+    Job post
+
+home_how_stop_3:
+  where: Home page, "How it works" slider, the name under its last stop
+  max: 12
+  text: >-
+    PDF
+
 home_how_toggle:
   where: Home page, under the three steps, opens the details
   max: 40
