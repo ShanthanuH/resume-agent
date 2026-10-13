@@ -49,7 +49,7 @@ og_title_2:
   where: Link preview image, big text, second line, in italics
   max: 24
   text: >-
-    You? Still you.
+    You? Hired.
 
 og_line:
   where: Link preview image, small line at the bottom
@@ -61,7 +61,7 @@ og_alt:
   where: Link preview image, text for screen readers
   max: 120
   text: >-
-    SwooshCV. Resume? Tailored. You? Still you.
+    SwooshCV. Resume? Tailored. You? Hired.
 
 skip_link:
   where: Every page, hidden link for keyboard users, shows on first Tab press
@@ -119,7 +119,7 @@ home_title_2:
   where: Home page, top, biggest text, second sentence, in italics
   max: 30
   text: >-
-    You? Still you.
+    You? Hired.
 
 home_lead:
   where: Home page, one line under the big text

@@ -89,7 +89,7 @@ has its own address on a replay build: open `/states`.
 - The page ends on one dark panel with a yellow button: the only dark block, so the eye lands on it.
 - The logo, the favicon and the link-preview image all use the same highlight: the signature is the brand.
 - Headline shape: two short sentences, the second in italics on its own line.
-- The headline is "Resume? Tailored. You? Still you.": a question and answer rhythm with some character, and both halves are true of every run. "You? Hired." was considered and left out: it promises an outcome the product cannot back, on a site whose point is not overclaiming.
+- The headline is "Resume? Tailored. You? Hired.": two question-and-answer beats that rhyme. It states the aim, not a measured result; the "Does it work?" section below says what has been measured.
 - No speed claim in the hero: none has been measured. The facts line is "Free. No account. Nothing stored."
 - "How it works" is three numbered lines with no icons and no cards.
 - "Does it work?" and privacy sit side by side as two one-line sections with one link each.
