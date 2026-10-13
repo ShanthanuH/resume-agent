@@ -42,13 +42,13 @@ export function DownloadButton({ result, kept, staticPdf }: Props) {
         </a>
       ) : (
         <button type="button" onClick={download} disabled={state === "working"} className={`${primaryButton} w-full`}>
-          {state === "working" && <span aria-hidden className="breathe h-2 w-2 rounded-full bg-paper" />}
+          {state === "working" && <span aria-hidden className="breathe h-2.5 w-2.5 bg-black" />}
           {state === "working" ? copy.result_download_busy : copy.result_download}
         </button>
       )}
       {/* role="status" makes screen readers announce these when they appear. */}
-      <p role="status" className="mt-2 text-sm text-muted">
-        {state === "failed" && <span className="text-danger">{copy.result_download_failed}</span>}
+      <p role="status" className="small mt-2 text-muted">
+        {state === "failed" && <span className="text-left-out">{copy.result_download_failed}</span>}
         {/* The real page count is always said, never hidden. */}
         {state !== "failed" && pages > 1 && <span className="text-ink">{fill(copy.result_pages, { pages })}</span>}
         {state !== "failed" && pages === 1 && <span className="hidden lg:inline">{copy.result_pdf_note}</span>}

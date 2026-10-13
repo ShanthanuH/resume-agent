@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { StateDemo } from "@/components/StateDemo";
-import { page } from "@/components/ui";
 import { REPLAY_ONLY } from "@/lib/config";
 import { copy } from "@/lib/copy";
 import { STATE_NAMES, type StateName } from "@/lib/states";
@@ -18,9 +17,5 @@ export function generateStaticParams() {
 export default async function StatePage({ params }: PageProps<"/states/[state]">) {
   if (!REPLAY_ONLY) notFound();
   const { state } = await params;
-  return (
-    <div className={`${page} pt-6 sm:pt-12`}>
-      <StateDemo name={state as StateName} />
-    </div>
-  );
+  return <StateDemo name={state as StateName} />;
 }

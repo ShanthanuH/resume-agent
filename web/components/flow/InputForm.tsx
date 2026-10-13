@@ -7,7 +7,7 @@ import { copy } from "@/lib/copy";
 import { jobProblem, resumeProblem, type RunEvent, type RunState } from "@/lib/run-machine";
 import { problemSentence } from "@/lib/steps";
 import { Turnstile } from "../Turnstile";
-import { primaryButton, quietLink } from "../ui";
+import { page, primaryButton, quietLink } from "../ui";
 import { ResumeField } from "./ResumeField";
 
 type Props = {
@@ -19,25 +19,23 @@ type Props = {
 };
 
 /**
- * One numbered step: a big numeral in the margin, then the label and the field.
- * Step 3 has no label: the button under it says what it does.
+ * One step of the form: its label, then the field. The order is shown by
+ * position alone (and by the list the steps sit in, for screen readers).
+ * The last step has no label: the button says what it does.
  */
-function Step({ number, label, children }: { number: number; label?: ReactNode; children: ReactNode }) {
+function Step({ label, children }: { label?: ReactNode; children: ReactNode }) {
   return (
-    <div className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-3 sm:grid-cols-[2.75rem_minmax(0,1fr)]">
-      <span aria-hidden className="display text-[1.75rem] leading-none text-muted sm:text-[2rem]">
-        {number}
-      </span>
-      <div>
-        {label && <div className="mb-2 font-medium">{label}</div>}
-        {children}
-      </div>
-    </div>
+    <li>
+      {label && <div className="lead mb-3 font-bold">{label}</div>}
+      {children}
+    </li>
   );
 }
 
 /**
- * The whole input on one screen: 1 your resume, 2 the job post, 3 the button.
+ * The whole input on one screen: your resume, the job post, the button.
+ * The resume box is white, because white is the resume everywhere on the
+ * site. The job post box is a dark tile. The button is cyan.
  *
  * A field only complains after the button was pressed, or when a file was
  * refused. Nobody wants "too short" while they are still pasting.
@@ -62,20 +60,22 @@ export function InputForm({ state, dispatch, onSubmit, onToken, waiting }: Props
 
   return (
     // noValidate: the browser's own pop-up messages are off, ours are used.
-    <form onSubmit={submit} noValidate className="mx-auto w-full max-w-xl">
-      <h1 className="display text-[2rem] sm:text-[2.5rem]">{copy.flow_title}</h1>
-      {REPLAY_ONLY && (
-        <p className="mt-4 rounded-md border border-rule bg-sheet px-4 py-3 text-sm text-soft">
-          {copy.flow_preview_note}
-        </p>
-      )}
+    <form
+      onSubmit={submit}
+      noValidate
+      className={`${page} grid gap-x-10 gap-y-8 pb-[var(--chapter)] pt-6 lg:grid-cols-12 lg:pt-14`}
+    >
+      <div className="lg:col-span-5">
+        <h1 className="head">{copy.flow_title}</h1>
+        {REPLAY_ONLY && <p className="field-recorded small mt-6 max-w-md px-4 py-3">{copy.flow_preview_note}</p>}
+      </div>
 
-      <div className="mt-8 space-y-8">
-        <Step number={1} label={copy.flow_step_resume}>
+      <ol className="space-y-9 lg:col-span-7">
+        <Step label={copy.flow_step_resume}>
           <ResumeField input={input} problem={resumeCode && problemSentence(resumeCode)} dispatch={dispatch} />
         </Step>
 
-        <Step number={2} label={<label htmlFor={job}>{copy.flow_step_job}</label>}>
+        <Step label={<label htmlFor={job}>{copy.flow_step_job}</label>}>
           <textarea
             id={job}
             aria-describedby={jobCode ? jobHint : undefined}
@@ -84,36 +84,37 @@ export function InputForm({ state, dispatch, onSubmit, onToken, waiting }: Props
             onChange={(event) => dispatch({ type: "job_typed", text: event.target.value })}
             rows={5}
             placeholder={copy.flow_job_placeholder}
-            className="block min-h-[7.5rem] w-full rounded-[10px] border border-rule bg-sheet p-4 text-base placeholder:text-muted focus:border-ink"
+            // A problem puts an orange bar on the box's left edge.
+            className="field-tile block min-h-40 w-full border-l-8 border-tile p-4 placeholder:text-muted aria-invalid:border-left-out"
           />
           {jobCode && (
-            <p id={jobHint} role="alert" className="enter mt-2 text-sm text-danger">
+            <p id={jobHint} role="alert" className="enter mt-2 font-medium text-left-out">
               {problemSentence(jobCode)}
             </p>
           )}
         </Step>
 
-        <Step number={3}>
+        <Step>
           {!REPLAY_ONLY && <Turnstile onToken={onToken} />}
           <button type="submit" disabled={waiting} className={`${primaryButton} w-full`}>
-            {waiting && <span aria-hidden className="breathe h-2 w-2 rounded-full bg-paper" />}
+            {waiting && <span aria-hidden className="breathe h-2.5 w-2.5 bg-black" />}
             {REPLAY_ONLY ? copy.flow_submit_replay : copy.flow_submit}
           </button>
           {/* role="status": read out when it appears, without stealing focus. */}
-          <p role="status" className="mt-3 text-sm text-muted">
+          <p role="status" className="small mt-3 text-muted">
             {waiting ? (
               copy.flow_bot_wait
             ) : (
               <>
                 {copy.flow_facts}{" "}
-                <Link href="/privacy" className={`${quietLink} min-h-0 text-soft`}>
+                <Link href="/privacy" className={`${quietLink} min-h-0 text-ink`}>
                   {copy.flow_facts_link}
                 </Link>
               </>
             )}
           </p>
         </Step>
-      </div>
+      </ol>
     </form>
   );
 }

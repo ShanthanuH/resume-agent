@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Flow } from "@/components/flow/Flow";
 import { SiteLink } from "@/components/SiteLink";
-import { page, primaryButton } from "@/components/ui";
+import { chapter, inkButton, page } from "@/components/ui";
 import { copy } from "@/lib/copy";
 
 export const metadata: Metadata = {
@@ -16,16 +16,19 @@ export const metadata: Metadata = {
  */
 export default function ExamplePage() {
   return (
-    <div className={`${page} pt-6 sm:pt-12`}>
+    <>
       <Flow variant="example" />
-      <section aria-labelledby="yours" className="mt-20 border-t border-rule pt-14">
-        <h2 id="yours" className="display text-[1.75rem] sm:text-[2.25rem]">
-          {copy.example_cta_title}
-        </h2>
-        <SiteLink href="/try" className={`${primaryButton} mt-6`}>
-          {copy.home_cta}
-        </SiteLink>
+      {/* Cyan, the colour of the main action: the way from watching to doing. */}
+      <section aria-labelledby="yours" className="field-action mt-[var(--chapter)]">
+        <div className={`${page} ${chapter} arrive`}>
+          <h2 id="yours" className="head">
+            {copy.example_cta_title}
+          </h2>
+          <SiteLink href="/try" className={`${inkButton} mt-8`}>
+            {copy.home_cta}
+          </SiteLink>
+        </div>
       </section>
-    </div>
+    </>
   );
 }

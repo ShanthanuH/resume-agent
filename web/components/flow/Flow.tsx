@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { REPLAY_ONLY, TURNSTILE_SITE_KEY } from "@/lib/config";
 import { copy } from "@/lib/copy";
+import { takeHandedOver } from "@/lib/handoff";
 import type { RunState } from "@/lib/run-machine";
 import { InputForm } from "./InputForm";
 import { Notice } from "./Notice";
@@ -93,6 +94,13 @@ export function Flow({ variant, initial, speed = 1 }: Props) {
     setToken(""); // a token works once
   }
 
+  // A file chosen in the last chapter of the home page is waiting: take it in.
+  useEffect(() => {
+    if (isExample || initial) return;
+    const file = takeHandedOver();
+    if (file) dispatch({ type: "file_added", file });
+  }, [isExample, initial, dispatch]);
+
   // The recorded-run page starts playing by itself.
   useEffect(() => {
     if (isExample && !initial) startReplay({ speed });
@@ -123,7 +131,9 @@ export function Flow({ variant, initial, speed = 1 }: Props) {
   return (
     // A minimum height, so that a short screen (the wait, a notice) does not pull
     // the footer up and a long one push it back down as the flow moves along.
-    <div ref={top} className="min-h-[70svh] scroll-mt-6">
+    // Each screen is its own field of colour, edge to edge, so this box has no
+    // width or padding of its own.
+    <div ref={top} className="min-h-[72svh]">
       {/* The key makes each screen a new element, so its entrance animation plays. */}
       <div key={screen} className="enter">
         {screen === "form" && editing && (

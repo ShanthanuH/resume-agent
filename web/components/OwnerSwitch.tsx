@@ -51,13 +51,13 @@ export function OwnerSwitch() {
   }, []);
 
   return (
-    <div className="mt-4 space-y-4">
+    <div className="mt-6 space-y-5">
       {/* role="status" makes screen readers announce the outcome. */}
-      <p role="status" className="text-lg text-soft">
+      <p role="status" className="lead">
         {MESSAGE[state]}
       </p>
       {state === "on" && (
-        <p className="text-sm text-muted">{fill(copy.owner_remove_hint, { address: REMOVE_ADDRESS })}</p>
+        <p className="small text-muted">{fill(copy.owner_remove_hint, { address: REMOVE_ADDRESS })}</p>
       )}
       <SiteLink href="/try" className={primaryButton}>
         {copy.owner_go}

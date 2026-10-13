@@ -2,8 +2,9 @@
 
 import { copy } from "@/lib/copy";
 import { phaseOf, type Source } from "@/lib/run-machine";
-import { PHASE_SENTENCE } from "@/lib/steps";
+import { PHASE_SENTENCE, stepSentence } from "@/lib/steps";
 import type { Step } from "@/lib/types";
+import { chapter, page } from "../ui";
 import { Clock } from "./Clock";
 import { ProgressBar } from "./ProgressBar";
 import { ReplayNote } from "./ReplayNote";
@@ -19,44 +20,68 @@ type Props = {
   speed?: number;
 };
 
+/** The newest step that has a sentence, or "" before there is one. */
+function latestOf(steps: Step[]): string {
+  for (let index = steps.length - 1; index >= 0; index--) {
+    const sentence = stepSentence(steps[index]);
+    if (sentence) return sentence;
+  }
+  return "";
+}
+
 /**
- * The wait. One sentence that says what is happening, one quiet progress bar,
- * and the time so far. A run takes a minute or two, so the screen has to feel
- * alive without shouting: the bar breathes, the clock ticks, nothing else moves.
+ * The wait: one whole screen of lemon, the colour of a changed word, because
+ * changing words is what is going on. One large sentence says what is
+ * happening, a row of blocks shows the stage, the clock ticks, and under them
+ * the newest step is shown as it arrives: a run takes a minute or two, and
+ * watching it check each line is the most convincing thing the product does.
  */
 export function Running({ steps, queued, startedAt, source, onSkip, speed = 1 }: Props) {
   const phase = phaseOf(steps);
   const sentence = queued ? copy.run_queued : PHASE_SENTENCE[phase];
+  const latest = latestOf(steps);
 
   return (
-    <section className="mx-auto w-full max-w-xl">
+    <>
       {source === "replay" && <ReplayNote onSkip={onSkip} />}
-      {/* aria-live="polite" makes screen readers read each new sentence once,
-          without cutting off what they were saying. tabIndex lets the flow
-          move keyboard focus here when this screen appears. */}
-      {/* Room for two lines is kept, and the sentence sits at the bottom of it:
-          a longer sentence grows upwards and the bar below never moves. */}
-      <h1
-        aria-live="polite"
-        tabIndex={-1}
-        data-focus
-        className="display flex min-h-[2.2em] items-end text-[2rem] sm:text-[2.5rem]"
-      >
-        {/* The key makes React treat each sentence as a new element, so the
-            entrance animation plays every time the sentence changes. */}
-        <span key={sentence} className="enter inline-block">
-          {sentence}
-        </span>
-      </h1>
-      <div className="mt-6 flex items-center gap-4">
-        <ProgressBar phase={phase} sentence={sentence} />
-        {/* The clock shows the run's own time. For a live run that is simply ours. */}
-        <Clock startedAt={startedAt} speed={source === "replay" ? speed : 1} className="text-sm text-soft" />
-      </div>
-      <p className="mt-4 text-sm text-muted">{copy.run_hint}</p>
-      <div className="mt-6">
-        <StepsToggle steps={steps} />
-      </div>
-    </section>
+      <section className="field-changed">
+        <div className={`${page} ${chapter} flex min-h-[72svh] flex-col justify-end`}>
+          {/* aria-live="polite" makes screen readers read each new sentence once,
+              without cutting off what they were saying. tabIndex lets the flow
+              move keyboard focus here when this screen appears. */}
+          {/* Room for two lines is kept, and the sentence sits at the bottom of it:
+              a longer sentence grows upwards and the blocks below never move. */}
+          <h1
+            aria-live="polite"
+            tabIndex={-1}
+            data-focus
+            className="statement flex min-h-[2.1em] items-end text-[clamp(1.5rem,0.9rem+3.3vw,4.25rem)]"
+          >
+            {/* The key makes React treat each sentence as a new element, so the
+                entrance animation plays every time the sentence changes. */}
+            <span key={sentence} className="enter inline-block">
+              {sentence}
+            </span>
+          </h1>
+          <div className="mt-8 flex items-center gap-4">
+            <ProgressBar phase={phase} sentence={sentence} />
+            {/* The clock shows the run's own time. For a live run that is simply ours. */}
+            <Clock startedAt={startedAt} speed={source === "replay" ? speed : 1} className="lead font-bold" />
+          </div>
+          {/* The newest step, for the eye only: screen readers get the sentence
+              above and the full list below, and would otherwise hear this twice.
+              Two lines are kept free so a long step moves nothing. */}
+          <p aria-hidden className="lead mt-6 min-h-[2.6em]">
+            <span key={latest} className="enter line-clamp-2">
+              {latest}
+            </span>
+          </p>
+          <p className="small mt-4">{copy.run_hint}</p>
+          <div className="mt-2">
+            <StepsToggle steps={steps} />
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

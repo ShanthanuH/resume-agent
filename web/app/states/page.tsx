@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { page, quietLink } from "@/components/ui";
+import { page } from "@/components/ui";
 import { REPLAY_ONLY } from "@/lib/config";
 import { copy } from "@/lib/copy";
 import type { StateName } from "@/lib/states";
@@ -32,21 +32,24 @@ const LABELS: [StateName | "empty", string][] = [
 export default function StatesPage() {
   if (!REPLAY_ONLY) notFound();
   return (
-    <div className={`${page} pt-6 sm:pt-12`}>
-      <div className="max-w-xl">
-        <h1 className="display text-[2rem] sm:text-[2.5rem]">{copy.states_title}</h1>
-        <p className="mt-3 text-soft">{copy.states_lead}</p>
-        <ul className="mt-6 divide-y divide-rule border-y border-rule">
-          {LABELS.map(([name, label]) => (
-            <li key={name}>
-              {/* "empty" is simply the flow page itself. */}
-              <Link href={name === "empty" ? "/try" : `/states/${name}`} className={`${quietLink} w-full font-medium`}>
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+    <div className={`${page} grid gap-x-10 gap-y-8 pt-6 lg:grid-cols-12 lg:pt-14`}>
+      <div className="lg:col-span-5">
+        <h1 className="head">{copy.states_title}</h1>
+        <p className="lead mt-6">{copy.states_lead}</p>
       </div>
+      <ul className="space-y-1 lg:col-span-7">
+        {LABELS.map(([name, label]) => (
+          <li key={name}>
+            {/* "empty" is simply the flow page itself. */}
+            <Link
+              href={name === "empty" ? "/try" : `/states/${name}`}
+              className="field-tile flex min-h-14 items-center px-5 font-medium transition-transform duration-[120ms] ease-swoosh hover:translate-x-1"
+            >
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

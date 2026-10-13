@@ -5,7 +5,7 @@ import { copy, fill } from "@/lib/copy";
 import { nextResetTime } from "@/lib/format";
 import { errorSentence } from "@/lib/steps";
 import type { ErrorCode } from "@/lib/types";
-import { outlineButton, primaryButton } from "../ui";
+import { chapter, inkButton, page, quietLink } from "../ui";
 
 type Props =
   | { kind: "limited"; scope: "site" | "visitor"; onWatch: () => void }
@@ -23,6 +23,10 @@ const useResetTime = () => useSyncExternalStore(noChange, () => nextResetTime(),
  * today's runs are gone, the live demo is paused, or something failed. Each
  * says what happened in one line and offers the next thing to do. When the
  * visitor cannot run their own resume, that next thing is the recorded run.
+ *
+ * The whole screen takes one colour. Orange is the site's colour for "went
+ * wrong"; cornflower is the colour of the recorded run, which is what the
+ * limit and pause screens lead to.
  */
 export function Notice(props: Props) {
   const time = useResetTime();
@@ -41,26 +45,28 @@ export function Notice(props: Props) {
 
   return (
     // role="alert" makes screen readers read this as soon as it appears.
-    <section role="alert" className="mx-auto w-full max-w-xl">
-      <h1 tabIndex={-1} data-focus className="display text-[2rem] outline-none sm:text-[2.5rem]">
-        {title}
-      </h1>
-      <p className="mt-3 text-lg text-soft">{text}</p>
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        {props.kind === "error" ? (
-          <>
-            <button type="button" onClick={props.onRetry} className={primaryButton}>
-              {copy.error_retry}
-            </button>
-            <button type="button" onClick={props.onWatch} className={outlineButton}>
+    <section role="alert" className={props.kind === "error" ? "field-left-out" : "field-recorded"}>
+      <div className={`${page} ${chapter} flex min-h-[72svh] flex-col justify-end`}>
+        <h1 tabIndex={-1} data-focus className="head max-w-[14ch] outline-none">
+          {title}
+        </h1>
+        <p className="lead mt-6 max-w-[34ch]">{text}</p>
+        <div className="mt-10 flex flex-col gap-x-8 gap-y-2 sm:flex-row sm:items-center">
+          {props.kind === "error" ? (
+            <>
+              <button type="button" onClick={props.onRetry} className={inkButton}>
+                {copy.error_retry}
+              </button>
+              <button type="button" onClick={props.onWatch} className={`${quietLink} justify-center font-medium`}>
+                {copy.watch_run}
+              </button>
+            </>
+          ) : (
+            <button type="button" onClick={props.onWatch} className={inkButton}>
               {copy.watch_run}
             </button>
-          </>
-        ) : (
-          <button type="button" onClick={props.onWatch} className={primaryButton}>
-            {copy.watch_run}
-          </button>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );

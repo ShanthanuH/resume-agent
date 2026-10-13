@@ -8,9 +8,9 @@ export const metadata: Metadata = { title: copy.owner_meta_title, robots: { inde
 
 export default function OwnerPage() {
   return (
-    <div className={`${page} pt-6 sm:pt-12`}>
-      <div className="max-w-xl">
-        <h1 className="display text-[2rem] sm:text-[2.5rem]">{copy.owner_title}</h1>
+    <div className={`${page} pt-6 lg:pt-14`}>
+      <div className="max-w-2xl">
+        <h1 className="head">{copy.owner_title}</h1>
         <OwnerSwitch />
       </div>
     </div>

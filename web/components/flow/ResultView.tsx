@@ -2,16 +2,18 @@
 
 import { useState } from "react";
 import { copy, fill } from "@/lib/copy";
+import { diffWords } from "@/lib/diff";
 import { changedCount, gaps } from "@/lib/resume";
 import type { Source } from "@/lib/run-machine";
 import type { Result, Step } from "@/lib/types";
-import { quietLink } from "../ui";
+import { page, quietLink } from "../ui";
 import { DownloadButton } from "./DownloadButton";
 import { Gaps } from "./Gaps";
 import { Paper } from "./Paper";
 import { Questions } from "./Questions";
 import { ReplayNote } from "./ReplayNote";
 import { StepsToggle } from "./StepsToggle";
+import { lineAnchor } from "./TraceLine";
 
 type Props = {
   result: Result;
@@ -29,17 +31,28 @@ function summaryOf(result: Result, changed: number): string {
   return changed === 1 ? copy.result_summary_one : fill(copy.result_summary_many, { count: changed });
 }
 
+/** For each rewritten line: its ID and the first run of words that changed. */
+function changedWords(result: Result): { id: string; words: string }[] {
+  return result.bullets.map((bullet) => {
+    const original = bullet.replaces ? (result.evidence[bullet.replaces] ?? "") : "";
+    const first = diffWords(original, bullet.text).find((piece) => piece.changed);
+    return { id: bullet.id, words: first?.text ?? bullet.text };
+  });
+}
+
 /**
- * The result. The tailored resume comes first and large, with the changed
- * words highlighted. Beside it (under it on a phone): one summary line, the
- * download button, what the job asks for that the resume lacks, and any
- * question the run had.
+ * The result. Black around, and the resume on white in the middle of it, with
+ * the changed words in lemon. Beside it (above and under it on a phone): one
+ * summary line, a lemon block per changed line that jumps to it, the download
+ * button, what the job asks for that the resume lacks, and any question the
+ * run had.
  */
 export function ResultView({ result, steps, source, onAgain, againLabel, staticPdf }: Props) {
   // Lines where the visitor chose their original. Every rewrite starts out in.
   const [kept, setKept] = useState<Set<string>>(() => new Set());
   const [openId, setOpenId] = useState<string | null>(null);
   const changed = changedCount(result, kept);
+  const jumps = changedWords(result).filter((jump) => !kept.has(jump.id));
 
   function keep(bulletId: string, keepOriginal: boolean) {
     // Copy the set: React only re-draws when it is handed a new object.
@@ -49,35 +62,58 @@ export function ResultView({ result, steps, source, onAgain, againLabel, staticP
     setKept(next);
   }
 
+  /** Open one changed line and bring it to the middle of the screen. */
+  function jumpTo(bulletId: string) {
+    setOpenId(bulletId);
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.getElementById(lineAnchor(bulletId))?.scrollIntoView({ block: "center", behavior: calm ? "auto" : "smooth" });
+  }
+
   return (
-    <div>
+    <>
       {source === "replay" && <ReplayNote />}
       {/* One column on a phone: summary, resume, button, the rest. On a wide
           screen the resume is the left column and everything else sits to its
           right. "lg:contents" on the aside is what lets one set of elements do
           both: on a phone its children take part in the single column. */}
-      <div className="grid gap-x-12 gap-y-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
-        <aside className="contents lg:sticky lg:top-6 lg:order-2 lg:block lg:max-h-[calc(100dvh-3rem)] lg:space-y-8 lg:overflow-y-auto">
-          <header className="order-1">
-            <h1 tabIndex={-1} data-focus className="display text-[1.75rem] outline-none sm:text-[2rem]">
+      <div className={`${page} grid gap-x-10 pt-8 lg:grid-cols-12 lg:items-start lg:pt-12`}>
+        <aside className="contents lg:sticky lg:top-6 lg:order-2 lg:col-span-5 lg:-m-2 lg:block lg:max-h-[calc(100dvh-3rem)] lg:space-y-10 lg:overflow-y-auto lg:p-2">
+          <header className="order-1 pb-6 lg:pb-0">
+            <h1 tabIndex={-1} data-focus className="lead font-bold outline-none">
               {summaryOf(result, changed)}
             </h1>
-            {result.bullets.length > 0 && <p className="mt-2 text-sm text-soft">{copy.result_hint}</p>}
+            {result.bullets.length > 0 && <p className="small mt-2 font-normal">{copy.result_hint}</p>}
+            {/* One lemon block per changed line, showing the words that changed.
+                On a phone the changed lines are below the first screen: a tap
+                here opens the line and scrolls to it. */}
+            {jumps.length > 0 && (
+              <ul className="mt-4 flex flex-col items-start gap-1">
+                {jumps.map((jump) => (
+                  <li key={jump.id}>
+                    <button
+                      type="button"
+                      onClick={() => jumpTo(jump.id)}
+                      className="field-changed min-h-11 px-3 py-2 text-left font-medium leading-snug transition-transform duration-[120ms] ease-swoosh hover:translate-x-1 active:translate-y-0.5 [--ring:#ffffff]"
+                    >
+                      {jump.words}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </header>
           {/* On a phone the button stays at the bottom of the screen while the
               resume scrolls, so it is always one tap away. */}
-          <div className="sticky bottom-0 z-10 order-3 -mx-5 border-t border-rule bg-paper px-5 py-3 sm:-mx-8 sm:px-8 lg:static lg:mx-0 lg:border-0 lg:p-0">
+          <div className="sticky bottom-0 z-10 order-3 -mx-4 bg-ground px-4 py-3 sm:-mx-10 sm:px-10 lg:static lg:mx-0 lg:p-0">
             <DownloadButton result={result} kept={kept} staticPdf={staticPdf} />
           </div>
-          <div className="order-4 space-y-8">
+          <div className="order-4 space-y-10 pt-6 lg:pt-0">
             <Gaps missing={gaps(result)} />
             <Questions questions={result.questions} />
-            <div className="border-t border-rule pt-4">
-              <p className="text-sm text-muted">
-                {fill(copy.result_time, { seconds: Math.round(result.stats.seconds) })}
-              </p>
+            <div>
+              <p className="small text-muted">{fill(copy.result_time, { seconds: Math.round(result.stats.seconds) })}</p>
               <div className="flex flex-wrap items-start gap-x-6">
-                <button type="button" onClick={onAgain} className={`${quietLink} text-sm text-soft`}>
+                <button type="button" onClick={onAgain} className={`${quietLink} small`}>
                   {againLabel}
                 </button>
                 <StepsToggle steps={steps} />
@@ -85,7 +121,8 @@ export function ResultView({ result, steps, source, onAgain, againLabel, staticP
             </div>
           </div>
         </aside>
-        <div className="order-2 lg:order-1">
+        {/* On a phone the sheet runs from edge to edge of the screen. */}
+        <div className="order-2 max-lg:-mx-4 sm:max-lg:-mx-10 lg:order-1 lg:col-span-7">
           <Paper
             result={result}
             label={copy.result_resume_label}
@@ -96,6 +133,6 @@ export function ResultView({ result, steps, source, onAgain, againLabel, staticP
           />
         </div>
       </div>
-    </div>
+    </>
   );
 }

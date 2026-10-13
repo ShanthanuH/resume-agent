@@ -17,7 +17,7 @@ export function StepsToggle({ steps }: { steps: Step[] }) {
         aria-expanded={open}
         aria-controls={open ? list : undefined}
         onClick={() => setOpen(!open)}
-        className={`${quietLink} text-sm text-soft`}
+        className={`${quietLink} small`}
       >
         {open ? copy.run_hide_steps : copy.run_show_steps}
       </button>

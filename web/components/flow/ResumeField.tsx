@@ -14,11 +14,11 @@ type Props = {
 
 // Every look of the box has this height, so nothing below it moves when a
 // file is added or removed. The outline shows when the hidden file input
-// inside it has keyboard focus.
+// inside it has keyboard focus. The box is white: it is where the resume goes,
+// and white is the resume everywhere on the site.
 const BOX =
-  "flex min-h-[7.5rem] w-full flex-col justify-center rounded-[10px] border px-5 py-4 " +
-  "transition-colors duration-200 ease-swoosh " +
-  "has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ink";
+  "flex min-h-40 w-full flex-col justify-center px-5 py-4 " +
+  "has-[input:focus-visible]:outline-[3px] has-[input:focus-visible]:outline-offset-[3px] has-[input:focus-visible]:outline-white";
 
 /**
  * True while a file is being dragged over the page. A file dropped anywhere on
@@ -91,8 +91,8 @@ export function ResumeField({ input, problem, dispatch }: Props) {
   if (dragging) {
     // A file is in the air: say so, whatever was in the box before.
     box = (
-      <div className={`${BOX} items-center border-ink bg-mark/40 text-center`}>
-        <span className="font-medium">{copy.flow_drop_now}</span>
+      <div className={`${BOX} field-action items-center text-center`}>
+        <span className="lead font-bold">{copy.flow_drop_now}</span>
       </div>
     );
   } else if (mode === "text") {
@@ -105,21 +105,20 @@ export function ResumeField({ input, problem, dispatch }: Props) {
         onChange={(event) => dispatch({ type: "resume_typed", text: event.target.value })}
         rows={5}
         placeholder={copy.flow_resume_placeholder}
-        className="block min-h-[7.5rem] w-full rounded-[10px] border border-rule bg-sheet p-4 text-base placeholder:text-muted focus:border-ink"
+        className="field-sheet block min-h-40 w-full border-l-8 border-sheet p-4 placeholder:text-neutral-600 aria-invalid:border-left-out"
       />
     );
   } else if (file) {
-    // A file is in. Solid border, red if it cannot be used.
-    const tone = fileProblem ? "border-danger text-danger" : "border-ink text-ink";
+    // A file is in. A file that cannot be used gets an orange bar on the left.
     box = (
-      <div className={`${BOX} bg-sheet ${fileProblem ? "border-danger" : "border-ink"}`}>
+      <div className={`${BOX} field-sheet border-l-8 ${fileProblem ? "border-left-out" : "border-sheet"}`}>
         {fileInput}
         <div className="flex items-center gap-3">
-          <span className={`label rounded border px-1.5 py-0.5 ${tone}`}>PDF</span>
-          <p className="min-w-0 flex-1 truncate font-medium">{file.name}</p>
-          <p className="tabular shrink-0 text-sm text-muted">{fileSize(file.size)}</p>
+          <span className="small bg-black px-1.5 py-0.5 font-bold text-white">PDF</span>
+          <p className="lead min-w-0 flex-1 truncate font-bold">{file.name}</p>
+          <p className="small tabular shrink-0">{fileSize(file.size)}</p>
         </div>
-        <div className="mt-1 flex gap-5 text-sm">
+        <div className="small mt-1 flex gap-6">
           <label htmlFor={picker} className={`${quietLink} cursor-pointer`}>
             {copy.flow_file_change}
           </label>
@@ -135,11 +134,11 @@ export function ResumeField({ input, problem, dispatch }: Props) {
     box = (
       <label
         htmlFor={picker}
-        className={`${BOX} cursor-pointer items-center border-dashed border-muted bg-sheet text-center hover:border-ink`}
+        className={`${BOX} field-sheet cursor-pointer items-center text-center transition-transform duration-[120ms] ease-swoosh hover:-translate-y-0.5`}
       >
         {fileInput}
-        <span className="font-medium">{copy.flow_drop}</span>
-        <span className="mt-1 text-sm text-muted">{copy.flow_drop_hint}</span>
+        <span className="lead font-bold">{copy.flow_drop}</span>
+        <span className="small mt-1">{copy.flow_drop_hint}</span>
       </label>
     );
   }
@@ -149,14 +148,14 @@ export function ResumeField({ input, problem, dispatch }: Props) {
       {box}
       {/* The problem sits in the same place for every kind of input. */}
       {problem && (
-        <p id={hint} role="alert" className="enter mt-2 text-sm text-danger">
+        <p id={hint} role="alert" className="enter mt-2 font-medium text-left-out">
           {problem}
         </p>
       )}
       <button
         type="button"
         onClick={() => dispatch({ type: "mode_set", mode: mode === "text" ? "file" : "text" })}
-        className={`${quietLink} text-sm text-soft`}
+        className={`${quietLink} small`}
       >
         {mode === "text" ? copy.flow_upload_instead : copy.flow_paste_instead}
       </button>

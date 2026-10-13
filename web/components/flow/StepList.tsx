@@ -8,9 +8,9 @@ import type { Step } from "@/lib/types";
 // A small mark in front of each sentence. A shape as well as a shade, so the
 // meaning does not depend on seeing colour.
 const MARK: Record<Tone, { glyph: string; className: string }> = {
-  good: { glyph: "✓", className: "text-ink" },
-  left_out: { glyph: "–", className: "text-muted" },
-  redo: { glyph: "↻", className: "text-danger" },
+  good: { glyph: "✓", className: "text-yours" },
+  left_out: { glyph: "–", className: "text-left-out" },
+  redo: { glyph: "↻", className: "text-left-out" },
   plain: { glyph: "·", className: "text-muted" },
 };
 
@@ -41,7 +41,8 @@ export function StepList({ steps, id }: { steps: Step[]; id: string }) {
         const list = event.currentTarget;
         pinned.current = list.scrollHeight - list.scrollTop - list.clientHeight < NEAR_BOTTOM_PX;
       }}
-      className="max-h-72 space-y-2 overflow-y-auto overscroll-contain rounded-md border border-rule bg-sheet p-4 text-sm"
+      // A dark tile on any field: the list reads the same on lemon and on black.
+      className="field-tile max-h-72 space-y-2 overflow-y-auto overscroll-contain p-4 text-base"
     >
       {shown.length === 0 && <li className="text-muted">{copy.run_steps_empty}</li>}
       {shown.map(({ step, sentence }, index) => {
@@ -56,11 +57,11 @@ export function StepList({ steps, id }: { steps: Step[]; id: string }) {
             className="enter flex gap-2.5"
             style={{ "--i": Math.min(place, 10) } as React.CSSProperties}
           >
-            <span aria-hidden className={`w-3 shrink-0 text-center font-medium ${mark.className}`}>
+            <span aria-hidden className={`w-3 shrink-0 text-center font-bold ${mark.className}`}>
               {mark.glyph}
             </span>
             {/* line-clamp keeps a long resume line to two rows of the list. */}
-            <span className="line-clamp-2 min-w-0 break-words text-soft">{sentence}</span>
+            <span className="line-clamp-2 min-w-0 break-words">{sentence}</span>
           </li>
         );
       })}
