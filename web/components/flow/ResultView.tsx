@@ -77,12 +77,18 @@ export function ResultView({ result, steps, source, onAgain, againLabel, staticP
           right. "lg:contents" on the aside is what lets one set of elements do
           both: on a phone its children take part in the single column. */}
       <div className={`${page} grid gap-x-10 pt-8 lg:grid-cols-12 lg:items-start lg:pt-12`}>
+        {/* The summary runs the full width, above both columns. Its size is
+            chosen so that the longest summary still fits in two lines. */}
+        <h1
+          tabIndex={-1}
+          data-focus
+          className="statement enter order-first pb-4 text-[clamp(1.25rem,4.6vw,4.5rem)] outline-none lg:col-span-12 lg:pb-10"
+        >
+          {summaryOf(result, changed)}
+        </h1>
         <aside className="contents lg:sticky lg:top-6 lg:order-2 lg:col-span-5 lg:-m-2 lg:block lg:max-h-[calc(100dvh-3rem)] lg:space-y-10 lg:overflow-y-auto lg:p-2">
-          <header className="order-1 pb-6 lg:pb-0">
-            <h1 tabIndex={-1} data-focus className="lead font-bold outline-none">
-              {summaryOf(result, changed)}
-            </h1>
-            {result.bullets.length > 0 && <p className="small mt-2 font-normal">{copy.result_hint}</p>}
+          <header className="stagger order-1 pb-6 lg:pb-0">
+            {result.bullets.length > 0 && <p className="font-medium">{copy.result_hint}</p>}
             {/* One lemon block per changed line, showing the words that changed.
                 On a phone the changed lines are below the first screen: a tap
                 here opens the line and scrolls to it. */}

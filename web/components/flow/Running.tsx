@@ -45,7 +45,7 @@ export function Running({ steps, queued, startedAt, source, onSkip, speed = 1 }:
     <>
       {source === "replay" && <ReplayNote onSkip={onSkip} />}
       <section className="field-changed">
-        <div className={`${page} ${chapter} flex min-h-[72svh] flex-col justify-end`}>
+        <div className={`${page} ${chapter} stagger flex min-h-[72svh] flex-col justify-end`}>
           {/* aria-live="polite" makes screen readers read each new sentence once,
               without cutting off what they were saying. tabIndex lets the flow
               move keyboard focus here when this screen appears. */}
@@ -55,7 +55,7 @@ export function Running({ steps, queued, startedAt, source, onSkip, speed = 1 }:
             aria-live="polite"
             tabIndex={-1}
             data-focus
-            className="statement flex min-h-[2.1em] items-end text-[clamp(1.5rem,0.9rem+3.3vw,4.25rem)]"
+            className="statement flex min-h-[2.1em] items-end text-[clamp(1.5rem,7vw,6.5rem)]"
           >
             {/* The key makes React treat each sentence as a new element, so the
                 entrance animation plays every time the sentence changes. */}
@@ -76,7 +76,7 @@ export function Running({ steps, queued, startedAt, source, onSkip, speed = 1 }:
               {latest}
             </span>
           </p>
-          <p className="small mt-4">{copy.run_hint}</p>
+          <p className="mt-4">{copy.run_hint}</p>
           <div className="mt-2">
             <StepsToggle steps={steps} />
           </div>

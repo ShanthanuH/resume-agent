@@ -59,7 +59,7 @@ export default async function Image() {
               display: "flex",
               flexDirection: "column",
               marginTop: 30,
-              fontSize: 126,
+              fontSize: 112, // the longer sentence just fits on one line at this size
               fontWeight: 700,
               lineHeight: 0.92,
               letterSpacing: -4,

@@ -67,13 +67,14 @@ export function Paper({
   return (
     <article
       aria-label={label}
-      // data-ui marks this as the product's own interface for the design
-      // inspector (taste-skill), which then leaves its conventions alone.
-      data-ui
+      // data-ui marks the home page's excerpt as a picture of the product's
+      // interface, for the design inspector (taste-skill). The full resume on
+      // the result page is the page itself, not a picture of it.
+      data-ui={large ? "" : undefined}
       className={`field-sheet ${
         large
           ? "text-[clamp(1.25rem,0.95rem+1.3vw,2.125rem)] font-medium leading-[1.25]"
-          : "px-4 py-8 text-[1.0625rem] leading-[1.5] sm:p-12"
+          : "px-4 py-8 leading-[1.5] sm:p-12"
       } ${className}`}
     >
       {name && <p className="statement">{name}</p>}

@@ -46,8 +46,8 @@ export function Notice(props: Props) {
   return (
     // role="alert" makes screen readers read this as soon as it appears.
     <section role="alert" className={props.kind === "error" ? "field-left-out" : "field-recorded"}>
-      <div className={`${page} ${chapter} flex min-h-[72svh] flex-col justify-end`}>
-        <h1 tabIndex={-1} data-focus className="head max-w-[14ch] outline-none">
+      <div className={`${page} ${chapter} stagger flex min-h-[72svh] flex-col justify-end`}>
+        <h1 tabIndex={-1} data-focus className="head poster outline-none">
           {title}
         </h1>
         <p className="lead mt-6 max-w-[34ch]">{text}</p>

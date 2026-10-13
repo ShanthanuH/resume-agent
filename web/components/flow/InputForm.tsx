@@ -65,12 +65,15 @@ export function InputForm({ state, dispatch, onSubmit, onToken, waiting }: Props
       noValidate
       className={`${page} grid gap-x-10 gap-y-8 pb-[var(--chapter)] pt-6 lg:grid-cols-12 lg:pt-14`}
     >
-      <div className="lg:col-span-5">
-        <h1 className="head">{copy.flow_title}</h1>
-        {REPLAY_ONLY && <p className="field-recorded small mt-6 max-w-md px-4 py-3">{copy.flow_preview_note}</p>}
+      {/* The title runs the full width, as large as it can be on one line. */}
+      <h1 className="head poster enter lg:col-span-12">{copy.flow_title}</h1>
+      <div className="enter min-w-0 lg:col-span-5">
+        {REPLAY_ONLY && <p className="field-recorded max-w-md px-4 py-3">{copy.flow_preview_note}</p>}
       </div>
 
-      <ol className="space-y-9 lg:col-span-7">
+      {/* min-w-0 lets the column shrink below its longest unbreakable word (a
+          long file name), so nothing pushes the page wider than the screen. */}
+      <ol className="stagger min-w-0 space-y-9 lg:col-span-7">
         <Step label={copy.flow_step_resume}>
           <ResumeField input={input} problem={resumeCode && problemSentence(resumeCode)} dispatch={dispatch} />
         </Step>

@@ -22,13 +22,16 @@ const BLOCKS = [
 export function BlockName() {
   const letters = copy.nav_brand.toUpperCase().split("");
   return (
-    <div aria-hidden className="flex h-[22svh] min-h-28 items-end gap-1 sm:h-[30svh]">
+    // overflow-hidden: the blocks rise into place from below this box's bottom
+    // edge (see .block-letter in globals.css), and are cut off until they do.
+    <div aria-hidden className="flex h-[22svh] min-h-28 items-end gap-1 overflow-hidden sm:h-[30svh]">
       {letters.map((letter, index) => {
         const [colour, height] = BLOCKS[index % BLOCKS.length];
         return (
           <span
             key={index}
             data-letter={letter}
+            style={{ "--i": index } as React.CSSProperties}
             // The letter sits at the bottom of its block and is as large as the
             // block is wide (cqw = 1% of the block's width).
             className={`block-letter flex flex-1 items-end justify-center overflow-hidden text-black [container-type:inline-size] before:text-[92cqw] before:font-bold before:leading-[0.8] ${colour} ${height}`}

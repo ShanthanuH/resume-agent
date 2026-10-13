@@ -20,7 +20,7 @@ export function ReplayNote({ onSkip }: { onSkip?: () => void }) {
       <div className={`${page} py-3`}>
         <p className="flex flex-wrap items-baseline gap-x-3">
           <span className="font-bold">{copy.replay_label}</span>
-          <span className="small font-normal">{copy.replay_note}</span>
+          <span className="max-w-[60ch]">{copy.replay_note}</span>
         </p>
         <div className="small flex flex-wrap gap-x-6">
           <button

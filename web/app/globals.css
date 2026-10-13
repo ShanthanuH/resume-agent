@@ -71,6 +71,12 @@ body {
 
 /* --- Fields ------------------------------------------------------------------ */
 
+/* The field and type classes below sit in Tailwind's "components" layer. A
+   layer sets who wins when two rules disagree: utilities (font-bold,
+   open:bg-action, text-[...]) are in a later layer, so a utility written next
+   to one of these classes overrides it. Outside a layer these would always win. */
+@layer components {
+
 /* A field is a flat area of one colour. The class sets three things together:
    the background, the text colour that reads on it, and the focus ring. */
 .field-ground {
@@ -123,6 +129,12 @@ body {
   text-wrap: balance; /* even line lengths, no lonely last word */
 }
 
+/* The one title of a screen that is nothing but its title: the form, a notice,
+   the 404 page. As large as two lines of it can be. */
+.poster {
+  font-size: clamp(2rem, 8.4vw, 7.5rem);
+}
+
 /* A heading that is a full sentence: the same weight, in normal letters. */
 .statement {
   font-size: var(--step-statement);
@@ -151,6 +163,8 @@ body {
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+} /* end of @layer components */
 
 /* The home headline: two lines, each as wide as the page allows. The size is
    tied to the width of its box (cqw = 1% of that width), so the longer line
@@ -226,6 +240,24 @@ mark {
   }
 }
 
+/* The parts of a screen coming in one after another: title, text, controls.
+   Put on the box that holds them. */
+.stagger > * {
+  animation: enter 500ms var(--ease-swoosh) backwards;
+}
+.stagger > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 140ms;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 210ms;
+}
+.stagger > *:nth-child(n + 5) {
+  animation-delay: 280ms;
+}
+
 /* The parts of a chapter rise into place as the chapter scrolls into view,
    one a little after the other. The browser ties the animation to the scroll
    position itself (animation-timeline), so no script is involved. A browser
@@ -243,6 +275,23 @@ mark {
     .arrive > *:nth-child(n + 3) {
       animation-range: entry 20% entry 85%;
     }
+  }
+}
+/* The name in the footer: each block rises from the bottom edge as the footer
+   scrolls into view, the later letters a little after the earlier ones (--i is
+   the letter's place in the name). Tied to scrolling in the same way. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .block-letter {
+      animation: block-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry calc(45% + var(--i, 0) * 7%);
+    }
+  }
+}
+@keyframes block-rise {
+  from {
+    transform: translateY(45%);
   }
 }
 @keyframes arrive {

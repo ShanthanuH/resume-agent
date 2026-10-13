@@ -135,7 +135,7 @@ export function Flow({ variant, initial, speed = 1 }: Props) {
     // width or padding of its own.
     <div ref={top} className="min-h-[72svh]">
       {/* The key makes each screen a new element, so its entrance animation plays. */}
-      <div key={screen} className="enter">
+      <div key={screen}>
         {screen === "form" && editing && (
           <InputForm state={state} dispatch={dispatch} onSubmit={submit} onToken={onToken} waiting={waiting} />
         )}

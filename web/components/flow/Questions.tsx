@@ -16,7 +16,7 @@ export function Questions({ questions }: { questions: string[] }) {
           <li key={question}>{question}</li>
         ))}
       </ul>
-      <p className="small mt-3 font-normal">{copy.questions_text}</p>
+      <p className="mt-3 max-w-[60ch]">{copy.questions_text}</p>
     </section>
   );
 }

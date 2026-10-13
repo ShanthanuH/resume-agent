@@ -12,8 +12,8 @@ import { copy } from "@/lib/copy";
 export default function ErrorPage({ retry }: { error: Error & { digest?: string }; retry: () => void }) {
   return (
     <section role="alert" className="field-left-out">
-      <div className={`${page} ${chapter} flex min-h-[72svh] flex-col justify-end`}>
-        <h1 className="head max-w-[14ch]">{copy.crash_title}</h1>
+      <div className={`${page} ${chapter} stagger flex min-h-[72svh] flex-col justify-end`}>
+        <h1 className="head poster">{copy.crash_title}</h1>
         <p className="lead mt-6 max-w-[34ch]">{copy.crash_text}</p>
         <button type="button" onClick={() => retry()} className={`${inkButton} mt-10 self-start`}>
           {copy.crash_retry}
