@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk } from "next/font/google";
-import localFont from "next/font/local";
+import { Jost } from "next/font/google";
+import { BlockName } from "@/components/BlockName";
 import { HeaderAction } from "@/components/HeaderAction";
 import { SiteLink } from "@/components/SiteLink";
 import { page, quietLink } from "@/components/ui";
@@ -8,26 +8,10 @@ import { GITHUB_URL, SITE_URL } from "@/lib/config";
 import { copy } from "@/lib/copy";
 import "./globals.css";
 
-// The pairing: Fraunces, a soft old-style serif, for headlines, and Hanken
-// Grotesk, a quiet sans, for everything else. next/font serves both from our
-// own domain, so no visitor request goes to Google. Each sets a CSS variable
-// used in globals.css.
-//
-// Fraunces comes from two small files in assets/fonts: its display drawing
-// (optical size 72), cut down to the Latin letters the headlines use. Together
-// they are 38 KB. The full font from Google with the same look is 150 KB, and
-// a phone on a slow network has to wait for it before it can show the headline.
-const display = localFont({
-  variable: "--font-fraunces",
-  src: [
-    { path: "../assets/fonts/Fraunces-72pt-Regular.woff2", weight: "400", style: "normal" },
-    { path: "../assets/fonts/Fraunces-72pt-Italic.woff2", weight: "400", style: "italic" },
-  ],
-  // Until the font arrives the headline is shown in Times, stretched to the
-  // same size, so the text does not jump when Fraunces replaces it.
-  adjustFontFallback: "Times New Roman",
-});
-const sans = Hanken_Grotesk({ variable: "--font-hanken", subsets: ["latin"] });
+// One typeface for everything: Jost, a geometric sans in the tradition of
+// 1920s poster lettering. next/font serves it from our own domain, so no
+// visitor request goes to Google. It sets a CSS variable used in globals.css.
+const jost = Jost({ variable: "--font-jost", subsets: ["latin"], weight: ["400", "500", "700"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL), // turns relative image paths into full URLs
@@ -44,36 +28,37 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: copy.meta_title, description: copy.meta_description },
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#f8f4ea" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#000000" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} h-full antialiased`}>
+    <html lang="en" className={`${jost.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         {/* Hidden until a keyboard user presses Tab: jumps past the header. */}
         <a
           href="#content"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-ink focus:px-4 focus:py-3 focus:text-paper"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-action focus:px-4 focus:py-3 focus:text-black"
         >
           {copy.skip_link}
         </a>
-        <header className={`${page} flex items-center justify-between py-4`}>
+        {/* A plain bar: the name, two links, one action. */}
+        <header className={`${page} flex items-center justify-between gap-4 py-3`}>
           <SiteLink
             href="/"
             aria-label={copy.nav_home_label}
-            className="display flex min-h-11 items-center text-[1.4rem]"
+            className="flex min-h-11 items-center text-xl font-bold uppercase tracking-[-0.03em]"
           >
-            {/* The stroke under the name is the product's highlight. */}
-            <span className="logo-mark">{copy.nav_brand}</span>
+            {copy.nav_brand}
           </SiteLink>
           <HeaderAction />
         </header>
         <main id="content" className="flex-1">
           {children}
         </main>
-        <footer className="mt-24 border-t border-rule">
-          <div className={`${page} flex flex-wrap items-center gap-x-6 gap-y-1 py-6 text-sm text-soft`}>
-            <span className="display mr-auto text-base text-ink">{copy.nav_brand}</span>
+        {/* The close: the name built large from blocks of the site's colours. */}
+        <footer className={`${page} pb-6 pt-[var(--chapter)]`}>
+          <BlockName />
+          <div className="small mt-8 flex flex-wrap items-center gap-x-8 gap-y-1">
             <SiteLink href="/example" className={quietLink}>
               {copy.footer_example}
             </SiteLink>
