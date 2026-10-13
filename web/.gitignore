@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated from content/copy.yaml by scripts/copy.mjs
+/lib/copy.gen.ts

@@ -1,7 +1,10 @@
 import type { Requirement, Result } from "./types";
 
-/** The resume as the PDF endpoint wants it: accepted bullets in, the rest original. */
-export function buildDoc(result: Result, accepted: Set<string>) {
+/**
+ * The resume as the PDF endpoint wants it. Every rewrite is in, except the
+ * lines in `kept`: bullet IDs where the visitor chose their original.
+ */
+export function buildDoc(result: Result, kept: Set<string>) {
   const text = new Map(result.bullets.map((b) => [b.id, b.text]));
   return {
     header: result.header,
@@ -13,7 +16,7 @@ export function buildDoc(result: Result, accepted: Set<string>) {
         organization: entry.organization,
         dates: entry.dates,
         lines: entry.lines.map((line) =>
-          line.bullet_id && accepted.has(line.bullet_id)
+          line.bullet_id && !kept.has(line.bullet_id)
             ? (text.get(line.bullet_id) ?? line.original)
             : line.original,
         ),
@@ -22,20 +25,19 @@ export function buildDoc(result: Result, accepted: Set<string>) {
   };
 }
 
-export type Coverage = {
-  covered: Requirement[]; // a verified line on the final resume covers it
-  unshown: Requirement[]; // there is evidence, but its rewrite was rejected
-  gaps: Requirement[]; // no evidence on the resume at all
-};
+/** How many lines on the resume differ from what the visitor wrote. */
+export function changedCount(result: Result, kept: Set<string>): number {
+  return result.bullets.filter((bullet) => !kept.has(bullet.id)).length;
+}
 
-/** Sort requirements by what the final resume can honestly show for each. */
-export function coverage(requirements: Requirement[], accepted: Set<string>): Coverage {
-  const out: Coverage = { covered: [], unshown: [], gaps: [] };
-  for (const req of requirements) {
-    const hasAccepted = req.bullet_ids.some((id) => accepted.has(id));
-    if (hasAccepted || req.kept_line_ids.length > 0) out.covered.push(req);
-    else if (req.bullet_ids.length > 0) out.unshown.push(req);
-    else out.gaps.push(req);
-  }
-  return out;
+/**
+ * What the job asks for that the resume does not show at all: no rewritten
+ * line covers it and no original line does. Must-haves come first.
+ */
+export function gaps(result: Result): Requirement[] {
+  const missing = result.requirements.filter(
+    (req) => req.bullet_ids.length === 0 && req.kept_line_ids.length === 0,
+  );
+  // sort is stable, so within each group the job post's own order is kept.
+  return missing.sort((a, b) => Number(b.priority === "must_have") - Number(a.priority === "must_have"));
 }

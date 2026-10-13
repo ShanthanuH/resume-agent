@@ -69,9 +69,31 @@ def is_owner(header: str | None) -> bool:
 LIMIT_MESSAGE = "Demo limit reached for today. See the full example."
 UNAVAILABLE_MESSAGE = "Live runs are not available right now. See the full example."
 
+# Set DEMO_PAUSED=1 to switch live runs off by hand, for example while the model
+# account has no credit. The site then offers the recorded run instead.
+DEMO_PAUSED = os.environ.get("DEMO_PAUSED", "").lower() not in ("", "0", "false")
+# Vercel sets VERCEL_ENV to "preview" on every preview deployment. Previews are
+# for looking at the design, so they never start a live run: no model call, no
+# bot check, and none of the day's real runs used up.
+IS_PREVIEW = os.environ.get("VERCEL_ENV", "") == "preview"
+
+
+def live_runs_off() -> bool:
+    """True when no live run may start at all, whatever the day's count says."""
+    return DEMO_PAUSED or IS_PREVIEW
+
 
 class LimitReached(Exception):
-    """Raised with a message that is safe and friendly enough to show a visitor."""
+    """Raised with a message that is safe and friendly enough to show a visitor.
+
+    `code` tells the browser which screen to show, so it can use its own words:
+    "limit_site" (the day's runs are gone for everyone), "limit_visitor" (this
+    visitor has had theirs) or "paused" (live runs cannot be counted right now).
+    """
+
+    def __init__(self, message: str, code: str = "limit_site") -> None:
+        super().__init__(message)
+        self.code = code
 
 
 def client_ip(forwarded_for: str | None, peer: str) -> str:
@@ -106,9 +128,12 @@ class RunCounter:
         """Count one run for this visitor, or raise LimitReached."""
         self._roll_over()
         key = _ip_key(ip)
-        # One message for both limits. The browser adds a link to the example page.
-        if self.total >= DAILY_RUN_CAP or self.per_ip.get(key, 0) >= RUNS_PER_IP:
-            raise LimitReached(LIMIT_MESSAGE)
+        # The site-wide cap is checked first: when the day is used up, that is
+        # the true reason for everyone, including a visitor who had a run.
+        if self.total >= DAILY_RUN_CAP:
+            raise LimitReached(LIMIT_MESSAGE, "limit_site")
+        if self.per_ip.get(key, 0) >= RUNS_PER_IP:
+            raise LimitReached(LIMIT_MESSAGE, "limit_visitor")
         self.total += 1
         self.per_ip[key] = self.per_ip.get(key, 0) + 1
 
@@ -118,6 +143,11 @@ class RunCounter:
         if self.per_ip.get(key, 0) > 0:
             self.per_ip[key] -= 1
             self.total = max(0, self.total - 1)
+
+    async def state(self) -> str:
+        """"open" while the day has runs left for the site, else "limited"."""
+        self._roll_over()
+        return "limited" if self.total >= DAILY_RUN_CAP else "open"
 
 
 class RedisCounter:
@@ -153,10 +183,12 @@ class RedisCounter:
             )
         except (httpx.HTTPError, KeyError, ValueError) as err:
             # Cannot count, so cannot enforce the budget: refuse the run.
-            raise LimitReached(UNAVAILABLE_MESSAGE) from err
+            raise LimitReached(UNAVAILABLE_MESSAGE, "paused") from err
         if total > DAILY_RUN_CAP or mine > RUNS_PER_IP:
             await self.refund(ip)  # undo the two INCRs above
-            raise LimitReached(LIMIT_MESSAGE)
+            # Same order as RunCounter: the site-wide cap is the reason if both hit.
+            code = "limit_site" if total > DAILY_RUN_CAP else "limit_visitor"
+            raise LimitReached(LIMIT_MESSAGE, code)
 
     async def refund(self, ip: str) -> None:
         total_key, ip_key = self._keys(ip)
@@ -164,6 +196,16 @@ class RedisCounter:
             await self._send(["DECR", total_key], ["DECR", ip_key])
         except httpx.HTTPError:
             pass  # the worst case is one run fewer today
+
+    async def state(self) -> str:
+        """Read today's total without changing it. Counts nothing, stores nothing."""
+        try:
+            # Only the site-wide key is read: no IP address is involved at all.
+            (total,) = await self._send(["GET", f"runs:{_today()}:total"])
+        except (httpx.HTTPError, KeyError, ValueError):
+            return "paused"  # cannot count, so a run would be refused: say so first
+        # GET returns None before the day's first run, and the count as text after.
+        return "limited" if int(total or 0) >= DAILY_RUN_CAP else "open"
 
 
 class ClosedCounter:
@@ -173,10 +215,13 @@ class ClosedCounter:
     """
 
     async def claim(self, ip: str) -> None:
-        raise LimitReached(UNAVAILABLE_MESSAGE)
+        raise LimitReached(UNAVAILABLE_MESSAGE, "paused")
 
     async def refund(self, ip: str) -> None:
         pass
+
+    async def state(self) -> str:
+        return "paused"
 
 
 def make_counter() -> RunCounter | RedisCounter | ClosedCounter:

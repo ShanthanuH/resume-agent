@@ -45,6 +45,19 @@ class ResumeDoc(BaseModel):
     sections: list[DocSection] = Field(max_length=20)
 
 
+def clean_contact(line: str) -> str:
+    """One contact line with its empty items removed.
+
+    A header like "Pune |  | meera@example.com |" has gaps where the PDF held an
+    icon or a link with no text. Printed as it is, the gaps show as "| |". This
+    splits the line at each "|", keeps the pieces that hold a letter or a digit,
+    and joins them again. A line with nothing left comes back empty.
+    """
+    # \w matches a letter or a digit, so a lone "•" or "-" counts as empty too.
+    parts = [part.strip() for part in line.split("|")]
+    return " | ".join(part for part in parts if re.search(r"\w", part))
+
+
 def split_header(text: str, evidence: list[EvidenceLine]) -> list[str]:
     """The lines above the first section: the name and the contact details.
 
@@ -67,6 +80,11 @@ def split_header(text: str, evidence: list[EvidenceLine]) -> list[str]:
         # A section heading, an entry title, or the start of an evidence line.
         if low in known or any(body.startswith(low) for body in bodies):
             break
+        # The first line is the name and is kept as written. The rest are
+        # contact lines: empty items are dropped, and so is a line of only gaps.
+        line = clean_contact(line) if header else line
+        if not line:
+            continue
         header.append(line[:300])
         if len(header) == MAX_HEADER_LINES:
             break
@@ -132,7 +150,10 @@ def to_html(doc: ResumeDoc) -> str:
     """The resume as simple HTML: headings, one-row tables and bullet lists."""
     linker = _Linker(doc.links)
     name = doc.header[0] if doc.header else ""
-    contact = [linker.html(line) for line in doc.header[1:]]
+    # Cleaned again here: this endpoint renders whatever the browser sends, so
+    # it cannot rely on the header having come through split_header.
+    cleaned = [clean_contact(line) for line in doc.header[1:]]
+    contact = [linker.html(line) for line in cleaned if line]
     body: list[str] = []
     for section in doc.sections:
         body.append(f"<h2>{html.escape(section.name)}</h2>")

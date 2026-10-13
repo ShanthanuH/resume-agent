@@ -3,6 +3,11 @@
 Nothing is stored. A run lives in memory while its request is open; the result
 is sent to the browser, and the browser sends it back when it wants a PDF.
 
+Every error and every progress event carries a short `code`. The browser turns
+the code into words from web/content/copy.yaml, so the visible text of the site
+lives in one file. The `message` next to it is for logs and for anyone calling
+the API by hand.
+
 Run it locally with:
     APP_ENV=dev uv run uvicorn resume_agent.api.app:app --reload --port 8000
 """
@@ -21,6 +26,7 @@ from typing import Any
 from fastapi import FastAPI, Form, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
+from google.genai.errors import APIError
 
 from resume_agent.agent import run_agent, start_session
 from resume_agent.api import limits
@@ -43,6 +49,12 @@ HEARTBEAT_SECONDS = 10  # send something this often so proxies keep the stream o
 # Path to a saved run (the example page's JSON). When set, /api/run replays it
 # and calls no model. Used to build and test the frontend for free.
 REPLAY_FILE = os.environ.get("REPLAY_FILE", "")
+REPLAY_STEP_SECONDS = 0.25  # the pause between steps when REPLAY_FILE is played
+# HTTP statuses from the model provider that mean "this account cannot run
+# right now": a bad or blocked key, billing switched off, or the quota used up.
+# llm.py has already retried a 429 three times before it gets here, so by now it
+# is a spent quota and not a busy moment. Trying again would fail the same way.
+PAUSED_MODEL_CODES = {401, 402, 403, 429}
 
 app = FastAPI(title="resume-agent API", docs_url=None, redoc_url=None)
 app.add_middleware(
@@ -61,13 +73,32 @@ counter = limits.make_counter()
 # their token counts and report wrong costs. One run at a time keeps them right.
 run_slot = asyncio.Semaphore(1)
 
+# /api/status is open to anyone, with no bot check in front of it. Its answer
+# is remembered for this long, so that however often it is asked, this server
+# reads the count from Redis at most once in that time. Without it, someone
+# could use up the Redis free quota just by asking, and a Redis that cannot
+# answer pauses the demo.
+STATUS_TTL_SECONDS = 20
+_status_memo: tuple[float, str] | None = None  # (when it was read, the answer)
+
+
+async def _runs_state() -> str:
+    """Today's state from the counter, read at most once per STATUS_TTL_SECONDS."""
+    global _status_memo  # this function replaces the remembered answer
+    now = time.monotonic()
+    if _status_memo is not None and now - _status_memo[0] < STATUS_TTL_SECONDS:
+        return _status_memo[1]
+    state = await counter.state()
+    _status_memo = (now, state)
+    return state
+
 
 class NothingParsed(Exception):
     """The resume or the job description gave the parser nothing to work with."""
 
 
-def _error(status: int, message: str) -> JSONResponse:
-    return JSONResponse({"message": message}, status_code=status)
+def _error(status: int, code: str, message: str) -> JSONResponse:
+    return JSONResponse({"code": code, "message": message}, status_code=status)
 
 
 def _sse(event: str, data: dict[str, Any]) -> str:
@@ -86,6 +117,14 @@ def _read_pdf(data: bytes) -> tuple[str, list[Link]]:
     return extracted.text, extracted.links
 
 
+def _model_account_is_out(error: BaseException) -> bool:
+    """True if the model provider refused because of the key, billing or quota."""
+    if not isinstance(error, APIError):
+        return False
+    # FAILED_PRECONDITION is what Gemini answers when billing is not enabled.
+    return error.code in PAUSED_MODEL_CODES or error.status == "FAILED_PRECONDITION"
+
+
 @app.get("/health")
 def health() -> dict[str, Any]:
     return {"ok": True, "bot_check": limits.bot_check_enabled(),
@@ -93,7 +132,27 @@ def health() -> dict[str, Any]:
         # Which counter is in use: RedisCounter in production, ClosedCounter if
         # Redis is not set up yet. Handy for checking a deploy.
         "counter": type(counter).__name__,
+        "paused": limits.live_runs_off(),
     }
+
+
+@app.get("/api/status")
+async def status() -> JSONResponse:
+    """Whether a live run could start right now: "open", "limited" or "paused".
+
+    The page asks this before the visitor uploads anything, so that when the
+    day's runs are gone they are told at once and offered the recorded run. It
+    only reads the site-wide count. Nothing about the visitor is looked at, so
+    the answer is the same for everyone and the CDN may share it for a moment.
+    The answer can be some seconds old. That is fine: /api/run checks for real.
+    """
+    runs = "paused" if limits.live_runs_off() else await _runs_state()
+    return JSONResponse(
+        {"runs": runs},
+        # s-maxage lets the CDN answer for 15 seconds without waking this
+        # function, which matters when an ad sends many visitors at once.
+        headers={"Cache-Control": "public, s-maxage=15, stale-while-revalidate=45"},
+    )
 
 
 @app.post("/api/run")
@@ -111,32 +170,37 @@ async def run(
         # without loading a huge upload into memory.
         data = await resume_file.read(limits.MAX_FILE_BYTES + 1)
         if len(data) > limits.MAX_FILE_BYTES:
-            return _error(413, "That file is over 2 MB. Try a smaller PDF, or paste the text.")
+            return _error(413, "file_too_big", "That file is over 2 MB. Try a smaller PDF, or paste the text.")
         if not data.startswith(b"%PDF"):  # every PDF file starts with these bytes
-            return _error(415, "Only PDF files work for now. You can also paste the text.")
+            return _error(415, "file_not_pdf", "Only PDF files work for now. You can also paste the text.")
         try:
             resume_text, links = await asyncio.to_thread(_read_pdf, data)
         except Exception:  # noqa: BLE001  a broken or locked PDF
-            return _error(422, "That PDF could not be read. Paste the text instead.")
+            return _error(422, "file_unreadable", "That PDF could not be read. Paste the text instead.")
         if len(resume_text.strip()) < limits.MIN_CHARS:
             return _error(
                 422,
+                "file_no_text",
                 "That PDF has no selectable text. It may be a scan. Paste the text instead.",
             )
     resume_text, jd_text = resume_text.strip(), jd_text.strip()
     if len(resume_text) < limits.MIN_CHARS:
-        return _error(422, "Add your resume: upload a PDF or paste the text.")
+        return _error(422, "resume_too_short", "Add your resume: upload a PDF or paste the text.")
     if len(jd_text) < limits.MIN_CHARS:
-        return _error(422, "Paste the full job description. That one is too short.")
+        return _error(422, "job_too_short", "Paste the full job description. That one is too short.")
     if len(resume_text) > limits.MAX_RESUME_CHARS:
-        return _error(413, "That resume is too long. Keep it under about four pages.")
+        return _error(413, "resume_too_long", "That resume is too long. Keep it under about four pages.")
     if len(jd_text) > limits.MAX_JD_CHARS:
-        return _error(413, "That job description is too long. Paste only the posting.")
+        return _error(413, "job_too_long", "That job description is too long. Paste only the posting.")
 
+    if limits.live_runs_off():
+        # Checked before the bot check and the count, so a paused site spends
+        # nothing: no Cloudflare call, no run taken from the day's total.
+        return _error(503, "paused", limits.UNAVAILABLE_MESSAGE)
     peer = request.client.host if request.client else "unknown"
     ip = limits.client_ip(request.headers.get("x-forwarded-for"), peer)
     if not await limits.passes_bot_check(turnstile_token, ip):
-        return _error(403, "The bot check did not pass. Reload the page and try again.")
+        return _error(403, "bot_check", "The bot check did not pass. Reload the page and try again.")
     # The owner's test runs are not counted. counted_ip is None for them, which
     # also tells _live_run there is nothing to refund if the run fails.
     counted_ip = None if limits.is_owner(request.headers.get("x-owner-key")) else ip
@@ -144,7 +208,7 @@ async def run(
         try:
             await counter.claim(counted_ip)
         except limits.LimitReached as reached:
-            return _error(429, str(reached))
+            return _error(429, reached.code, str(reached))
 
     stream = _replay() if REPLAY_FILE else _live_run(resume_text, jd_text, links, counted_ip)
     return StreamingResponse(
@@ -164,7 +228,8 @@ async def _live_run(
     holder: dict[str, Session] = {}
 
     def work() -> None:
-        # ask_user always answers with nothing: the questions panel is not built yet.
+        # ask_user always answers with nothing. The questions are shown to the
+        # visitor after the run, in the result (see payload.questions).
         session = start_session(safe_text, jd_text, links, lambda question: "")
         holder["session"] = session  # from here on the stream can see the trace
         if not session.evidence or not session.requirements:
@@ -172,10 +237,10 @@ async def _live_run(
         run_agent(session)
 
     if run_slot.locked():
-        yield _sse("status", {"message": "Another run is in progress. Yours starts next."})
+        yield _sse("status", {"code": "queued"})  # another run holds the slot
     async with run_slot:
         started = time.monotonic()
-        yield _sse("status", {"message": "Reading your resume and the job description"})
+        yield _sse("status", {"code": "started"})
         # The agent code is blocking, so it runs in a thread and this coroutine
         # stays free to send events.
         task = asyncio.create_task(asyncio.to_thread(work))
@@ -186,8 +251,12 @@ async def _live_run(
             finished = task.done()  # read BEFORE draining, so no late step is missed
             session = holder.get("session")
             if session is not None:
+                # When these steps reached the browser, in milliseconds from the
+                # start. A saved run keeps it, so a replay can move the same way.
+                at = int((time.monotonic() - started) * 1000)
                 for step in session.trace[sent:]:
-                    yield _sse("step", restore_all(describe_step(step, session), found))
+                    described = {**describe_step(step, session), "at": at}
+                    yield _sse("step", restore_all(described, found))
                     last_event = time.monotonic()
                 sent = len(session.trace)
             if finished:
@@ -205,7 +274,7 @@ async def _live_run(
             # The thread cannot be stopped; MAX_TURNS ends it soon. Wait for it
             # here so the next run does not start while it still uses the counter.
             log.warning("run %s timed out after %.0fs", run_id, seconds)
-            yield _sse("failed", {"message": "This run took too long and was stopped. Please try again."})
+            yield _sse("failed", {"code": "timeout", "message": "This run took too long and was stopped."})
             if ip is not None:  # None: an owner run, which was never counted
                 await counter.refund(ip)
             await asyncio.wait([task])
@@ -217,16 +286,15 @@ async def _live_run(
             nothing_parsed = isinstance(error, NothingParsed)
             if not nothing_parsed and ip is not None:
                 await counter.refund(ip)  # our fault or the model's, not the visitor's
-            yield _sse(
-                "failed",
-                {
-                    "message": "We could not find resume lines or job requirements in "
-                    "that text. Check both boxes and try again."
-                    if nothing_parsed
-                    else "The model service had a problem. Nothing was saved. "
-                    "Please try again in a minute."
-                },
-            )
+            if nothing_parsed:
+                code, message = "nothing_parsed", "No resume lines or job requirements were found."
+            elif _model_account_is_out(error):
+                # Not a blip: the model account has no credit or a bad key. The
+                # visitor is shown "paused" and the recorded run, not "try again".
+                code, message = "paused", limits.UNAVAILABLE_MESSAGE
+            else:
+                code, message = "model_error", "The model service had a problem. Nothing was saved."
+            yield _sse("failed", {"code": code, "message": message})
             return
         session = holder["session"]
         result = build_result(session, split_header(safe_text, list(session.evidence.values())), seconds)
@@ -241,11 +309,16 @@ async def _live_run(
 
 
 async def _replay() -> AsyncIterator[str]:
-    """Send a saved run step by step, as a live run would. Calls no model."""
+    """Send a saved run step by step over the real stream. Calls no model.
+
+    This is for testing the network path (upload, bot check, limits, stream)
+    for free. The replay a visitor watches is played in the browser, with the
+    run's real timing: see web/lib/replay.ts.
+    """
     saved = json.loads(Path(REPLAY_FILE).read_text())
-    yield _sse("status", {"message": "Reading your resume and the job description"})
+    yield _sse("status", {"code": "started"})
     for step in saved["steps"]:
-        await asyncio.sleep(0.25)
+        await asyncio.sleep(REPLAY_STEP_SECONDS)
         yield _sse("step", step)
     yield _sse("done", saved["result"])
 

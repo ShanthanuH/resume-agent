@@ -1,46 +1,206 @@
 @import "tailwindcss";
 
-/* The whole palette. One accent (evidence green) plus a rust for rejections.
-   Change a colour here and every screen follows. */
+/* The whole look, in one place. Paper, ink and one accent: the yellow of a
+   highlighter pen. The accent is used for one thing only, the words that
+   changed. Change a value here and every screen follows. */
 @theme inline {
-  --color-paper: #faf7f0; /* page background: warm, like resume paper */
-  --color-sheet: #ffffff; /* cards and the resume preview */
-  --color-ink: #1b1a17; /* main text */
-  --color-muted: #6b675e; /* secondary text */
-  --color-rule: #ddd7c9; /* borders and dividers */
-  --color-accent: #0b6b4f; /* evidence green: links, citations, verified */
-  --color-accent-soft: #e2f0ea; /* tint behind added words and citation chips */
-  --color-reject: #a8321c; /* verifier rejections and errors */
-  --color-reject-soft: #f7e6e1;
-  --font-sans: var(--font-plex-sans);
-  --font-serif: var(--font-newsreader);
-  --font-mono: var(--font-plex-mono);
+  --color-paper: #fbfaf6; /* page background: a warm off-white */
+  --color-sheet: #ffffff; /* the resume, and boxes you type in */
+  --color-desk: #f4f1e8; /* the surface the demo's sheet of paper lies on */
+  --color-ink: #15140f; /* main text, and the main button */
+  --color-soft: #55524a; /* secondary text */
+  --color-muted: #6c685e; /* small notes. 5:1 on paper, so it stays readable */
+  --color-rule: #e3dfd4; /* hairlines and borders */
+  --color-mark: #ffe27a; /* the highlighter: changed words */
+  --color-mark-deep: #ffd23f; /* the same highlight when pointed at */
+  --color-danger: #a6341b; /* a file that cannot be used, an error */
+  --color-danger-soft: #fbece7;
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  /* One easing for all motion: quick start, soft landing. */
+  --ease-swoosh: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  /* Stops phones from enlarging text on their own when the page is rotated. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   background: var(--color-paper);
   color: var(--color-ink);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
+  /* Hanken has old-style and tabular figures; lining figures read best in UI. */
+  font-feature-settings: "lnum";
 }
 
 /* A visible focus ring everywhere, for keyboard users. */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* Headings that get focus from code, so a screen reader reads the new screen.
+   They are not controls, so they show no ring. */
+[data-focus]:focus-visible {
+  outline: none;
+}
+/* A text box already has a border, so its ring sits right on it. */
+textarea:focus-visible {
+  outline-offset: 0;
+  border-radius: 10px;
 }
 
-/* New trace steps slide in, unless the visitor asked for less motion. */
-@keyframes step-in {
+/* --- Type ------------------------------------------------------------------ */
+
+/* Headlines: Fraunces, regular weight, set tight. */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.06;
+  text-wrap: balance; /* even line lengths, no lonely last word */
+}
+
+/* Small capital labels: "HOW IT WORKS", "YOUR ORIGINAL LINE". */
+.label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Numbers that must not jiggle as they change: the clock. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "lnum";
+}
+
+/* --- The signature: the highlight ------------------------------------------- */
+
+/* A changed word. The background is drawn as a gradient so that it can grow
+   from left to right like a pen stroke (see .swoosh). box-decoration-break
+   keeps the rounded ends when a highlight wraps onto a second line. */
+mark {
+  color: inherit;
+  background: linear-gradient(var(--color-mark), var(--color-mark)) no-repeat left center / 100% 100%;
+  padding: 0.06em 0.18em;
+  margin: 0 -0.18em; /* the padding must not push the words apart */
+  border-radius: 0.2em 0.5em 0.25em 0.45em; /* slightly uneven, like a real pen */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-color 150ms var(--ease-swoosh);
+}
+
+/* The highlight is drawn in when it first appears. --i staggers a row of them. */
+.swoosh mark {
+  animation: swoosh 300ms var(--ease-swoosh) both;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+@keyframes swoosh {
+  from {
+    background-size: 0% 100%;
+  }
+}
+
+/* The logo is the same stroke under the first half of the name. */
+.logo-mark {
+  background: linear-gradient(var(--color-mark), var(--color-mark)) no-repeat left 88% / 100% 38%;
+}
+
+/* --- Motion ------------------------------------------------------------------ */
+
+/* A screen or a line coming in: a short rise and fade. */
+.enter {
+  animation: enter 260ms var(--ease-swoosh) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+@keyframes enter {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(6px);
   }
 }
-.step-in {
-  animation: step-in 0.25s ease-out;
+
+/* The original line sliding in under a changed line. Animating a grid row from
+   0fr to 1fr is the way to animate "height: auto" in plain CSS. */
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 240ms var(--ease-swoosh),
+    opacity 200ms var(--ease-swoosh);
 }
+.reveal[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.reveal > div {
+  overflow: hidden; /* the row can only shrink to nothing if its content is clipped */
+  min-height: 0;
+}
+
+/* The active part of the progress bar: a soft light passing through it. */
+.sweep {
+  position: relative;
+  overflow: hidden;
+}
+.sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-ink);
+  border-radius: inherit;
+  animation: sweep 1.8s ease-in-out infinite;
+}
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  55%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* A small dot that breathes: "this is live". */
+.breathe {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+@keyframes breathe {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* Visitors who asked their device for less motion get none of the above.
+   Things still change, they just change at once. */
 @media (prefers-reduced-motion: reduce) {
-  .step-in {
-    animation: none;
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
+  .sweep::after {
+    transform: translateX(-50%); /* a half-filled bar instead of a moving one */
+    animation: none !important;
+  }
+}
+
+/* --- Small fixes ------------------------------------------------------------ */
+
+/* The built-in triangle of <details> is replaced by our own plus sign. */
+summary {
+  list-style: none;
+  cursor: pointer;
+}
+summary::-webkit-details-marker {
+  display: none;
 }

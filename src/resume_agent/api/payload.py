@@ -1,10 +1,19 @@
-"""Shape a finished Session, and each trace step, into JSON for the browser."""
+"""Shape a finished Session, and each trace step, into JSON for the browser.
+
+Nothing here is a sentence. A step is sent as a `kind` plus the few facts that
+belong to it, and the browser turns that into words from web/content/copy.yaml.
+That keeps every visible string in one file, and keeps IDs like "E3" off the
+screen: the browser is given the texts, never the IDs.
+"""
 
 from typing import Any
 
 from resume_agent.api.redact import restore
 from resume_agent.models import TraceStep
 from resume_agent.session import Session
+
+# Trace steps with these decisions are answers the user was actually asked for.
+_ASKED = {"no answer", "answered"}
 
 
 def restore_all(value: Any, found: dict[str, str]) -> Any:
@@ -18,98 +27,108 @@ def restore_all(value: Any, found: dict[str, str]) -> Any:
     return value
 
 
-def _quote(session: Session, requirement_id: str) -> str:
+def _requirement(session: Session, requirement_id: str) -> str:
+    """The requirement's own words, or "" if the agent sent an unknown ID."""
     req = session.requirements.get(requirement_id)
-    return f"“{req.text}”" if req else requirement_id
+    return req.text if req else ""
+
+
+def _line(session: Session, evidence_ids: list[str] | None) -> str:
+    """The resume line a rewrite was about: the first ID is the line to rewrite."""
+    line = session.line(evidence_ids[0]) if evidence_ids else None
+    return line.text if line else ""
 
 
 def describe_step(step: TraceStep, session: Session) -> dict[str, Any]:
-    """One trace step as a short headline and detail a visitor can read.
-
-    kind drives the colour on screen: ok, gap, bad, warn or info.
-    """
+    """One trace step as a `kind` and its facts. See web/lib/types.ts for the list."""
     tool, decision, given, out = step.tool, step.decision, step.input, step.output
-    kind, title, detail = "info", f"{tool}: {decision}", ""
+    kind = "other"  # a tool this file does not know: the browser shows nothing for it
+    facts: dict[str, Any] = {}
 
     if tool == "parse_resume":
-        title = f"Read your resume: {out['items']} evidence lines"
-        detail = "Each line is copied word for word. Nothing else can be cited."
+        kind, facts = "read_resume", {"count": out["items"]}
     elif tool == "parse_jd":
-        title = f"Read the job description: {out['items']} requirements"
+        kind, facts = "read_job", {"count": out["items"]}
     elif tool == "agent":
         names: list[str] = out.get("calls", [])
+        # What the agent decided to do next, as tool name -> how many calls.
         # dict.fromkeys keeps one of each name, in the order first seen.
-        counts = [f"{names.count(n)} × {n}" for n in dict.fromkeys(names)]
-        title = f"Agent turn {given.get('turn')}: planned {len(names)} tool calls"
-        detail = ", ".join(counts)
+        kind, facts = "plan", {"calls": {n: names.count(n) for n in dict.fromkeys(names)}}
     elif decision == "refused":
-        kind, title = "warn", f"Guard refused a {tool} call"
-        detail = out.get("error", "")
+        kind = "refused"  # the guard in session.py said no to a call
     elif decision == "error":
-        kind, title = "warn", f"{tool} failed, the agent was told"
-        detail = "A model call did not complete. The agent can try again."
+        kind = "tool_error"  # a model call failed; the agent can try again
     elif tool == "search_evidence":
-        req = _quote(session, given.get("requirement_id", ""))
-        if out.get("evidence_ids"):
-            kind, title = "ok", f"Found evidence for {req}"
-            detail = "Resume lines " + ", ".join(out["evidence_ids"])
-        else:
-            kind, title = "gap", f"No evidence for {req}"
-            detail = "Goes to the gap report. Nothing is written for it."
+        found = out.get("evidence_ids") or []
+        kind = "match_found" if found else "match_missing"
+        facts = {"requirement": _requirement(session, given.get("requirement_id", ""))}
+        if found:
+            facts["count"] = len(found)  # how many resume lines show it
     elif tool == "reject_requirement":
-        kind, title = "gap", f"Marked as a gap: {_quote(session, given.get('requirement_id', ''))}"
-        detail = given.get("reason", "")
+        kind = "match_missing"
+        facts = {"requirement": _requirement(session, given.get("requirement_id", ""))}
     elif tool == "rewrite_bullet":
-        line_id = (given.get("evidence_ids") or ["?"])[0]
+        facts = {"before": _line(session, given.get("evidence_ids"))}
         if decision == "rewritten":
-            title, detail = f"Rewrote line {line_id} as {out['bullet_id']}", out["text"]
+            kind, facts["after"] = "rewrote", out["text"]
         elif decision == "keep original":
-            kind, title = "ok", f"Kept line {line_id} exactly as you wrote it"
-            detail = "It already fits the job. Nothing to verify."
+            kind = "kept"
         else:
-            kind, title = "warn", f"No rewrite came back for line {line_id}"
+            kind = "rewrite_empty"  # the writer returned nothing: the line stays
     elif tool == "verify_claim":
-        bullet_id = given.get("bullet_id", "")
-        if out.get("passed"):
-            kind, title = "ok", f"Verifier passed {bullet_id}"
-            detail = "Every claim in it is in the lines it cites."
-        else:
-            kind, title = "bad", f"Verifier rejected {bullet_id}"
-            detail = " ".join(out.get("violations", []))
+        kind = "check_passed" if out.get("passed") else "check_failed"
     elif tool == "drop_bullet":
-        kind, title = "warn", f"Dropped {given.get('bullet_id', '')}"
-        detail = "Your original line stays."
+        kind = "dropped"
     elif tool == "ask_user":
-        title = "The agent had a question. Questions are not answered in this version."
-        detail = given.get("question", "")
+        kind, facts = "asked", {"question": given.get("question", "")}
     elif tool == "assemble_resume":
         if decision == "assembled":
-            kind, title = "ok", f"Assembled the resume with {out['bullets_used']} verified bullets"
+            kind, facts = "assembled", {"count": out["bullets_used"]}
         elif decision == "fallback":
-            kind, title = "warn", "Out of steps: assembled in code from the verified bullets"
+            kind = "assembled_fallback"  # out of turns: finished in code
         else:
-            kind, title = "warn", "Assembly check failed, trying again"
-            detail = " ".join(out.get("problems", []))
-    return {
-        "n": step.step,
-        "tool": tool,
-        "kind": kind,
-        "title": title,
-        "detail": detail,
-        "ms": step.latency_ms,
-    }
+            kind = "assemble_retry"  # a check failed and the agent tries again
+    return {"n": step.step, "kind": kind, "ms": step.latency_ms, **facts}
+
+
+def arrival_times(trace: list[TraceStep]) -> list[int]:
+    """When each step reached the browser, in milliseconds from the start.
+
+    A live run sends steps in bursts, not one by one: both parse steps arrive
+    together once parsing is done, and all the results of one tool arrive
+    together when that tool's single model call returns. A saved run only has
+    each step's own latency, so this rebuilds the bursts from them. The replay
+    in the browser uses these times, which is why it moves like a real run.
+    """
+    times: list[int] = []
+    clock = 0
+    start = 0  # index of the first step of the burst being built
+    for i, step in enumerate(trace):
+        clock += step.latency_ms
+        nxt = trace[i + 1] if i + 1 < len(trace) else None
+        # A burst ends when the next step comes from a different tool. The two
+        # parse steps count as one burst: the trace is not visible before both.
+        same_burst = nxt is not None and (
+            nxt.tool == step.tool or {step.tool, nxt.tool} == {"parse_resume", "parse_jd"}
+        )
+        if not same_burst:
+            times.extend([clock] * (i + 1 - start))  # the whole burst lands now
+            start = i + 1
+    return times
+
+
+def questions(session: Session) -> list[str]:
+    """Questions the agent put to the user, in the order it asked them."""
+    return [
+        step.input["question"]
+        for step in session.trace
+        if step.tool == "ask_user" and step.decision in _ASKED and step.input.get("question")
+    ]
 
 
 def build_result(session: Session, header: list[str], seconds: float) -> dict[str, Any]:
-    """Everything the review and output screens need. Still holds placeholders."""
+    """Everything the result screen needs. Still holds placeholders."""
     assert session.resume is not None  # run_agent always assembles before returning
-    # Earlier failed checks per bullet, so the review can show "rejected once".
-    rejections: dict[str, list[str]] = {}
-    for step in session.trace:
-        if step.tool == "verify_claim" and step.output.get("passed") is False:
-            rejections.setdefault(step.input["bullet_id"], []).extend(
-                step.output.get("violations", [])
-            )
     costs = [step.cost for step in session.trace]
     return {
         "header": header,
@@ -123,7 +142,8 @@ def build_result(session: Session, header: list[str], seconds: float) -> dict[st
                         "lines": [
                             {
                                 "evidence_id": line.evidence_id,
-                                # The line before any rewrite, for the reject button.
+                                # The line before any rewrite: what "keep my
+                                # original" puts back, and what the trace shows.
                                 "original": session.evidence[line.evidence_id].text,
                                 "bullet_id": line.bullet_id,
                             }
@@ -142,12 +162,10 @@ def build_result(session: Session, header: list[str], seconds: float) -> dict[st
                 "replaces": bullet.replaces,
                 "source_ids": bullet.source_ids,
                 "requirement_ids": bullet.requirement_ids,
-                "attempts": session.attempts.get(bullet.replaces or "", 1),
-                "rejections": rejections.get(bullet.id, []),
             }
             for bullet in session.bullets.values()
         ],
-        # Every line a bullet can cite, by ID, for the citation markers.
+        # Every line a bullet can cite, by ID, so the trace can show its source.
         "evidence": {
             line.id: line.text
             for line in [*session.evidence.values(), *session.confirmed.values()]
@@ -157,11 +175,11 @@ def build_result(session: Session, header: list[str], seconds: float) -> dict[st
                 "id": req.id,
                 "text": req.text,
                 "priority": req.priority,
-                # Covered by a rewritten bullet only while the visitor accepts it.
+                # Rewritten bullets that cover it.
                 "bullet_ids": [
                     b.id for b in session.bullets.values() if req.id in b.requirement_ids
                 ],
-                # Covered by an original line the writer chose not to change.
+                # Original lines the writer chose not to change that cover it.
                 "kept_line_ids": [
                     line_id
                     for line_id, req_ids in session.kept_original.items()
@@ -170,6 +188,7 @@ def build_result(session: Session, header: list[str], seconds: float) -> dict[st
             }
             for req in session.requirements.values()
         ],
+        "questions": questions(session),
         "stats": {
             "seconds": round(seconds, 1),
             "steps": len(session.trace),

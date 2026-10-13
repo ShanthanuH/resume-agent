@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
-import { TryFlow } from "@/components/TryFlow";
+import { Flow } from "@/components/flow/Flow";
+import { page } from "@/components/ui";
+import { copy } from "@/lib/copy";
 
-export const metadata: Metadata = { title: "Tailor your resume" };
+export const metadata: Metadata = {
+  title: copy.flow_meta_title,
+  description: copy.flow_meta_description,
+};
 
+/** The product: drop your resume, paste the job post, press one button. */
 export default function TryPage() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
-      <TryFlow />
+    <div className={`${page} pt-6 sm:pt-12`}>
+      <Flow variant="try" />
     </div>
   );
 }

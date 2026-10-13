@@ -1,10 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { OWNER_COOKIE } from "@/lib/api";
+import { copy, fill } from "@/lib/copy";
+import { SiteLink } from "./SiteLink";
+import { primaryButton } from "./ui";
 
 const THIRTY_DAYS = 60 * 60 * 24 * 30; // cookie lifetime, in seconds
+const REMOVE_ADDRESS = "/owner#key=off"; // opening this deletes the saved key
+
+// What the page says in each state.
+const MESSAGE = {
+  checking: copy.owner_checking,
+  on: copy.owner_on,
+  off: copy.owner_off,
+  none: copy.owner_none,
+};
 
 /**
  * Stores the owner key from the address bar in a cookie, then removes it from
@@ -42,20 +53,15 @@ export function OwnerSwitch() {
   return (
     <div className="mt-4 space-y-4">
       {/* role="status" makes screen readers announce the outcome. */}
-      <p role="status">
-        {state === "checking" && "Checking…"}
-        {state === "on" && "A key is saved in this browser for 30 days. If it is the right one, your runs are not counted against the limits."}
-        {state === "off" && "The key was removed from this browser."}
-        {state === "none" && "No key is saved in this browser."}
+      <p role="status" className="text-lg text-soft">
+        {MESSAGE[state]}
       </p>
       {state === "on" && (
-        <p className="text-sm text-muted">
-          To remove it, open <span className="font-mono">/owner#key=off</span>.
-        </p>
+        <p className="text-sm text-muted">{fill(copy.owner_remove_hint, { address: REMOVE_ADDRESS })}</p>
       )}
-      <Link href="/try" className="inline-flex min-h-12 items-center rounded-md bg-accent px-6 font-medium text-white hover:bg-ink">
-        Go to Try it
-      </Link>
+      <SiteLink href="/try" className={primaryButton}>
+        {copy.owner_go}
+      </SiteLink>
     </div>
   );
 }

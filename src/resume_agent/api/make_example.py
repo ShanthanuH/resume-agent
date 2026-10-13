@@ -1,10 +1,12 @@
-"""Run the agent once on the sample resume and save everything the example page needs.
+"""Run the agent once on the sample resume and save the run for the replay.
 
     uv run python -m resume_agent.api.make_example \
         examples/sample_resume.txt examples/sample_jd.txt web/public/example
 
-Writes <out>.json (the steps and the result, exactly what a live run streams)
-and <out>.pdf (all changes accepted). This makes real model calls and costs money.
+Writes <out>.json (the job text, the steps with their timing, and the result:
+what a live run streams) and <out>.pdf (all changes applied). The site plays
+this file back as "watch a real run". This makes real model calls and costs
+money. Only ever run it on the fictional sample resume.
 """
 
 import json
@@ -14,7 +16,7 @@ from pathlib import Path
 
 from resume_agent import llm
 from resume_agent.agent import run_agent, start_session
-from resume_agent.api.payload import build_result, describe_step, restore_all
+from resume_agent.api.payload import arrival_times, build_result, describe_step, restore_all
 from resume_agent.api.redact import redact
 from resume_agent.api.render import ResumeDoc, render_pdf, split_header
 
@@ -48,13 +50,19 @@ def accept_all(result: dict) -> ResumeDoc:
 def main() -> None:
     resume_path, jd_path, out = (Path(arg) for arg in sys.argv[1:4])
     safe_text, found = redact(resume_path.read_text())
+    jd_text = jd_path.read_text()
     started = time.monotonic()
-    session = start_session(safe_text, jd_path.read_text(), [], lambda question: "")
+    session = start_session(safe_text, jd_text, [], lambda question: "")
     run_agent(session)
     header = split_header(safe_text, list(session.evidence.values()))
     result = restore_all(build_result(session, header, time.monotonic() - started), found)
-    steps = [restore_all(describe_step(s, session), found) for s in session.trace]
-    out.with_suffix(".json").write_text(json.dumps({"steps": steps, "result": result}, indent=1))
+    # "at" is when each step would have reached the browser in a live run.
+    steps = [
+        restore_all({**describe_step(step, session), "at": at}, found)
+        for step, at in zip(session.trace, arrival_times(session.trace))
+    ]
+    saved = {"jd_text": jd_text.strip(), "steps": steps, "result": result}
+    out.with_suffix(".json").write_text(json.dumps(saved, indent=1))
     data, pages = render_pdf(accept_all(result))
     out.with_suffix(".pdf").write_bytes(data)
     print(f"{len(steps)} steps, {len(result['bullets'])} bullets, PDF pages: {pages}")

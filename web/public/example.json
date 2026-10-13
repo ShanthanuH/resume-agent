@@ -1,244 +1,232 @@
 {
+ "jd_text": "Backend Engineer, Payments Platform\nNorthwind Pay (fictional company) | Bengaluru, hybrid\n\nAbout the role\nYou will join the team that runs our payment APIs. These services handle merchant payouts and refunds, and they must be fast and correct. You will design, build and operate backend services with a small team of engineers.\n\nWhat you will do\n- Design and build REST APIs in Python\n- Own services in production: monitor them, fix incidents and improve response times\n- Write automated tests and review your teammates' code\n- Work with PostgreSQL and a caching layer to keep queries fast\n- Ship through CI/CD pipelines and run services in containers on Kubernetes\n\nWhat we are looking for\n- 3 or more years of backend engineering experience\n- Strong Python, with FastAPI or Django\n- Solid SQL and experience tuning PostgreSQL queries\n- Experience with Redis or another cache\n- Experience running services on Kubernetes\n- Infrastructure as code with Terraform\n- Experience with Kafka or another event streaming system\n- A habit of writing tests\n\nNice to have\n- Experience in payments or fintech\n- Go\n- Experience mentoring junior engineers",
  "steps": [
   {
    "n": 1,
-   "tool": "parse_resume",
-   "kind": "info",
-   "title": "Read your resume: 13 evidence lines",
-   "detail": "Each line is copied word for word. Nothing else can be cited.",
-   "ms": 3220
+   "kind": "read_resume",
+   "ms": 3220,
+   "count": 13,
+   "at": 5151
   },
   {
    "n": 2,
-   "tool": "parse_jd",
-   "kind": "info",
-   "title": "Read the job description: 14 requirements",
-   "detail": "",
-   "ms": 1931
+   "kind": "read_job",
+   "ms": 1931,
+   "count": 14,
+   "at": 5151
   },
   {
    "n": 3,
-   "tool": "agent",
-   "kind": "info",
-   "title": "Agent turn 1: planned 14 tool calls",
-   "detail": "9 \u00d7 search_evidence, 5 \u00d7 reject_requirement",
-   "ms": 10589
+   "kind": "plan",
+   "ms": 10589,
+   "calls": {
+    "search_evidence": 9,
+    "reject_requirement": 5
+   },
+   "at": 15740
   },
   {
    "n": 4,
-   "tool": "search_evidence",
-   "kind": "ok",
-   "title": "Found evidence for \u201cBackend engineering experience\u201d",
-   "detail": "Resume lines E2, E3, E4",
-   "ms": 188
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Backend engineering experience",
+   "count": 3,
+   "at": 17432
   },
   {
    "n": 5,
-   "tool": "search_evidence",
-   "kind": "ok",
-   "title": "Found evidence for \u201cPython\u201d",
-   "detail": "Resume lines E2, E12",
-   "ms": 188
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Python",
+   "count": 2,
+   "at": 17432
   },
   {
    "n": 6,
-   "tool": "search_evidence",
-   "kind": "ok",
-   "title": "Found evidence for \u201cFastAPI\u201d",
-   "detail": "Resume lines E2, E13",
-   "ms": 188
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "FastAPI",
+   "count": 2,
+   "at": 17432
   },
   {
    "n": 7,
-   "tool": "search_evidence",
-   "kind": "ok",
-   "title": "Found evidence for \u201cSQL\u201d",
-   "detail": "Resume lines E12",
-   "ms": 188
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "SQL",
+   "count": 1,
+   "at": 17432
   },
   {
    "n": 8,
-   "tool": "search_evidence",
-   "kind": "ok",
-   "title": "Found evidence for \u201cPostgreSQL query tuning\u201d",
-   "detail": "Resume lines E3",
-   "ms": 188
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "PostgreSQL query tuning",
+   "count": 1,
+   "at": 17432
   },
   {
    "n": 9,
-   "tool": "search_evidence",
-   "kind": "ok",
-   "title": "Found evidence for \u201cRedis\u201d",
-   "detail": "Resume lines E3, E13",
-   "ms": 188
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Redis",
+   "count": 2,
+   "at": 17432
   },
   {
    "n": 10,
-   "tool": "search_evidence",
-   "kind": "ok",
-   "title": "Found evidence for \u201cWriting automated tests\u201d",
-   "detail": "Resume lines E5, E13",
-   "ms": 188
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Writing automated tests",
+   "count": 2,
+   "at": 17432
   },
   {
    "n": 11,
-   "tool": "search_evidence",
-   "kind": "gap",
-   "title": "No evidence for \u201cExperience in payments or fintech\u201d",
-   "detail": "Goes to the gap report. Nothing is written for it.",
-   "ms": 188
+   "kind": "match_missing",
+   "ms": 188,
+   "requirement": "Experience in payments or fintech",
+   "at": 17432
   },
   {
    "n": 12,
-   "tool": "search_evidence",
-   "kind": "ok",
-   "title": "Found evidence for \u201cMentoring junior engineers\u201d",
-   "detail": "Resume lines E6",
-   "ms": 188
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Mentoring junior engineers",
+   "count": 1,
+   "at": 17432
   },
   {
    "n": 13,
-   "tool": "reject_requirement",
-   "kind": "gap",
-   "title": "Marked as a gap: \u201cDjango\u201d",
-   "detail": "Django is not present in the candidate's resume.",
-   "ms": 0
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Django",
+   "at": 17432
   },
   {
    "n": 14,
-   "tool": "reject_requirement",
-   "kind": "gap",
-   "title": "Marked as a gap: \u201cKubernetes\u201d",
-   "detail": "Kubernetes is not mentioned anywhere in the resume.",
-   "ms": 0
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Kubernetes",
+   "at": 17432
   },
   {
    "n": 15,
-   "tool": "reject_requirement",
-   "kind": "gap",
-   "title": "Marked as a gap: \u201cTerraform\u201d",
-   "detail": "Terraform is not mentioned anywhere in the resume.",
-   "ms": 0
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Terraform",
+   "at": 17432
   },
   {
    "n": 16,
-   "tool": "reject_requirement",
-   "kind": "gap",
-   "title": "Marked as a gap: \u201cKafka\u201d",
-   "detail": "Kafka is not mentioned anywhere in the resume.",
-   "ms": 0
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Kafka",
+   "at": 17432
   },
   {
    "n": 17,
-   "tool": "reject_requirement",
-   "kind": "gap",
-   "title": "Marked as a gap: \u201cGo\u201d",
-   "detail": "Go language experience is not present in the resume.",
-   "ms": 0
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Go",
+   "at": 17432
   },
   {
    "n": 18,
-   "tool": "agent",
-   "kind": "info",
-   "title": "Agent turn 2: planned 7 tool calls",
-   "detail": "7 \u00d7 rewrite_bullet",
-   "ms": 27954
+   "kind": "plan",
+   "ms": 27954,
+   "calls": {
+    "rewrite_bullet": 7
+   },
+   "at": 45386
   },
   {
    "n": 19,
-   "tool": "rewrite_bullet",
-   "kind": "ok",
-   "title": "Kept line E2 exactly as you wrote it",
-   "detail": "It already fits the job. Nothing to verify.",
-   "ms": 1258
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Built a shipment tracking API in Python and FastAPI that serves 1.2 million requests a day",
+   "at": 54192
   },
   {
    "n": 20,
-   "tool": "rewrite_bullet",
-   "kind": "info",
-   "title": "Rewrote line E3 as B2",
-   "detail": "Tuned slow PostgreSQL queries and added Redis caching, cutting median API response time from 420 ms to 150 ms",
-   "ms": 1258
+   "kind": "rewrote",
+   "ms": 1258,
+   "before": "Cut median API response time from 420 ms to 150 ms by adding Redis caching and fixing slow PostgreSQL queries",
+   "after": "Tuned slow PostgreSQL queries and added Redis caching, cutting median API response time from 420 ms to 150 ms",
+   "at": 54192
   },
   {
    "n": 21,
-   "tool": "rewrite_bullet",
-   "kind": "ok",
-   "title": "Kept line E4 exactly as you wrote it",
-   "detail": "It already fits the job. Nothing to verify.",
-   "ms": 1258
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Wrote a nightly job that reconciles 300,000 delivery records and flags mismatches for the operations team",
+   "at": 54192
   },
   {
    "n": 22,
-   "tool": "rewrite_bullet",
-   "kind": "info",
-   "title": "Rewrote line E5 as B4",
-   "detail": "Wrote automated unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
-   "ms": 1258
+   "kind": "rewrote",
+   "ms": 1258,
+   "before": "Added unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+   "after": "Wrote automated unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+   "at": 54192
   },
   {
    "n": 23,
-   "tool": "rewrite_bullet",
-   "kind": "ok",
-   "title": "Kept line E6 exactly as you wrote it",
-   "detail": "It already fits the job. Nothing to verify.",
-   "ms": 1258
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Reviewed pull requests for a team of 5 engineers and wrote the team's API style guide",
+   "at": 54192
   },
   {
    "n": 24,
-   "tool": "rewrite_bullet",
-   "kind": "ok",
-   "title": "Kept line E12 exactly as you wrote it",
-   "detail": "It already fits the job. Nothing to verify.",
-   "ms": 1258
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Languages: Python, TypeScript, SQL, Java",
+   "at": 54192
   },
   {
    "n": 25,
-   "tool": "rewrite_bullet",
-   "kind": "ok",
-   "title": "Kept line E13 exactly as you wrote it",
-   "detail": "It already fits the job. Nothing to verify.",
-   "ms": 1258
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Frameworks and tools: FastAPI, Flask, React, Docker, GitHub Actions, Redis, PostgreSQL, pytest",
+   "at": 54192
   },
   {
    "n": 26,
-   "tool": "agent",
-   "kind": "info",
-   "title": "Agent turn 3: planned 2 tool calls",
-   "detail": "2 \u00d7 verify_claim",
-   "ms": 3893
+   "kind": "plan",
+   "ms": 3893,
+   "calls": {
+    "verify_claim": 2
+   },
+   "at": 58085
   },
   {
    "n": 27,
-   "tool": "verify_claim",
-   "kind": "ok",
-   "title": "Verifier passed B2",
-   "detail": "Every claim in it is in the lines it cites.",
-   "ms": 547
+   "kind": "check_passed",
+   "ms": 547,
+   "at": 59179
   },
   {
    "n": 28,
-   "tool": "verify_claim",
-   "kind": "ok",
-   "title": "Verifier passed B4",
-   "detail": "Every claim in it is in the lines it cites.",
-   "ms": 547
+   "kind": "check_passed",
+   "ms": 547,
+   "at": 59179
   },
   {
    "n": 29,
-   "tool": "agent",
-   "kind": "info",
-   "title": "Agent turn 4: planned 1 tool calls",
-   "detail": "1 \u00d7 assemble_resume",
-   "ms": 4307
+   "kind": "plan",
+   "ms": 4307,
+   "calls": {
+    "assemble_resume": 1
+   },
+   "at": 63486
   },
   {
    "n": 30,
-   "tool": "assemble_resume",
-   "kind": "ok",
-   "title": "Assembled the resume with 2 verified bullets",
-   "detail": "",
-   "ms": 0
+   "kind": "assembled",
+   "ms": 0,
+   "count": 2,
+   "at": 63486
   }
  ],
  "result": {
@@ -381,9 +369,7 @@
      "R1",
      "R6",
      "R7"
-    ],
-    "attempts": 1,
-    "rejections": []
+    ]
    },
    {
     "id": "B4",
@@ -394,9 +380,7 @@
     ],
     "requirement_ids": [
      "R11"
-    ],
-    "attempts": 1,
-    "rejections": []
+    ]
    }
   ],
   "evidence": {
@@ -539,6 +523,7 @@
     ]
    }
   ],
+  "questions": [],
   "stats": {
    "seconds": 63.5,
    "steps": 30,

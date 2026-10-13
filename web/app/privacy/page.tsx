@@ -1,75 +1,54 @@
 import type { Metadata } from "next";
-import { GITHUB_URL, SITE_NAME } from "@/lib/config";
+import { page, quietLink } from "@/components/ui";
+import { GITHUB_URL } from "@/lib/config";
+import { copy } from "@/lib/copy";
 
 export const metadata: Metadata = {
-  title: "Privacy",
-  description: "What is sent, to whom, and what is kept. In plain words.",
+  title: copy.privacy_meta_title,
+  description: copy.privacy_meta_description,
 };
 
-// Each statement here describes what the code does today. If the code changes
-// (analytics, a new host, a new model provider), this page must change with it.
+// Each statement on this page describes what the code does today. If the code
+// changes (analytics, a new host, a new model provider), the words in
+// content/copy.yaml must change with it.
 const SECTIONS = [
+  { title: copy.privacy_keep_title, points: [copy.privacy_keep_1, copy.privacy_keep_2, copy.privacy_keep_3] },
   {
-    title: "What we keep",
-    body: [
-      "Nothing. Your resume and the job description are processed in memory and gone when the run ends. There is no database and no account.",
-      "If you upload a PDF, it is written to a temporary file so the text can be read, and that file is deleted straight away.",
-      "Your result lives in your browser tab. Close or reload the tab and it is gone.",
-    ],
+    title: copy.privacy_model_title,
+    points: [copy.privacy_model_1, copy.privacy_model_2, copy.privacy_model_3, copy.privacy_model_4],
   },
+  { title: copy.privacy_logs_title, points: [copy.privacy_logs_1, copy.privacy_logs_2] },
   {
-    title: "What is sent to the AI model",
-    body: [
-      "The text of your resume and the job description is sent to Google's Gemini API, which does the reading and rewriting.",
-      "Before that, we replace your email address, phone number and web links with placeholders, so the model never sees them. They are put back only in the result shown to you.",
-      "Your name and anything else written in the resume text, such as a city, employers and schools, is sent as part of the text.",
-      "We use the paid Gemini API. Google's terms for the paid API say it does not use that content to improve its products. Google may keep it for a limited time to detect abuse.",
-    ],
-  },
-  {
-    title: "What our logs hold",
-    body: [
-      "For each run: how long it took, how many steps and tokens it used, what it cost us, and how many changes it proposed. No resume text, no job text.",
-      "To enforce the daily limit we count runs per IP address. The count is kept for up to two days in a small database (Upstash Redis), under a scrambled form of the address that cannot be turned back into it.",
-    ],
-  },
-  {
-    title: "Other companies involved",
-    body: [
-      "Hosting: the website and the agent both run on Vercel. Like any host, it sees your IP address and the requests you make.",
-      "Bot check: before a run, Cloudflare Turnstile checks that you are a person. Cloudflare sees your IP address and some browser details to do that.",
-      "We set no cookies for visitors and run no advertising trackers on this site.",
-    ],
+    title: copy.privacy_others_title,
+    points: [copy.privacy_others_1, copy.privacy_others_2, copy.privacy_others_3],
   },
 ];
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6">
-      <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Privacy</h1>
-      <p className="mt-3 text-muted">
-        {SITE_NAME} was built so that you can check what it does. That includes what it does with
-        your data.
-      </p>
-      {SECTIONS.map((section) => (
-        <section key={section.title} className="mt-10">
-          <h2 className="font-serif text-2xl font-semibold">{section.title}</h2>
-          <ul className="mt-3 space-y-3">
-            {section.body.map((line) => (
-              <li key={line} className="border-l-2 border-rule pl-3">
-                {line}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
-      <p className="mt-10 text-sm text-muted">
-        The code that does all of this is public.{" "}
-        <a href={GITHUB_URL} className="text-accent underline underline-offset-4">
-          Read it on GitHub
-        </a>
-        .
-      </p>
+    <div className={`${page} pt-6 sm:pt-12`}>
+      <div className="max-w-2xl">
+        <h1 className="display text-[2.6rem] sm:text-[3.5rem]">{copy.privacy_title}</h1>
+        <p className="mt-4 text-lg text-soft sm:text-xl">{copy.privacy_lead}</p>
+        {SECTIONS.map((section) => (
+          <section key={section.title} className="mt-12 border-t border-rule pt-8">
+            <h2 className="display text-[1.75rem]">{section.title}</h2>
+            <ul className="mt-4 space-y-4">
+              {section.points.map((point) => (
+                <li key={point} className="text-soft">
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+        <p className="mt-12 border-t border-rule pt-6 text-soft">
+          {copy.privacy_code}{" "}
+          <a href={GITHUB_URL} className={`${quietLink} font-medium text-ink`}>
+            {copy.privacy_code_link}
+          </a>
+        </p>
+      </div>
     </div>
   );
 }

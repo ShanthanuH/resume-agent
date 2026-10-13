@@ -1,176 +1,135 @@
-import Link from "next/link";
-import { GITHUB_URL } from "@/lib/config";
+import { HeroDemo } from "@/components/HeroDemo";
+import { SiteLink } from "@/components/SiteLink";
+import { page, primaryButton, quietLink } from "@/components/ui";
+import { EVAL_URL } from "@/lib/config";
+import { copy } from "@/lib/copy";
 
-// Every sentence on this page follows the product's own rule: no claim we
-// cannot back. No speed claims, no "beats the ATS", no unmeasured numbers.
+// The home page shows the product working and says very little: under 150
+// visible words, not counting the FAQ (scripts/copy.mjs enforces that). Every
+// section has one idea, in one or two short lines, and the same shape:
+// a small label or heading, a line, a link.
 
-const STEPS = [
-  {
-    title: "It reads your resume line by line",
-    body: "Each line is copied word for word and given an ID. These lines are the only facts the agent may use.",
-  },
-  {
-    title: "It rewrites only where there is evidence",
-    body: "For each thing the job asks for, it looks for a line that shows it. No line, no bullet: the requirement goes to a gap report instead.",
-  },
-  {
-    title: "A verifier checks every rewrite",
-    body: "Numbers, tools, titles and scope must match the cited lines. A bullet that fails is rewritten or dropped. You see each check as it runs.",
-  },
-];
-
+const STEPS = [copy.home_how_1, copy.home_how_2, copy.home_how_3];
+const DETAILS = [copy.home_more_how_1, copy.home_more_how_2, copy.home_more_how_3];
 const FAQ = [
-  {
-    q: "Will it add keywords from the job description?",
-    a: "Only if your resume already shows that experience. If the job asks for Kubernetes and your resume never mentions it, you get a line in the gap report, not a bullet.",
-  },
-  {
-    q: "Will this get me past an ATS?",
-    a: "We do not promise that. The PDF is ATS-friendly: one column, real text, standard headings. No tool can honestly guarantee how a company's software scores a resume.",
-  },
-  {
-    q: "Why did it change so few lines?",
-    a: "A line is rewritten only when the rewrite is better for this job and passes the verifier. If your line already says it well, it stays exactly as you wrote it.",
-  },
-  {
-    q: "What can I upload?",
-    a: "A PDF with selectable text, up to 2 MB, or you can paste the text. Scanned PDFs do not work.",
-  },
-  {
-    q: "Is it free?",
-    a: "Yes. It is a demo, so only a few live runs are available each day for everyone together. The example page shows a full run at any time.",
-  },
+  [copy.faq_1_q, copy.faq_1_a],
+  [copy.faq_2_q, copy.faq_2_a],
+  [copy.faq_3_q, copy.faq_3_a],
+  [copy.faq_4_q, copy.faq_4_a],
+  [copy.faq_5_q, copy.faq_5_a],
 ];
 
-/** The hero's picture: one rewritten bullet with its citation, drawn in HTML. */
-function Specimen() {
-  return (
-    <figure className="rounded-lg border border-rule bg-sheet p-5 text-sm shadow-sm">
-      <figcaption className="font-mono text-xs uppercase tracking-wide text-muted">
-        From the example run
-      </figcaption>
-      <p className="mt-3 text-xs font-medium text-muted">
-        Your line <span className="rounded bg-accent-soft px-1 font-mono text-accent">E3</span>
-      </p>
-      <p className="mt-1 border-l-2 border-rule pl-3 text-muted">
-        Cut median API response time from 420 ms to 150 ms by adding Redis caching and fixing slow
-        PostgreSQL queries
-      </p>
-      <p className="mt-4 text-xs font-medium text-muted">Tailored for “PostgreSQL query tuning”</p>
-      <p className="mt-1 border-l-2 border-accent pl-3">
-        Tuned slow PostgreSQL queries and added Redis caching, cutting median API response time from
-        420 ms to 150 ms{" "}
-        <span className="rounded bg-accent-soft px-1 font-mono text-xs text-accent">E3</span>
-      </p>
-      <p className="mt-4 text-xs text-accent">✓ Verifier passed: both numbers and both tools are in E3.</p>
-      <p className="mt-2 border-t border-dashed border-rule pt-2 text-xs">
-        <span className="font-semibold">Not on your resume:</span> Kubernetes, Terraform, Kafka
-      </p>
-    </figure>
-  );
-}
+// The heading every section below the hero shares.
+const sectionTitle = "display text-[1.75rem] sm:text-[2.25rem]";
+// A toggle row: the question or label on the left, a plus that turns into a
+// minus on the right. "group-open" is true while the <details> is open.
+const toggleRow = "flex min-h-12 items-center justify-between gap-4 py-3 font-medium";
+const plus =
+  "relative h-3 w-3 shrink-0 before:absolute before:inset-x-0 before:top-1/2 before:h-px before:bg-ink " +
+  "after:absolute after:inset-y-0 after:left-1/2 after:w-px after:bg-ink after:transition-transform after:duration-200 " +
+  "after:ease-swoosh group-open:after:scale-y-0";
 
-export default function LandingPage() {
+export default function HomePage() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
-      <section className="grid items-center gap-10 py-12 sm:py-20 lg:grid-cols-2">
+    <div className={page}>
+      {/* --- Hero: headline, one line, the main button, and the product. --- */}
+      <section className="grid gap-10 pb-16 pt-8 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,31rem)] lg:items-center lg:gap-14 lg:pb-24">
         <div>
-          <h1 className="font-serif text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-            Tailor your resume to any job. Built to never invent experience.
+          <h1 className="display text-[2.6rem] sm:text-[3.5rem] lg:text-[4rem]">
+            {/* The second sentence sits on its own line: two short sentences, one shape. */}
+            {copy.home_title_1} <em className="block">{copy.home_title_2}</em>
           </h1>
-          <p className="mt-5 text-lg text-muted">
-            Every rewritten line points back to the line on your resume it came from. What the job
-            asks for and you do not have is listed plainly, not made up.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            {/* The example comes first: it always works and costs nothing to show. */}
-            <Link
-              href="/example"
-              className="flex min-h-12 items-center justify-center rounded-md bg-accent px-6 font-medium text-white hover:bg-ink"
-            >
-              See the full example
-            </Link>
-            <Link
-              href="/try"
-              className="flex min-h-12 items-center justify-center rounded-md border border-ink px-6 font-medium hover:bg-ink hover:text-paper"
-            >
-              Try it on your resume
-            </Link>
+          <p className="mt-5 max-w-md text-lg text-soft sm:text-xl">{copy.home_lead}</p>
+          <div className="mt-8 flex flex-col gap-x-5 gap-y-3 sm:flex-row sm:items-center">
+            <SiteLink href="/try" className={primaryButton}>
+              {copy.home_cta}
+            </SiteLink>
+            <p className="text-sm text-muted">{copy.home_facts}</p>
           </div>
-          <p className="mt-4 text-sm text-muted">
-            A free demo with a few live runs a day. No account. Your resume is not stored.
-          </p>
         </div>
-        <Specimen />
+        <HeroDemo />
       </section>
 
-      <section className="border-t border-rule py-12" aria-labelledby="how">
-        <h2 id="how" className="font-serif text-3xl font-semibold">
-          How it works
+      {/* --- How it works: three steps, details behind a toggle. --- */}
+      <section aria-labelledby="how" className="border-t border-rule py-14 sm:py-20">
+        <h2 id="how" className="label">
+          {copy.home_how_title}
         </h2>
-        <ol className="mt-8 grid gap-8 sm:grid-cols-3">
-          {STEPS.map((step, i) => (
-            <li key={step.title}>
-              <p className="font-mono text-sm text-accent">[{i + 1}]</p>
-              <h3 className="mt-2 font-semibold">{step.title}</h3>
-              <p className="mt-2 text-sm text-muted">{step.body}</p>
+        <ol className="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-10">
+          {STEPS.map((step, index) => (
+            <li key={step} className="flex items-baseline gap-4 sm:block">
+              <span aria-hidden className="display text-[2.5rem] text-muted sm:text-[3.5rem]">
+                {index + 1}
+              </span>
+              <p className={`${sectionTitle} sm:mt-2`}>{step}</p>
             </li>
           ))}
         </ol>
+        <details className="group mt-8 max-w-2xl border-y border-rule">
+          <summary className={toggleRow}>
+            {copy.home_how_toggle}
+            <span aria-hidden className={plus} />
+          </summary>
+          <div className="space-y-3 pb-5 text-soft">
+            {DETAILS.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
+        </details>
       </section>
 
-      <section className="border-t border-rule py-12" aria-labelledby="eval">
-        <h2 id="eval" className="font-serif text-3xl font-semibold">
-          Does it work?
+      {/* --- Two honest lines, side by side: does it work, and privacy. --- */}
+      <div className="grid border-t border-rule sm:grid-cols-2">
+        <section aria-labelledby="proof" className="py-14 sm:py-20 sm:pr-10">
+          <h2 id="proof" className={sectionTitle}>
+            {copy.home_proof_title}
+          </h2>
+          <p className="mt-3 max-w-sm text-lg text-soft">{copy.home_proof_text}</p>
+          <a href={EVAL_URL} className={`${quietLink} mt-2 font-medium`}>
+            {copy.home_proof_link}
+          </a>
+        </section>
+        <section
+          aria-labelledby="privacy"
+          className="border-t border-rule py-14 sm:border-l sm:border-t-0 sm:py-20 sm:pl-10"
+        >
+          <h2 id="privacy" className={sectionTitle}>
+            {copy.home_privacy_title}
+          </h2>
+          <p className="mt-3 max-w-sm text-lg text-soft">{copy.home_privacy_text}</p>
+          <SiteLink href="/privacy" className={`${quietLink} mt-2 font-medium`}>
+            {copy.home_privacy_link}
+          </SiteLink>
+        </section>
+      </div>
+
+      {/* --- FAQ: five at most, closed to begin with. --- */}
+      <section aria-labelledby="faq" className="border-t border-rule py-14 sm:py-20">
+        <h2 id="faq" className="label">
+          {copy.home_faq_title}
         </h2>
-        <div className="mt-6 rounded-lg border border-dashed border-ink p-6">
-          <p className="font-mono text-xs uppercase tracking-wide text-accent">Evaluation in progress</p>
-          <p className="mt-3 max-w-2xl">
-            We are measuring how often this agent adds a claim the original resume does not support,
-            compared with plain prompting, on 30 real job descriptions and 3 resumes. The number
-            goes here when it is measured, along with the cases where the agent loses.
-          </p>
-          <p className="mt-3 text-sm text-muted">
-            Until then we make no accuracy claim. You can check every change yourself: each one
-            shows its source line.
-          </p>
+        <div className="mt-4 max-w-2xl divide-y divide-rule border-y border-rule">
+          {FAQ.map(([question, answer]) => (
+            // details/summary is a built-in toggle: no JavaScript is needed.
+            <details key={question} className="group">
+              <summary className={toggleRow}>
+                {question}
+                <span aria-hidden className={plus} />
+              </summary>
+              <p className="pb-5 pr-8 text-soft">{answer}</p>
+            </details>
+          ))}
         </div>
       </section>
 
-      <section className="border-t border-rule py-12" aria-labelledby="privacy">
-        <h2 id="privacy" className="font-serif text-3xl font-semibold">
-          Your resume stays yours
+      {/* --- The same main button once more, for those who read to the end. --- */}
+      <section aria-labelledby="end" className="border-t border-rule pt-14 sm:pt-20">
+        <h2 id="end" className={sectionTitle}>
+          {copy.home_end_title}
         </h2>
-        <p className="mt-4 max-w-2xl text-muted">
-          We do not store your resume or the job description. Your email, phone number and links
-          are removed before any text is sent to the AI model, and put back only in your result.
-          Our logs hold numbers, like how long a run took, never your text.{" "}
-          <Link href="/privacy" className="text-accent underline underline-offset-4">
-            Read the privacy page
-          </Link>
-          .
-        </p>
-      </section>
-
-      <section className="border-t border-rule py-12" aria-labelledby="faq">
-        <h2 id="faq" className="font-serif text-3xl font-semibold">
-          Questions
-        </h2>
-        <dl className="mt-6 max-w-2xl space-y-6">
-          {FAQ.map((item) => (
-            <div key={item.q}>
-              <dt className="font-semibold">{item.q}</dt>
-              <dd className="mt-1 text-muted">{item.a}</dd>
-            </div>
-          ))}
-        </dl>
-        <p className="mt-8 text-sm text-muted">
-          The code is open.{" "}
-          <a href={GITHUB_URL} className="text-accent underline underline-offset-4">
-            Read it on GitHub
-          </a>
-          .
-        </p>
+        <SiteLink href="/try" className={`${primaryButton} mt-6`}>
+          {copy.home_cta}
+        </SiteLink>
       </section>
     </div>
   );
