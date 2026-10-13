@@ -4,13 +4,18 @@
 /** The main action: solid ink. Tall enough to tap comfortably (48 px). */
 export const primaryButton =
   "inline-flex min-h-12 items-center justify-center gap-2 rounded-[10px] bg-ink px-6 text-base font-medium text-paper " +
-  "transition-[background-color,transform,opacity] duration-150 ease-swoosh hover:bg-[#2c2a23] active:scale-[0.985] " +
+  "transition-[background-color,transform,opacity] duration-150 ease-swoosh hover:bg-pine active:scale-[0.985] " +
   "disabled:opacity-60";
+
+/** The main action on a dark panel: the highlighter yellow, so it stands out on ink. */
+export const accentButton =
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-[10px] bg-mark px-6 text-base font-medium text-ink " +
+  "transition-[background-color,transform] duration-150 ease-swoosh hover:bg-mark-deep active:scale-[0.985]";
 
 /** A smaller main action, for the page header. */
 export const smallButton =
   "inline-flex min-h-11 items-center justify-center rounded-[10px] bg-ink px-4 text-sm font-medium text-paper " +
-  "transition-[background-color,transform] duration-150 ease-swoosh hover:bg-[#2c2a23] active:scale-[0.985]";
+  "transition-[background-color,transform] duration-150 ease-swoosh hover:bg-pine active:scale-[0.985]";
 
 /** A second choice next to a main action: an outline. */
 export const outlineButton =

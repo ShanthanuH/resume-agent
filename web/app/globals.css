@@ -1,16 +1,18 @@
 @import "tailwindcss";
 
-/* The whole look, in one place. Paper, ink and one accent: the yellow of a
-   highlighter pen. The accent is used for one thing only, the words that
-   changed. Change a value here and every screen follows. */
+/* The whole look, in one place. Cream paper, a deep pine-green ink and one
+   accent: the yellow of a highlighter pen. The accent marks the words that
+   changed, plus the logo, the headline and the last button. Change a value
+   here and every screen follows. */
 @theme inline {
-  --color-paper: #fbfaf6; /* page background: a warm off-white */
-  --color-sheet: #ffffff; /* the resume, and boxes you type in */
-  --color-desk: #f4f1e8; /* the surface the demo's sheet of paper lies on */
-  --color-ink: #15140f; /* main text, and the main button */
-  --color-soft: #55524a; /* secondary text */
-  --color-muted: #6c685e; /* small notes. 5:1 on paper, so it stays readable */
-  --color-rule: #e3dfd4; /* hairlines and borders */
+  --color-paper: #f8f4ea; /* page background: cream */
+  --color-sheet: #fffefb; /* the resume, and boxes you type in */
+  --color-desk: #ece6d6; /* the surface the demo's sheet of paper lies on */
+  --color-ink: #10261f; /* main text, and the main button: pine green, nearly black */
+  --color-pine: #1d4034; /* the main button when pointed at */
+  --color-soft: #4c5249; /* secondary text */
+  --color-muted: #666a5e; /* small notes. 5:1 on paper, so it stays readable */
+  --color-rule: #e0d9c6; /* hairlines and borders */
   --color-mark: #ffe27a; /* the highlighter: changed words */
   --color-mark-deep: #ffd23f; /* the same highlight when pointed at */
   --color-danger: #a6341b; /* a file that cannot be used, an error */
@@ -28,7 +30,11 @@ html {
 }
 
 body {
-  background: var(--color-paper);
+  /* A faint yellow glow in the top right corner, as if the highlighter left
+     some light on the page. It sits on top of the plain paper colour. */
+  background:
+    radial-gradient(56rem 34rem at 88% -10rem, rgb(255 226 122 / 0.3), transparent 70%) no-repeat,
+    var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
   /* Hanken has old-style and tabular figures; lining figures read best in UI. */
@@ -108,6 +114,19 @@ mark {
 /* The logo is the same stroke under the first half of the name. */
 .logo-mark {
   background: linear-gradient(var(--color-mark), var(--color-mark)) no-repeat left 88% / 100% 38%;
+}
+
+/* The same stroke under the headline's second sentence, drawn in once. */
+.stroke {
+  background: linear-gradient(var(--color-mark), var(--color-mark)) no-repeat left 86% / 100% 30%;
+  padding: 0 0.08em;
+  margin: 0 -0.08em; /* the padding must not shift the words */
+  animation: swoosh 600ms var(--ease-swoosh) 250ms both;
+}
+
+/* Inside a dark panel the focus ring must be light, or it cannot be seen. */
+.on-ink :focus-visible {
+  outline-color: var(--color-paper);
 }
 
 /* --- Motion ------------------------------------------------------------------ */

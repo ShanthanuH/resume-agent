@@ -1,6 +1,6 @@
 import { HeroDemo } from "@/components/HeroDemo";
 import { SiteLink } from "@/components/SiteLink";
-import { page, primaryButton, quietLink } from "@/components/ui";
+import { accentButton, page, primaryButton, quietLink } from "@/components/ui";
 import { EVAL_URL } from "@/lib/config";
 import { copy } from "@/lib/copy";
 
@@ -37,7 +37,11 @@ export default function HomePage() {
         <div>
           <h1 className="display text-[2.6rem] sm:text-[3.5rem] lg:text-[4rem]">
             {/* The second sentence sits on its own line: two short sentences, one shape. */}
-            {copy.home_title_1} <em className="block">{copy.home_title_2}</em>
+            {copy.home_title_1}{" "}
+            <em className="block">
+              {/* The highlighter stroke under these words is drawn in on load. */}
+              <span className="stroke">{copy.home_title_2}</span>
+            </em>
           </h1>
           <p className="mt-5 max-w-md text-lg text-soft sm:text-xl">{copy.home_lead}</p>
           <div className="mt-8 flex flex-col gap-x-5 gap-y-3 sm:flex-row sm:items-center">
@@ -58,7 +62,7 @@ export default function HomePage() {
         <ol className="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-10">
           {STEPS.map((step, index) => (
             <li key={step} className="flex items-baseline gap-4 sm:block">
-              <span aria-hidden className="display text-[2.5rem] text-muted sm:text-[3.5rem]">
+              <span aria-hidden className="display text-[2.5rem] italic text-ink/40 sm:text-[3.5rem]">
                 {index + 1}
               </span>
               <p className={`${sectionTitle} sm:mt-2`}>{step}</p>
@@ -123,11 +127,15 @@ export default function HomePage() {
       </section>
 
       {/* --- The same main button once more, for those who read to the end. --- */}
-      <section aria-labelledby="end" className="border-t border-rule pt-14 sm:pt-20">
-        <h2 id="end" className={sectionTitle}>
+      {/* It is the one dark panel on the page, so the eye ends up on it. */}
+      <section
+        aria-labelledby="end"
+        className="on-ink flex flex-col items-start justify-between gap-6 rounded-3xl bg-ink px-6 py-12 text-paper sm:flex-row sm:items-center sm:px-12 sm:py-16"
+      >
+        <h2 id="end" className="display text-[2rem] sm:text-[2.75rem]">
           {copy.home_end_title}
         </h2>
-        <SiteLink href="/try" className={`${primaryButton} mt-6`}>
+        <SiteLink href="/try" className={`${accentButton} shrink-0`}>
           {copy.home_cta}
         </SiteLink>
       </section>

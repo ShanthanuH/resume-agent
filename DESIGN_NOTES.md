@@ -83,10 +83,13 @@ has its own address on a replay build: open `/states`.
 ## 4. The landing page
 
 - Type: Fraunces (headlines) with Hanken Grotesk (everything else), chosen from eight pairings set side by side.
-- Palette: warm paper, ink, and one accent, highlighter yellow, used only for changed words and the logo.
+- Palette: cream paper, a pine-green ink that is nearly black, and one accent, highlighter yellow. Plain black on white read as a template; the green gives the page a colour of its own without adding a second accent.
+- The yellow marks changed words, the logo, the stroke under the headline's second sentence and the button on the closing panel. Nothing else.
+- A faint yellow glow sits in the top right corner of every page, and the demo has a long soft shadow: depth without decoration.
+- The page ends on one dark panel with a yellow button: the only dark block, so the eye lands on it.
 - The logo, the favicon and the link-preview image all use the same highlight: the signature is the brand.
 - Headline shape: two short sentences, the second in italics on its own line.
-- The headline says "Keep it true.", an aim, not "Nothing made up.", a claim: same reason the site said "built to" before.
+- The headline is "Resume? Tailored. You? Still you.": a question and answer rhythm with some character, and both halves are true of every run. "You? Hired." was considered and left out: it promises an outcome the product cannot back, on a site whose point is not overclaiming.
 - No speed claim in the hero: none has been measured. The facts line is "Free. No account. Nothing stored."
 - "How it works" is three numbered lines with no icons and no cards.
 - "Does it work?" and privacy sit side by side as two one-line sections with one link each.

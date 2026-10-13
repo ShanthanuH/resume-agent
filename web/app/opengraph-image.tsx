@@ -14,11 +14,11 @@ export const size = { width: 1200, height: 630 }; // the size every platform exp
 export const contentType = "image/png";
 
 // The colours of app/globals.css. The image library cannot read CSS variables.
-const PAPER = "#fbfaf6";
-const SHEET = "#ffffff";
-const INK = "#15140f";
-const SOFT = "#55524a";
-const RULE = "#e3dfd4";
+const PAPER = "#f8f4ea";
+const SHEET = "#fffefb";
+const INK = "#10261f";
+const SOFT = "#4c5249";
+const RULE = "#e0d9c6";
 const MARK = "#ffe27a";
 
 const font = (file: string) => readFile(join(process.cwd(), "assets/fonts", file));

@@ -43,13 +43,13 @@ og_title_1:
   where: Link preview image (1200 x 630), big text, first line
   max: 32
   text: >-
-    Tailor your resume to the job.
+    Resume? Tailored.
 
 og_title_2:
   where: Link preview image, big text, second line, in italics
   max: 24
   text: >-
-    Keep it true.
+    You? Still you.
 
 og_line:
   where: Link preview image, small line at the bottom
@@ -61,7 +61,7 @@ og_alt:
   where: Link preview image, text for screen readers
   max: 120
   text: >-
-    SwooshCV. Tailor your resume to the job. Keep it true.
+    SwooshCV. Resume? Tailored. You? Still you.
 
 skip_link:
   where: Every page, hidden link for keyboard users, shows on first Tab press
@@ -113,13 +113,13 @@ home_title_1:
   where: Home page, top, biggest text, first sentence
   max: 40
   text: >-
-    Tailor your resume to the job.
+    Resume? Tailored.
 
 home_title_2:
   where: Home page, top, biggest text, second sentence, in italics
   max: 30
   text: >-
-    Keep it true.
+    You? Still you.
 
 home_lead:
   where: Home page, one line under the big text

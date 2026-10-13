@@ -90,7 +90,8 @@ export function HeroDemo() {
 
   return (
     <figure ref={stage} aria-label={copy.home_demo_region} className="w-full">
-      <div className="rounded-2xl border border-rule bg-desk p-3 sm:p-4">
+      {/* The long soft shadow lifts the demo off the page, like a sheet on a desk. */}
+      <div className="rounded-2xl border border-rule bg-desk p-3 shadow-[0_32px_64px_-36px_rgb(16_38_31/0.45)] sm:p-4">
         <div className="flex items-center justify-between gap-3 px-1">
           <span className="label flex items-center gap-2">
             <span aria-hidden className={`h-1.5 w-1.5 rounded-full bg-ink ${running ? "breathe" : ""}`} />
