@@ -10,3 +10,6 @@ data/
 # except the example page's PDF, which is a fictional resume
 !web/public/example.pdf
 .vercel
+
+# taste-skill working files (direction sheet, inspector screenshots)
+.taste-skill/
