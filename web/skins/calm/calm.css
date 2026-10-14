@@ -15,7 +15,7 @@
   --color-ink-soft: #4a5d72; /* secondary text. 6.8:1 on white */
   --color-paper: #ffffff;
   --color-mist: #f4f8fc; /* alternate section background */
-  --color-cloud: #fbf7f1; /* the warm band */
+  --color-cloud: #edf3f9; /* a deeper mist: the left-out band */
   --color-line: rgb(11 31 51 / 0.08); /* hairlines and card rings */
   --color-sky: #3284ce; /* decorative only, never text on white */
   --color-sky-ink: #1a63b0; /* links, focus, selected. 6.1:1 on white */

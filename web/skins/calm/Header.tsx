@@ -16,7 +16,7 @@ export function Header() {
   const withButton = path !== "/try" && path !== "/";
   return (
     <header className="absolute inset-x-0 top-0 z-20 px-3 pt-3 sm:pt-5">
-      <div className="mx-auto flex max-w-[72rem] items-center justify-between gap-3 rounded-full bg-white/80 py-1.5 pl-5 pr-1.5 shadow-float ring-1 ring-white/60 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-[72rem] items-center justify-between gap-3 rounded-full bg-white/95 py-1.5 pl-5 pr-1.5 shadow-float ring-1 ring-white/60">
         <SiteLink href="/" aria-label={copy.nav_home_label} className="flex min-h-11 items-center text-[1.0625rem] font-semibold tracking-[-0.02em]">
           {copy.nav_brand}
         </SiteLink>

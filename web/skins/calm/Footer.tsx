@@ -6,7 +6,7 @@ import { page, textLink } from "./ui";
 export function Footer() {
   return (
     <footer className="bg-paper">
-      <div className={`${page} t-small flex flex-col gap-4 border-t border-line py-8 text-ink-soft sm:flex-row sm:items-center sm:justify-between`}>
+      <div className={`${page} t-small flex flex-col gap-4 pb-10 pt-16 text-ink-soft sm:flex-row sm:items-center sm:justify-between`}>
         <span className="font-semibold text-ink">{copy.nav_brand}</span>
         <nav className="flex flex-wrap gap-x-6">
           <SiteLink href="/example" className={textLink}>

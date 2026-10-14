@@ -30,7 +30,7 @@ All taken from the hero photo, except the two marks.
 | `ink-soft` | `#4a5d72` | secondary text, captions. 6.8:1 on white |
 | `paper` | `#ffffff` | page background, cards, the resume |
 | `mist` | `#f4f8fc` | alternate section background (a cool, high sky) |
-| `cloud` | `#fbf7f1` | the warm band (the lit cloud tops); used once or twice per page |
+| `cloud` | `#edf3f9` | a deeper mist: the band of left-out skills |
 | `line` | `rgb(11 31 51 / 0.08)` | hairlines and card rings. Never a grey solid border |
 | `sky` | `#3284ce` | decorative only: small dots, the progress fill. Never text on white |
 | `sky-ink` | `#1a63b0` | links, focus rings, the selected state. 6.1:1 on white |
@@ -49,7 +49,8 @@ Rules:
 - Text over the photo is white. The hero puts a soft navy wash behind its
   text block (`.sky-scrim`), so small white text stays readable on the light
   part of the sky.
-- No gradients except that one wash and the photo itself. No glow.
+- No gradients except that one wash and the photo itself (and the link
+  preview image's wash). Sections are flat colour. No glow.
 
 ## Type
 
@@ -103,8 +104,10 @@ are wide and faint, tinted with ink, never black.
 
 - `--shadow-soft`: `0 1px 2px rgb(11 31 51 / 0.04), 0 8px 24px -12px rgb(11 31 51 / 0.12)`. Cards on white.
 - `--shadow-float`: `0 2px 4px rgb(11 31 51 / 0.05), 0 24px 60px -20px rgb(11 31 51 / 0.30)`. The hero card over the sky, the header pill.
-- Over the photo, the hero card is `bg-white/85` with `backdrop-blur-xl`.
-  That is the only blur on the site.
+- Over the photo, the hero card is frosted (`backdrop-blur-xl`). That is the
+  only blur on the site; the header pill is plain `bg-white/95`.
+- No hairline dividers between sections or in the footer: space and a tone
+  step separate things. Rings (`line`) only outline cards and fields.
 
 ## Motion
 

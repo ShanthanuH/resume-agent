@@ -68,6 +68,7 @@ for (skin of SKINS) {
 
   await check("home: the demo plays to the end and shows the original line by itself", async () => {
     const page = await open("/");
+    await page.locator("figure").first().scrollIntoViewIfNeeded(); // the demo starts when it is seen
     await page.locator("mark").first().waitFor({ timeout: 12_000 }); // the highlights land
     await page.locator(OPEN_PANEL).waitFor({ timeout: 4000 }); // then the original slides in
     expect((await page.locator("mark").count()) >= 2, "expected at least two highlights");
@@ -77,6 +78,7 @@ for (skin of SKINS) {
 
   await check("home: under 150 visible words, not counting the FAQ or the resume in the demo", async () => {
     const page = await open("/");
+    await page.locator("figure").first().scrollIntoViewIfNeeded();
     await page.locator(OPEN_PANEL).waitFor({ timeout: 16_000 });
     const count = await page.evaluate(() => {
       const words = (selector) => {
@@ -96,6 +98,7 @@ for (skin of SKINS) {
 
   await check("home: with reduced motion the demo shows its end result at once", async () => {
     const page = await open("/", { reducedMotion: "reduce" });
+    await page.locator("figure").first().scrollIntoViewIfNeeded();
     await page.locator("mark").first().waitFor({ timeout: 2500 }); // no 4-second wait
     await page.context().close();
   });
@@ -165,7 +168,7 @@ for (skin of SKINS) {
     await page.locator(OPEN_PANEL).waitFor({ timeout: 2000 });
     await page.getByText("Your original line").first().waitFor();
     await page.mouse.move(5, 5); // away from the resume
-    await page.waitForFunction(() => document.querySelectorAll(OPEN_PANEL).length === 0, null, { timeout: 2000 });
+    await page.waitForFunction((open) => document.querySelectorAll(open).length === 0, OPEN_PANEL, { timeout: 2000 });
     await page.context().close();
   });
 

@@ -22,6 +22,14 @@ const WIDTHS = { 390: 844, 1440: 900 }; // width -> height of the window
 const only = process.argv.slice(2);
 const SKINS = process.env.SKIN ? [process.env.SKIN] : ["calm", "bold"];
 
+/** Scroll the home page demo into view (it starts there), wait for its highlights, then come back up. */
+async function playDemo(page) {
+  await page.locator("figure").first().scrollIntoViewIfNeeded();
+  await page.waitForSelector("mark", { timeout: 15000 });
+  await page.waitForTimeout(2200);
+  await page.evaluate(() => window.scrollTo(0, 0));
+}
+
 /** Wait until the fonts are in and the entrance animations have finished. */
 async function settle(page, ms = 700) {
   await page.evaluate(() => document.fonts.ready);
@@ -31,8 +39,8 @@ async function settle(page, ms = 700) {
 // Each shot: a name, the page to open, and what to do before the picture.
 // `full` takes the whole page instead of the first screen.
 const SHOTS = [
-  { name: "home", path: "/", full: true, act: (page) => page.waitForSelector("mark", { timeout: 15000 }).then(() => settle(page, 2200)) },
-  { name: "home-top", path: "/", act: (page) => page.waitForSelector("mark", { timeout: 15000 }).then(() => settle(page, 2200)) },
+  { name: "home", path: "/", full: true, act: playDemo },
+  { name: "home-top", path: "/", act: playDemo },
   { name: "home-start", path: "/", act: (page) => page.waitForTimeout(350) }, // the demo just after it begins
   { name: "home-faq-open", path: "/", full: true, act: async (page) => {
       for (const summary of await page.locator("details > summary").all()) await summary.click();
@@ -103,7 +111,7 @@ for (const shot of SHOTS) {
       // A whole-page picture is stitched from several screens. Anything that
       // sticks to the window (the download bar on a phone) would be painted in
       // the middle of it, so for these shots it is put back in the page's flow.
-      await page.addStyleTag({ content: ".sticky { position: static !important; }" });
+      await page.addStyleTag({ content: ".sticky { position: static !important; } .arrive { animation: none !important; }" });
     }
     await page.screenshot({ path: join(dir, `${shot.name}-${width}.png`), fullPage: Boolean(shot.full) });
     await context.close();

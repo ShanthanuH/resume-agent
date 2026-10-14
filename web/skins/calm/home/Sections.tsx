@@ -102,7 +102,7 @@ export function Faq() {
 
 export function Closing() {
   return (
-    <section aria-labelledby="closing" className="bg-gradient-to-b from-paper to-sky-wash">
+    <section aria-labelledby="closing" className="bg-sky-wash">
       <div className={`${page} ${section} text-center`}>
         <h2 id="closing" className="t-title mx-auto max-w-[16ch]">
           {copy.calm_home_closing_title}
