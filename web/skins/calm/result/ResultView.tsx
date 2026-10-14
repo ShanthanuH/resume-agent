@@ -12,7 +12,8 @@ import { ResumePage } from "./ResumePage";
 
 /** The result: the resume page and the panel. */
 export function ResultView({ result, job, staticPdf, onTryAnother, note }: ResultViewProps) {
-  const { kept, keep, openId, setOpenId, jumpTo } = useKeptLines();
+  // The first changed line starts open, so its "Before" box shows at once.
+  const { kept, keep, openId, setOpenId, jumpTo } = useKeptLines(result.bullets[0]?.id ?? null);
   const { state, download } = useDownload(result, kept);
   const [showChanges, setShowChanges] = useState(true);
 
@@ -20,7 +21,7 @@ export function ResultView({ result, job, staticPdf, onTryAnother, note }: Resul
   const pdf = kept.size === 0 ? staticPdf : undefined;
 
   return (
-    <main className="relative min-h-svh bg-[#DCE9F6] desk:h-svh desk:min-h-[700px] desk:overflow-hidden">
+    <div className="relative min-h-svh bg-[#DCE9F6] desk:h-svh desk:min-h-[700px] desk:overflow-hidden">
       {/* One blurred photo, a light wash over it, and the content on top. */}
       <div aria-hidden className="res-sky fixed inset-[-60px] scale-105 opacity-85 blur-[28px]" />
       <div
@@ -43,7 +44,7 @@ export function ResultView({ result, job, staticPdf, onTryAnother, note }: Resul
         </Glass>
         {note && <div className="order-0">{note}</div>}
         <div className="res-grid">
-          <div className="res-paper relative order-2 overflow-hidden rounded-[22px] bg-white shadow-[0_20px_50px_rgba(16,44,80,.16)] desk:min-h-0">
+          <div className="res-paper relative order-2 overflow-hidden desk:order-none rounded-[22px] bg-white shadow-[0_20px_50px_rgba(16,44,80,.16)] desk:min-h-0">
             <ResumePage
               result={result}
               kept={kept}
@@ -72,6 +73,6 @@ export function ResultView({ result, job, staticPdf, onTryAnother, note }: Resul
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

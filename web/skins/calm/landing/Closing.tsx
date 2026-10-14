@@ -46,7 +46,7 @@ export function Closing({ onStart }: { onStart: () => void }) {
       <footer className="glass relative mx-4 mb-5 box-border flex items-center justify-between gap-3 rounded-[20px] px-[18px] py-3.5 wide:mx-auto wide:mb-6 wide:w-[calc(100%-48px)] wide:max-w-[1152px] wide:flex-wrap wide:gap-x-6 wide:gap-y-3 wide:rounded-[22px] wide:px-6 wide:py-4">
         <Wordmark className="text-[22px] wide:text-[24px]" />
         <div className="flex gap-4 text-[14px] font-medium wide:gap-[22px] wide:text-[15px]">
-          <SiteLink href="/privacy" className="inline-flex min-h-11 items-center">
+          <SiteLink href="/privacy" className="inline-flex min-h-11 items-center underline">
             {copy.calm_footer_privacy}
           </SiteLink>
           <a href="https://shanthanu.vercel.app" className="inline-flex min-h-11 items-center text-ink-700 no-underline hover:underline">

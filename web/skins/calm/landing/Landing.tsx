@@ -51,7 +51,7 @@ export function Landing({ heroCard, sections, facts }: LandingProps) {
                 event.preventDefault();
                 goToForm();
               }}
-              className={`${NAV_BUTTON} ink hidden px-5 py-[11px] wide:inline-flex`}
+              className={`${NAV_BUTTON} ink px-5 py-[11px] max-wide:hidden`}
             >
               {copy.calm_nav_start}
             </a>

@@ -38,7 +38,36 @@ async function settle(page, ms = 700) {
 
 // Each shot: a name, the page to open, and what to do before the picture.
 // `full` takes the whole page instead of the first screen.
-const SHOTS = [
+const CALM_SHOTS = [
+  { name: "home", path: "/", full: true },
+  { name: "home-top", path: "/" },
+  { name: "flow-missing", path: "/", act: (page) => page.locator("form").getByRole("button", { name: /recorded run|Tailor my resume/ }).click() },
+  { name: "flow-paste", path: "/", act: (page) => page.getByRole("button", { name: "Or paste it as text" }).click() },
+  { name: "flow-file-added", path: "/states/file-added" },
+  { name: "flow-bad-file-scan", path: "/states/bad-file-scan" },
+  { name: "flow-bad-file-big", path: "/states/bad-file-big" },
+  { name: "try", path: "/try" },
+  { name: "running-steps", path: "/states/running-fast", act: (page) => page.waitForTimeout(3000) },
+  { name: "running-steps-off", path: "/states/running-fast", act: async (page) => {
+      await page.getByRole("switch", { name: "Show steps" }).click();
+      await page.waitForTimeout(3000);
+    } },
+  { name: "example", path: "/example", act: (page) => page.waitForTimeout(1500) },
+  { name: "done", path: "/states/done", full: true },
+  { name: "done-top", path: "/states/done" },
+  { name: "done-clean", path: "/states/done", act: (page) => page.getByRole("switch", { name: "Show changes" }).click() },
+  { name: "done-kept-original", path: "/states/done", act: (page) => page.getByRole("button", { name: "Keep my original" }).first().click() },
+  { name: "done-question", path: "/states/done-question", full: true },
+  { name: "error", path: "/states/error" },
+  { name: "limited", path: "/states/limited" },
+  { name: "limited-visitor", path: "/states/limited-visitor" },
+  { name: "paused", path: "/states/paused" },
+  { name: "privacy", path: "/privacy", full: true },
+  { name: "not-found", path: "/no-such-page" },
+  { name: "states", path: "/states", full: true },
+];
+
+const BOLD_SHOTS = [
   { name: "home", path: "/", full: true, act: playDemo },
   { name: "home-top", path: "/", act: playDemo },
   { name: "home-start", path: "/", act: (page) => page.waitForTimeout(350) }, // the demo just after it begins
@@ -80,12 +109,12 @@ const SHOTS = [
   { name: "states", path: "/states", full: true },
 ];
 
-// channel "chromium" uses the full browser that Playwright installed.
-const browser = await chromium.launch({ channel: "chromium" });
+// channel "chrome" uses the Google Chrome installed on this machine.
+const browser = await chromium.launch({ channel: "chrome" });
 for (const skin of SKINS) {
 const dir = join(OUT, skin);
 mkdirSync(dir, { recursive: true });
-for (const shot of SHOTS) {
+for (const shot of skin === "calm" ? CALM_SHOTS : BOLD_SHOTS) {
   if (only.length && !only.some((word) => shot.name.includes(word))) continue;
   for (const [width, height] of Object.entries(WIDTHS)) {
     const context = await browser.newContext({
