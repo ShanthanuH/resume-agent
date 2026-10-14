@@ -13,7 +13,8 @@
 # The dev server, the build and the tests run the same check.
 #
 # The home page may hold 150 visible words at most (keys that start with nav_,
-# footer_ and home_). Keys that start with home_more_ sit behind a toggle and
+# footer_ and home_), and so may the calm skin's (keys that start with calm_hero_
+# and calm_home_). Keys that start with home_more_ sit behind a toggle and
 # are not counted. The FAQ is not counted.
 
 # ==========================================================================
@@ -1405,3 +1406,43 @@ states_paused:
   max: 40
   text: >-
     Demo paused
+
+# ==========================================================================
+# CALM SKIN: shared (hero, gaps heading)
+# ==========================================================================
+
+calm_hero_title:
+  where: Calm home page, the one big line over the sky photo
+  max: 40
+  text: >-
+    Tailored. Not invented.
+
+calm_hero_sub:
+  where: Calm home page, the line under the big line, over the sky photo
+  max: 100
+  text: >-
+    Every change comes from a line you wrote. Free. No account. Nothing stored.
+
+calm_hero_alt:
+  where: Calm home page, read by screen readers for the sky photo
+  max: 120
+  text: >-
+    A paper airplane folded from a printed resume page, rising above the clouds in morning light
+
+calm_gaps_title:
+  where: Calm skin, home page and result, the heading above the crossed-out skills
+  max: 50
+  text: >-
+    Not on your resume, so we left them out
+
+calm_home_closing_title:
+  where: Calm home page, the closing section title
+  max: 40
+  text: >-
+    Try it on your resume
+
+calm_home_closing_cta:
+  where: Calm home page, the closing section button
+  max: 30
+  text: >-
+    Start with my resume

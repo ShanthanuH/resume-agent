@@ -93,7 +93,6 @@ export function SkyPhoto({ className = "" }: { className?: string }) {
       <source media="(min-width: 768px)" type="image/webp" srcSet="/hero/hero-wide.webp" />
       <source type="image/avif" srcSet="/hero/hero-tall.avif" />
       {/* A plain img: next/image would add a loader script for no gain here. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/hero/hero-tall.webp"
         alt={copy.calm_hero_alt}

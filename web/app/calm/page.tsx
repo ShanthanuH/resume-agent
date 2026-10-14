@@ -1,14 +1,18 @@
-import { copy } from "@/lib/copy";
-import { SkyPhoto } from "@/skins/calm/primitives";
+import { Hero } from "@/skins/calm/home/Hero";
+import { Closing, Faq, HowItWorks, LeftOut } from "@/skins/calm/home/Sections";
+import { TraceDemo } from "@/skins/calm/home/TraceDemo";
 
-// PLACEHOLDER: subagent A replaces this with the calm home page.
+// The calm home page: the photo with the upload box, the recorded run, what
+// was left out, how it works, the questions, one last button.
 export default function HomePage() {
   return (
-    <section className="relative min-h-[100svh]">
-      <SkyPhoto />
-      <h1 className="t-display relative pt-40 text-white">{copy.calm_hero_title}</h1>
-      <p className="relative text-white">{copy.calm_hero_sub}</p>
-      <p>{copy.calm_gaps_title}</p>
-    </section>
+    <>
+      <Hero />
+      <TraceDemo />
+      <LeftOut />
+      <HowItWorks />
+      <Faq />
+      <Closing />
+    </>
   );
 }

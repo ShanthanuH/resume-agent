@@ -176,19 +176,6 @@ export function scanCode(root = WEB) {
   return { used, errors };
 }
 
-/**
- * copy.yaml, followed by any extra files in content/parts/ (one per area,
- * while several people write copy at once). Read as one file: a key in two
- * places is an error, as in a single file.
- */
-function readSources() {
-  const parts = join(WEB, "content/parts");
-  const extra = existsSync(parts)
-    ? readdirSync(parts).filter((name) => name.endsWith(".yaml")).sort().map((name) => readFileSync(join(parts, name), "utf8"))
-    : [];
-  return [readFileSync(SOURCE, "utf8"), ...extra].join("\n");
-}
-
 /** The TypeScript module the site imports. One line per key, in file order. */
 export function generate(texts) {
   const lines = Object.entries(texts).map(([key, text]) => `  ${key}: ${JSON.stringify(text)},`);
@@ -205,7 +192,7 @@ export function generate(texts) {
 /** Check everything. Writes lib/copy.gen.ts unless checkOnly. Returns the problems. */
 export function buildCopy({ checkOnly = false } = {}) {
   const scan = scanCode();
-  const { errors, texts } = checkCopy(readSources(), scan.used);
+  const { errors, texts } = checkCopy(readFileSync(SOURCE, "utf8"), scan.used);
   const all = [...errors, ...scan.errors];
   if (all.length === 0 && !checkOnly) {
     const next = generate(texts);

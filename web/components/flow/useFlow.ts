@@ -92,9 +92,19 @@ export function useFlow({ variant, initial, speed = 1 }: FlowOptions) {
     setToken(""); // a token works once
   }
 
-  // Something chosen on the home page is waiting: take it in. If the visitor
-  // already pressed the button there, press it here once both fields are in.
-  const [pressOnReady, setPressOnReady] = useState(false);
+  // If the visitor already pressed the button on the home page, press it here
+  // once, on the first draw after their fields are in (a field still missing
+  // something then shows its message, as if pressed here). This effect comes
+  // before the hand-over below on purpose: effects run in order, so on the
+  // draw where the hand-over happens this one has already looked and passed.
+  const pressAfterHandOver = useRef(false);
+  useEffect(() => {
+    if (!pressAfterHandOver.current) return;
+    pressAfterHandOver.current = false;
+    submit();
+  });
+
+  // Something chosen on the home page is waiting: take it in.
   useEffect(() => {
     if (isExample || initial) return;
     const handed = takeHandedOver();
@@ -105,15 +115,8 @@ export function useFlow({ variant, initial, speed = 1 }: FlowOptions) {
       dispatch({ type: "resume_typed", text: handed.resumeText });
     }
     if (handed.jobText) dispatch({ type: "job_typed", text: handed.jobText });
-    if (handed.start) setPressOnReady(true);
+    if (handed.start) pressAfterHandOver.current = true;
   }, [isExample, initial, dispatch]);
-  // Pressed once, on the first draw after the hand-over: a field that is still
-  // missing something then shows its message, as if pressed here.
-  useEffect(() => {
-    if (!pressOnReady) return;
-    setPressOnReady(false);
-    submit();
-  });
 
   // The recorded-run page starts playing by itself.
   useEffect(() => {

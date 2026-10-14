@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { page } from "@/skins/calm/ui";
+import { page, pageTop } from "@/skins/calm/ui";
 import { REPLAY_ONLY } from "@/lib/config";
 import { copy } from "@/lib/copy";
 import type { StateName } from "@/lib/states";
@@ -32,24 +32,29 @@ const LABELS: [StateName | "empty", string][] = [
 export default function StatesPage() {
   if (!REPLAY_ONLY) notFound();
   return (
-    <div className={`${page} grid gap-x-10 gap-y-8 pt-6 lg:grid-cols-12 lg:pt-14`}>
-      <div className="lg:col-span-5">
-        <h1 className="head">{copy.states_title}</h1>
-        <p className="lead mt-6">{copy.states_lead}</p>
+    <div className={`bg-mist ${pageTop}`}>
+      <div className={`${page} pb-24 sm:pb-32`}>
+        <h1 className="t-title">{copy.states_title}</h1>
+        <p className="t-lead mt-5 max-w-[46ch] text-ink-soft">{copy.states_lead}</p>
+        <ul className="mt-10 max-w-xl space-y-2">
+          {LABELS.map(([name, label]) => (
+            <li key={name}>
+              {/* "empty" is simply the flow page itself. */}
+              <Link
+                href={name === "empty" ? "/try" : `/states/${name}`}
+                className="group flex min-h-14 items-center justify-between gap-4 rounded-field bg-paper px-5 font-medium text-ink shadow-soft ring-1 ring-line transition-transform duration-[160ms] ease-calm hover:bg-sky-wash active:scale-[0.99]"
+              >
+                {label}
+                <span aria-hidden className="text-sky-ink transition-transform duration-[160ms] ease-calm group-hover:translate-x-0.5">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 8h10M9 4l4 4-4 4" />
+                  </svg>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="space-y-1 lg:col-span-7">
-        {LABELS.map(([name, label]) => (
-          <li key={name}>
-            {/* "empty" is simply the flow page itself. */}
-            <Link
-              href={name === "empty" ? "/try" : `/states/${name}`}
-              className="field-tile flex min-h-14 items-center px-5 font-medium transition-transform duration-[120ms] ease-swoosh hover:translate-x-1"
-            >
-              {label}
-            </Link>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

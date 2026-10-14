@@ -7,7 +7,9 @@
 //        node scripts/screens.mjs              every shot
 //        node scripts/screens.mjs home done    only shots whose name has "home" or "done"
 //
-// BASE_URL picks another address (default http://localhost:3100).
+// BASE_URL picks another address (default http://localhost:3100). Every shot
+// is taken for both skins, into docs/screens/calm and docs/screens/bold;
+// SKIN=calm or SKIN=bold takes one only.
 
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -18,6 +20,7 @@ const BASE = process.env.BASE_URL ?? "http://localhost:3100";
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "../../docs/screens");
 const WIDTHS = { 390: 844, 1440: 900 }; // width -> height of the window
 const only = process.argv.slice(2);
+const SKINS = process.env.SKIN ? [process.env.SKIN] : ["calm", "bold"];
 
 /** Wait until the fonts are in and the entrance animations have finished. */
 async function settle(page, ms = 700) {
@@ -56,7 +59,7 @@ const SHOTS = [
   { name: "done-kept-original", path: "/states/done", act: async (page) => {
       await page.locator("li button[aria-expanded]").first().click();
       // Only the open panel's button: the closed panels hold one each too.
-      await page.locator('.reveal[data-open="true"]').getByRole("button", { name: "Keep my original" }).click();
+      await page.locator(':is(.reveal, .unfold)[data-open="true"]').getByRole("button", { name: "Keep my original" }).click();
     } },
   { name: "done-question", path: "/states/done-question", full: true },
   { name: "done-steps", path: "/states/done", full: true, act: (page) => page.getByRole("button", { name: "Show steps" }).click() },
@@ -69,9 +72,11 @@ const SHOTS = [
   { name: "states", path: "/states", full: true },
 ];
 
-mkdirSync(OUT, { recursive: true });
 // channel "chromium" uses the full browser that Playwright installed.
 const browser = await chromium.launch({ channel: "chromium" });
+for (const skin of SKINS) {
+const dir = join(OUT, skin);
+mkdirSync(dir, { recursive: true });
 for (const shot of SHOTS) {
   if (only.length && !only.some((word) => shot.name.includes(word))) continue;
   for (const [width, height] of Object.entries(WIDTHS)) {
@@ -79,6 +84,7 @@ for (const shot of SHOTS) {
       viewport: { width: Number(width), height },
       deviceScaleFactor: 1,
     });
+    await context.addCookies([{ name: "design", value: skin, url: BASE }]);
     const page = await context.newPage();
     // Report anything the page complains about: a screenshot can look fine
     // while the console is full of errors.
@@ -99,9 +105,10 @@ for (const shot of SHOTS) {
       // the middle of it, so for these shots it is put back in the page's flow.
       await page.addStyleTag({ content: ".sticky { position: static !important; }" });
     }
-    await page.screenshot({ path: join(OUT, `${shot.name}-${width}.png`), fullPage: Boolean(shot.full) });
+    await page.screenshot({ path: join(dir, `${shot.name}-${width}.png`), fullPage: Boolean(shot.full) });
     await context.close();
   }
-  console.log(shot.name);
+  console.log(`${skin} ${shot.name}`);
+}
 }
 await browser.close();
