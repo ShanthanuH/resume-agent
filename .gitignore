@@ -13,3 +13,6 @@ data/
 
 # taste-skill working files (direction sheet, inspector screenshots)
 .taste-skill/
+
+# Source PNGs of the hero photo (the site serves the AVIF/WebP in public/hero)
+web/assets/hero/*.png

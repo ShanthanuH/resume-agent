@@ -1,0 +1,222 @@
+/* Tailwind reads only this skin's files and the shared ones, so the bold
+   skin's classes never end up in this stylesheet. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../app/calm";
+@source "../../components";
+@source "../../lib";
+
+/* The calm look, in one place. It is written down in DESIGN.md at the top of
+   the repo: read that first. Short version: white, ink and sky; one daylight
+   photo; soft double-bezel cards; yellow only for a changed word, green only
+   for your original line. */
+@theme inline {
+  --color-ink: #0b1f33; /* all text on white, the main button */
+  --color-ink-soft: #4a5d72; /* secondary text. 6.8:1 on white */
+  --color-paper: #ffffff;
+  --color-mist: #f4f8fc; /* alternate section background */
+  --color-cloud: #fbf7f1; /* the warm band */
+  --color-line: rgb(11 31 51 / 0.08); /* hairlines and card rings */
+  --color-sky: #3284ce; /* decorative only, never text on white */
+  --color-sky-ink: #1a63b0; /* links, focus, selected. 6.1:1 on white */
+  --color-sky-wash: #e8f1fb; /* drag-over, hovered rows */
+  --color-changed: #f3ea7a; /* ONLY a changed word */
+  --color-yours: #dcf3d6; /* ONLY your original line */
+  --color-yours-edge: #2f8a43;
+  --color-problem: #b42318; /* ONLY a field's problem sentence */
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --ease-calm: cubic-bezier(0.32, 0.72, 0, 1);
+  --radius-shell: 28px;
+  --radius-card: 22px;
+  --radius-field: 16px;
+  --radius-mark: 4px;
+  --shadow-soft: 0 1px 2px rgb(11 31 51 / 0.04), 0 8px 24px -12px rgb(11 31 51 / 0.12);
+  --shadow-float: 0 2px 4px rgb(11 31 51 / 0.05), 0 24px 60px -20px rgb(11 31 51 / 0.3);
+}
+
+:root {
+  --section: clamp(5rem, 10vw, 9rem);
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection {
+    background: var(--color-sky-wash);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-sky-ink);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  /* Tailwind's preflight sets buttons to a pointer-less default. */
+  button:not(:disabled),
+  summary,
+  label[for] {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  /* ---- Type ---------------------------------------------------------- */
+  .t-display {
+    font-size: clamp(2.75rem, 1.6rem + 5vw, 5.5rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+  .t-title {
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+  .t-heading {
+    font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+  }
+  .t-lead {
+    font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  .t-body {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+  .t-small {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .t-eyebrow {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  /* ---- Over the photo: a soft navy wash behind white text ------------- */
+  .sky-scrim {
+    position: relative;
+    isolation: isolate;
+  }
+  .sky-scrim::before {
+    content: "";
+    position: absolute;
+    inset: -12% -10%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgb(11 31 51 / 0.28), rgb(11 31 51 / 0));
+    pointer-events: none;
+  }
+
+  /* ---- The yellow highlight ------------------------------------------ */
+  .mark {
+    background: var(--color-changed);
+    color: var(--color-ink);
+    border-radius: var(--radius-mark);
+    padding: 0.04em 0.16em;
+    margin: 0 -0.08em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  /* A mark that sweeps in from the left, once, when it first appears. */
+  .sweep {
+    background: linear-gradient(var(--color-changed), var(--color-changed)) no-repeat 0 0 / 0% 100%;
+    animation: sweep 600ms var(--ease-calm) forwards;
+  }
+  @keyframes sweep {
+    to {
+      background-size: 100% 100%;
+    }
+  }
+
+  /* ---- The original line opening under a changed one ----------------- */
+  .unfold {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 360ms var(--ease-calm);
+  }
+  .unfold[data-open="true"] {
+    grid-template-rows: 1fr;
+  }
+  .unfold > * {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* ---- A crossed-out skill ------------------------------------------- */
+  .strike {
+    color: var(--color-ink-soft);
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: rgb(11 31 51 / 0.55);
+  }
+
+  /* ---- Entrances: transform only, never on the hero ------------------ */
+  .rise {
+    animation: rise 700ms var(--ease-calm) both;
+  }
+  .rise-2 {
+    animation-delay: 80ms;
+  }
+  .rise-3 {
+    animation-delay: 160ms;
+  }
+  .rise-4 {
+    animation-delay: 240ms;
+  }
+  @keyframes rise {
+    from {
+      transform: translateY(16px);
+    }
+  }
+  /* As a block scrolls into view (browsers that support it). */
+  @supports (animation-timeline: view()) {
+    .arrive {
+      animation: arrive linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+    @keyframes arrive {
+      from {
+        transform: translateY(24px);
+        opacity: 0.001;
+      }
+    }
+  }
+
+  /* A soft pulse for "working" dots. */
+  .breathe {
+    animation: breathe 1.6s var(--ease-calm) infinite alternate;
+  }
+  @keyframes breathe {
+    from {
+      opacity: 0.35;
+      transform: scale(0.85);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .sweep {
+    background-size: 100% 100%;
+  }
+}
