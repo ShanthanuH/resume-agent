@@ -34,6 +34,8 @@ export type LandingProps = {
   heroCard: ReactNode;
   /** False on /try: the hero only, with no sections under it. */
   sections: boolean;
+  /** The "Free, no sign up" line under the card: only under the form. */
+  facts: boolean;
 };
 
 /** The screen around the running card (and around an error card). */

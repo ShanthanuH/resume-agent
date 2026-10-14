@@ -81,8 +81,11 @@ export function useFlow({ variant, initial, speed = 1 }: FlowOptions) {
     if (state.status === "idle") {
       dispatch({ type: "submit_pressed" });
       // After the fields have drawn their messages, put the cursor in the
-      // first one that has a problem.
-      requestAnimationFrame(() => top.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+      // first one that has a problem. A button (a skin's file drop area)
+      // cannot carry aria-invalid, so it says so with data-invalid.
+      requestAnimationFrame(() =>
+        top.current?.querySelector<HTMLElement>('[aria-invalid="true"], [data-invalid="true"]')?.focus(),
+      );
       return;
     }
     if (state.status !== "ready") return;

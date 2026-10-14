@@ -52,13 +52,13 @@ export function Flow({ sections = true, note, ...options }: Props) {
     focusJob.current = true;
   }
 
-  function hero(card: ReactNode) {
-    return <Landing heroCard={card} sections={sections} />;
+  function hero(card: ReactNode, facts = false) {
+    return <Landing heroCard={card} sections={sections} facts={facts} />;
   }
 
   let view: ReactNode = null;
   if (state.status === "idle" || state.status === "ready") {
-    view = hero(<HeroForm state={state} dispatch={dispatch} onSubmit={submit} onToken={onToken} waiting={waiting} />);
+    view = hero(<HeroForm state={state} dispatch={dispatch} onSubmit={submit} onToken={onToken} waiting={waiting} />, true);
   }
   // The recorded-run page never shows the form: before its replay has begun
   // (the first instant, and the server-drawn page) it shows an empty wait.
