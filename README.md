@@ -93,7 +93,7 @@ npm run dev
 
 Open http://localhost:3000.
 
-The site has two looks ("skins") that share all logic and all words: `calm` (light, the default) and `bold` (black, colour fields). Add `?design=bold` or `?design=calm` to any address to switch; a cookie remembers the choice. `NEXT_PUBLIC_DESIGN` sets a deployment's default. `DESIGN.md` describes calm, `web/skins/bold/DESIGN.md` describes bold.
+The site has two looks ("skins") that share all logic and all words: `calm` (light, the default) and `bold` (black, colour fields). Add `?design=bold` to any address to switch to bold (a cookie remembers it for a year); `?design=calm` switches back and clears the cookie. `NEXT_PUBLIC_DESIGN` sets a deployment's default. `DESIGN.md` describes calm, `web/skins/bold/DESIGN.md` describes bold.
 
 To try it with no API key and no cost, set this in `.env` before starting the backend. Every run then replays a saved real run and calls no model:
 
