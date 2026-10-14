@@ -1464,12 +1464,6 @@ calm_nav_how:
   text: >-
     See how it works
 
-calm_nav_start:
-  where: Calm home page, top right and closing, ink button that goes to the form
-  max: 20
-  text: >-
-    Tailor my resume
-
 calm_hero_title_1:
   where: Calm home page, the big line, first part
   max: 20
@@ -1572,12 +1566,6 @@ calm_form_submit:
   max: 20
   text: >-
     Tailor my resume
-
-calm_form_submit_replay:
-  where: Calm form, the main button on preview builds (plays the recorded run)
-  max: 30
-  text: >-
-    Play the recorded run
 
 calm_form_bot_wait:
   where: Calm form, under the button, when it was pressed before the bot check finished

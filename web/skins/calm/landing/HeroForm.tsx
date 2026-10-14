@@ -197,7 +197,7 @@ export function HeroForm({ state, dispatch, onSubmit, onToken, waiting }: HeroFo
         disabled={waiting}
         className="ink h-[52px] w-full rounded-2xl font-sans text-[16px] font-semibold wide:h-[54px]"
       >
-        {REPLAY_ONLY ? copy.calm_form_submit_replay : copy.calm_form_submit}
+        {copy.calm_form_submit}
       </button>
       {/* role="status": read out when it appears, without stealing focus. */}
       {waiting && (

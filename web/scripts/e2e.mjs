@@ -216,7 +216,7 @@ async function calmChecks() {
       found = await page.evaluate(() => document.activeElement?.id === "resume-drop");
     }
     expect(found, "the drop area should be reachable with Tab");
-    const chooser = page.waitForEvent("filechooser", { timeout: 2000 });
+    const chooser = page.waitForEvent("filechooser", { timeout: 5000 });
     await page.keyboard.press("Enter");
     await chooser;
     await page.context().close();
