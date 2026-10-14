@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { page, pageTop } from "@/skins/calm/ui";
+import { PageFrame } from "@/skins/calm/pages/PageFrame";
 import { REPLAY_ONLY } from "@/lib/config";
 import { copy } from "@/lib/copy";
 import type { StateName } from "@/lib/states";
@@ -32,29 +32,27 @@ const LABELS: [StateName | "empty", string][] = [
 export default function StatesPage() {
   if (!REPLAY_ONLY) notFound();
   return (
-    <div className={`bg-mist ${pageTop}`}>
-      <div className={`${page} pb-24 sm:pb-32`}>
-        <h1 className="t-title">{copy.states_title}</h1>
-        <p className="t-lead mt-5 max-w-[46ch] text-ink-soft">{copy.states_lead}</p>
-        <ul className="mt-10 max-w-xl space-y-2">
-          {LABELS.map(([name, label]) => (
-            <li key={name}>
-              {/* "empty" is simply the flow page itself. */}
-              <Link
-                href={name === "empty" ? "/try" : `/states/${name}`}
-                className="group flex min-h-14 items-center justify-between gap-4 rounded-field bg-paper px-5 font-medium text-ink shadow-soft ring-1 ring-line transition-transform duration-[160ms] ease-calm hover:bg-sky-wash active:scale-[0.99]"
-              >
-                {label}
-                <span aria-hidden className="text-sky-ink transition-transform duration-[160ms] ease-calm group-hover:translate-x-0.5">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 8h10M9 4l4 4-4 4" />
-                  </svg>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    <PageFrame>
+      <h1 className="font-serif text-[38px] leading-[1.1] text-ink-900 wide:text-[46px]">{copy.states_title}</h1>
+      <p className="mt-4 text-[17px] leading-[1.6] text-ink-700">{copy.states_lead}</p>
+      <ul className="mt-8 space-y-3">
+        {LABELS.map(([name, label]) => (
+          <li key={name}>
+            {/* "empty" is simply the flow page itself. */}
+            <Link
+              href={name === "empty" ? "/try" : `/states/${name}`}
+              className="glass lift flex min-h-14 items-center justify-between gap-4 rounded-[18px] px-5 font-semibold text-ink-900"
+            >
+              {label}
+              <span aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 8h10M9 4l4 4-4 4" />
+                </svg>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </PageFrame>
   );
 }

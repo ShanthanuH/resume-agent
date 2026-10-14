@@ -1,27 +1,24 @@
 "use client"; // error boundaries must be Client Components
 
-import { ArrowDot, Card } from "@/skins/calm/primitives";
-import { page, pageTop, primaryButton } from "@/skins/calm/ui";
+import { Glass } from "@/skins/calm/parts";
+import { PageFrame, inkButton } from "@/skins/calm/pages/PageFrame";
 import { copy } from "@/lib/copy";
 
 /**
- * Shown when a page throws while it is being drawn. Next.js puts this in the
- * page's place, inside the normal header and footer. `retry` draws the page
- * again. The error itself is not shown: its text could hold resume content.
+ * Shown when a page throws while it is being drawn. The error itself is not
+ * shown: its text could hold resume content. The button reloads the page.
  */
-export default function ErrorPage({ retry }: { error: Error & { digest?: string }; retry: () => void }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function ErrorPage(_props: { error: Error & { digest?: string }; retry: () => void }) {
   return (
-    <section role="alert" className={`bg-mist ${pageTop}`}>
-      <div className={`${page} pb-24 sm:pb-32`}>
-        <Card className="mx-auto max-w-xl" coreClassName="p-7 sm:p-10">
-          <h1 className="t-title">{copy.crash_title}</h1>
-          <p className="t-lead mt-5 text-ink-soft">{copy.crash_text}</p>
-          <button type="button" onClick={() => retry()} className={`${primaryButton} mt-8`}>
-            {copy.crash_retry}
-            <ArrowDot />
-          </button>
-        </Card>
-      </div>
-    </section>
+    <PageFrame>
+      <Glass role="alert" className="rounded-[28px] p-8">
+        <h1 className="font-serif text-[38px] leading-[1.1] text-ink-900 wide:text-[46px]">{copy.calm_500_title}</h1>
+        <p className="mt-4 text-[17px] leading-[1.6] text-ink-700">{copy.crash_text}</p>
+        <button type="button" onClick={() => window.location.reload()} className={`${inkButton} mt-7`}>
+          {copy.calm_500_button}
+        </button>
+      </Glass>
+    </PageFrame>
   );
 }

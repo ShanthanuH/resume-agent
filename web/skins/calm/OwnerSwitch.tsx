@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { OWNER_COOKIE } from "@/lib/api";
 import { copy, fill } from "@/lib/copy";
 import { SiteLink } from "@/components/SiteLink";
-import { ArrowDot } from "./primitives";
-import { primaryButton } from "./ui";
+import { inkButton } from "./pages/PageFrame";
 
 const THIRTY_DAYS = 60 * 60 * 24 * 30; // cookie lifetime, in seconds
 const REMOVE_ADDRESS = "/owner#key=off"; // opening this deletes the saved key
@@ -54,15 +53,14 @@ export function OwnerSwitch() {
   return (
     <div className="space-y-5">
       {/* role="status" makes screen readers announce the outcome. */}
-      <p role="status" className="t-lead">
+      <p role="status" className="text-[17px] leading-[1.6] text-ink-900">
         {MESSAGE[state]}
       </p>
       {state === "on" && (
-        <p className="t-small text-ink-soft">{fill(copy.owner_remove_hint, { address: REMOVE_ADDRESS })}</p>
+        <p className="text-[15px] leading-normal text-ink-700">{fill(copy.owner_remove_hint, { address: REMOVE_ADDRESS })}</p>
       )}
-      <SiteLink href="/try" className={primaryButton}>
+      <SiteLink href="/try" className={inkButton}>
         {copy.owner_go}
-        <ArrowDot />
       </SiteLink>
     </div>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { page, inlineLink, pageTop } from "@/skins/calm/ui";
+import { Glass } from "@/skins/calm/parts";
+import { PageFrame } from "@/skins/calm/pages/PageFrame";
 import { GITHUB_URL } from "@/lib/config";
 import { copy } from "@/lib/copy";
 
@@ -26,35 +27,31 @@ const SECTIONS = [
 
 export default function PrivacyPage() {
   return (
-    <>
-      <header className={`bg-mist ${pageTop}`}>
-        <div className={`${page} pb-14 sm:pb-20`}>
-          <h1 className="t-title">{copy.privacy_title}</h1>
-          <p className="t-lead mt-5 max-w-[46ch] text-ink-soft">{copy.privacy_lead}</p>
-        </div>
-      </header>
-      <div className={`${page} py-14 sm:py-20`}>
-        <div className="max-w-[62ch] space-y-14">
+    <PageFrame wide>
+      <Glass className="rounded-[28px] p-6 wide:p-8">
+        <h1 className="font-serif text-[38px] leading-[1.1] text-ink-900 wide:text-[46px]">
+          {copy.calm_privacy_title}
+        </h1>
+        <div className="mt-4 text-[17px] leading-[1.6] text-ink-700">
+          <p>{copy.privacy_lead}</p>
           {SECTIONS.map((s) => (
-            <section key={s.title}>
-              <h2 className="t-heading">{s.title}</h2>
-              <ul className="t-body mt-4 space-y-4 text-ink-soft">
+            <section key={s.title} className="mt-8">
+              <h2 className="font-serif text-[26px] leading-tight text-ink-900">{s.title}</h2>
+              <ul className="mt-3 list-disc space-y-3 pl-5 marker:text-ink-500">
                 {s.points.map((point) => (
-                  <li key={point} className="relative pl-5 before:absolute before:left-0 before:top-[0.72em] before:h-1.5 before:w-1.5 before:rounded-full before:bg-sky">
-                    {point}
-                  </li>
+                  <li key={point}>{point}</li>
                 ))}
               </ul>
             </section>
           ))}
-          <p className="t-body">
+          <p className="mt-8">
             {copy.privacy_code}{" "}
-            <a href={GITHUB_URL} className={`${inlineLink} font-medium`}>
+            <a href={GITHUB_URL} className="font-semibold text-ink-900 underline underline-offset-2">
               {copy.privacy_code_link}
             </a>
           </p>
         </div>
-      </div>
-    </>
+      </Glass>
+    </PageFrame>
   );
 }
