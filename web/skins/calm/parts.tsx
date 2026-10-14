@@ -4,6 +4,8 @@
 import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import { copy } from "@/lib/copy";
 
+export { Chevron } from "./icons";
+
 /** The site name in Instrument Serif. White on the dark photo areas. */
 export function Wordmark({ className = "", light = false }: { className?: string; light?: boolean }) {
   return <span className={`font-serif ${light ? "text-white" : "text-ink-900"} ${className}`}>{copy.nav_brand}</span>;
@@ -96,26 +98,6 @@ export function Mark({ children }: { children: ReactNode }) {
 /** A soft cloud shape. Place it with className or style; it is decorative. */
 export function Cloud({ className = "", style }: { className?: string; style?: CSSProperties }) {
   return <div aria-hidden className={`cloud ${className}`} style={style} />;
-}
-
-/** The FAQ chevron. Turn it with "rotate-180" when open. */
-export function Chevron({ size = 20, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      className={`transition-transform duration-[250ms] ease-[ease] motion-reduce:transition-none ${className}`}
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
 }
 
 /** The file-with-an-arrow icon of the drop area. */

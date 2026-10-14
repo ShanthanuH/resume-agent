@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, type ReactNode } from "react";
 import { useFlow, type FlowOptions } from "@/components/flow/useFlow";
@@ -8,17 +9,24 @@ import { jobHeading } from "@/lib/job-heading";
 import { HeroForm } from "../landing/HeroForm";
 import { Landing } from "../landing/Landing";
 import { HeroPreload } from "../parts";
-import { ResultView } from "../result/ResultView";
-import { NoticeCard } from "../running/NoticeCard";
-import { RunningCard } from "../running/RunningCard";
-import { RunningScreen } from "../running/RunningScreen";
 import { IDS } from "./contracts";
+
+// The screens after the form are loaded only when they are needed, so the
+// home page's first load carries the form and nothing else. On the server
+// they are still drawn in full (the states pages open on them).
+const RunningScreen = dynamic(() => import("../running/RunningScreen").then((m) => m.RunningScreen));
+const RunningCard = dynamic(() => import("../running/RunningCard").then((m) => m.RunningCard));
+const NoticeCard = dynamic(() => import("../running/NoticeCard").then((m) => m.NoticeCard));
+const ResultView = dynamic(() => import("../result/ResultView").then((m) => m.ResultView));
 
 const EXAMPLE_PDF = "/example.pdf"; // the recorded run's result, with every rewrite in
 
 type Props = FlowOptions & {
-  /** The landing sections under the hero. Off on /try. */
-  sections?: boolean;
+  /**
+   * The landing sections under the hero. The home page draws them on the
+   * server and passes them in, so they are not part of this component's code.
+   */
+  sections?: ReactNode;
   /** A note at the top of the running and result screens (the recorded-run page). */
   note?: ReactNode;
 };
@@ -29,9 +37,25 @@ type Props = FlowOptions & {
  * decided by the state machine alone (through useFlow); this component picks
  * the screen and hands each one its props. The screens only draw.
  */
-export function Flow({ sections = true, note, ...options }: Props) {
+export function Flow({ sections = null, note, ...options }: Props) {
   const { state, dispatch, top, screen, isExample, submit, onToken, waiting, skip, watch, speed } = useFlow(options);
   const router = useRouter();
+
+  // Fetch the later screens once the page is idle, so pressing the button
+  // never waits for them.
+  useEffect(() => {
+    const warm = () => {
+      void import("../running/RunningCard");
+      void import("../running/NoticeCard");
+      void import("../result/ResultView");
+    };
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(warm, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(warm, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // "Try another job post" sets this, so the job post box gets the cursor once
   // the form is back on screen.

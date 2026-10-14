@@ -32,8 +32,8 @@ export type HeroFormProps = {
 /** The landing page. The hero's card is the form, or a notice in its place. */
 export type LandingProps = {
   heroCard: ReactNode;
-  /** False on /try: the hero only, with no sections under it. */
-  sections: boolean;
+  /** The sections under the hero, drawn on the server. Null on /try: the hero only. */
+  sections: ReactNode;
   /** The "Free, no sign up" line under the card: only under the form. */
   facts: boolean;
 };

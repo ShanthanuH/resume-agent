@@ -1,7 +1,7 @@
-import { SiteLink } from "@/components/SiteLink";
+import Link from "next/link";
 import { copy } from "@/lib/copy";
-import { IDS } from "../flow/contracts";
 import { Wordmark } from "../parts";
+import { StartLink } from "./StartLink";
 
 /** The dashed contrail that ends on the star in the photo. */
 function Line({ d, className }: { d: string; className: string }) {
@@ -13,9 +13,13 @@ function Line({ d, className }: { d: string; className: string }) {
 }
 
 /** The sunset photo with the call to act again, and the footer on top of it. */
-export function Closing({ onStart }: { onStart: () => void }) {
+export function Closing() {
   return (
     <section className="closing on-dark">
+      {/* Decorative, so no alt text. Loaded only as it nears the screen. A plain
+          img: next/image would add a loader for a file that is already WebP. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/hero/closing.webp" alt="" width={1672} height={941} loading="lazy" decoding="async" aria-hidden className="closing-photo" />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[110px] bg-[linear-gradient(180deg,#5F89C0_0%,rgba(95,137,192,0)_100%)] wide:h-[120px]" />
       {/* Phone: the star is at 80vw, 166px. */}
       <Line d="M 62 0 C 67 8, 73 15.5, 78.4 21.6" className="wide:hidden" />
@@ -32,23 +36,16 @@ export function Closing({ onStart }: { onStart: () => void }) {
         <p className="m-0 text-[16px] font-medium text-white [text-shadow:0_1px_10px_rgba(11,35,64,0.55)] wide:text-[19px] wide:font-normal wide:[text-shadow:0_1px_10px_rgba(11,35,64,0.4)]">
           {copy.calm_home_closing_lead}
         </p>
-        <a
-          href={`#${IDS.start}`}
-          onClick={(event) => {
-            event.preventDefault();
-            onStart();
-          }}
-          className="glass lift mt-1.5 inline-flex min-h-11 items-center rounded-full px-[22px] py-3.5 text-[16px] font-bold text-ink-900 no-underline [background:rgb(255_255_255/0.6)] wide:mt-2 wide:px-[26px] wide:py-[15px]"
-        >
+        <StartLink className="glass lift mt-1.5 inline-flex min-h-11 items-center rounded-full px-[22px] py-3.5 text-[16px] font-bold text-ink-900 no-underline [background:rgb(255_255_255/0.6)] wide:mt-2 wide:px-[26px] wide:py-[15px]">
           {copy.calm_home_closing_cta}
-        </a>
+        </StartLink>
       </div>
       <footer className="glass relative mx-4 mb-5 box-border flex items-center justify-between gap-3 rounded-[20px] px-[18px] py-3.5 wide:mx-auto wide:mb-6 wide:w-[calc(100%-48px)] wide:max-w-[1152px] wide:flex-wrap wide:gap-x-6 wide:gap-y-3 wide:rounded-[22px] wide:px-6 wide:py-4">
         <Wordmark className="text-[22px] wide:text-[24px]" />
         <div className="flex gap-4 text-[14px] font-medium wide:gap-[22px] wide:text-[15px]">
-          <SiteLink href="/privacy" className="inline-flex min-h-11 items-center underline">
+          <Link href="/privacy" className="inline-flex min-h-11 items-center underline">
             {copy.calm_footer_privacy}
-          </SiteLink>
+          </Link>
           <a href="https://shanthanu.vercel.app" className="inline-flex min-h-11 items-center text-ink-700 no-underline hover:underline">
             {copy.calm_footer_made_by}
           </a>

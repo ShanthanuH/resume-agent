@@ -3,23 +3,8 @@
 import { copy } from "@/lib/copy";
 import type { LandingProps } from "../flow/contracts";
 import { IDS } from "../flow/contracts";
-import { Cloud } from "../parts";
 import { Wordmark } from "../parts";
-import { Closing } from "./Closing";
-import { Example } from "./Example";
-import { Faq, Missing, PrivacyStrip, Steps } from "./Sections";
-
-/** Scroll to an element, smoothly unless the visitor asked for less motion. */
-function scrollTo(id: string, block: ScrollLogicalPosition) {
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block });
-}
-
-/** Scroll to the form and put the cursor in the drop area, if it is on screen. */
-function goToForm() {
-  scrollTo(IDS.start, "center");
-  document.getElementById(IDS.drop)?.focus({ preventScroll: true });
-}
+import { goToForm, scrollTo } from "./go";
 
 const NAV_BUTTON = "inline-flex min-h-11 items-center rounded-full text-[14px] font-semibold no-underline wide:text-[15px]";
 
@@ -33,7 +18,7 @@ export function Landing({ heroCard, sections, facts }: LandingProps) {
         <nav className="relative flex flex-wrap items-center justify-between gap-4 px-5 py-4 wide:px-[clamp(20px,4vw,56px)] wide:py-6">
           <Wordmark light className="text-[26px] wide:text-ink-900 wide:text-[30px]" />
           <div className="flex flex-wrap items-center gap-2.5">
-            {sections && (
+            {sections ? (
               <a
                 href={`#${IDS.how}`}
                 onClick={(event) => {
@@ -44,7 +29,7 @@ export function Landing({ heroCard, sections, facts }: LandingProps) {
               >
                 {copy.calm_nav_how}
               </a>
-            )}
+            ) : null}
             <a
               href={`#${IDS.start}`}
               onClick={(event) => {
@@ -84,44 +69,7 @@ export function Landing({ heroCard, sections, facts }: LandingProps) {
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-[linear-gradient(180deg,rgba(234,241,248,0)_0%,#EAF1F8_100%)] wide:h-[180px]" />
       </header>
 
-      {sections && (
-        <>
-          <div className="day relative overflow-hidden">
-            {/* Clouds: they drift on wide screens and stand still on phones. */}
-            <Cloud className="drift hidden wide:block" style={{ width: 520, height: 220, left: -120, top: 140, opacity: 0.8 }} />
-            <Cloud className="drift2 hidden wide:block" style={{ width: 640, height: 260, right: -160, top: 980, opacity: 0.75 }} />
-            <Cloud className="drift hidden wide:block" style={{ width: 480, height: 200, left: "8%", top: 1900, opacity: 0.7 }} />
-            <Cloud className="drift2 hidden wide:block" style={{ width: 560, height: 220, right: "4%", top: 2650, opacity: 0.7 }} />
-            <Cloud className="wide:hidden" style={{ width: 360, height: 160, left: -140, top: 120, opacity: 0.8 }} />
-            <Cloud className="wide:hidden" style={{ width: 380, height: 170, right: -160, top: 1200, opacity: 0.75 }} />
-            <Cloud className="wide:hidden" style={{ width: 340, height: 150, left: -120, top: 2300, opacity: 0.7 }} />
-            {/* The contrail from the plane in the hero down to the star (wide only). */}
-            <svg
-              aria-hidden
-              viewBox="0 0 100 1000"
-              preserveAspectRatio="none"
-              className="pointer-events-none absolute inset-0 hidden h-full w-full [filter:drop-shadow(0_1px_1px_rgba(16,44,80,0.18))] wide:block"
-            >
-              <path
-                d="M 21 0 C 40 90, 92 140, 86 260 S 12 420, 16 560 S 90 760, 82 1000"
-                fill="none"
-                stroke="#FFFFFF"
-                strokeWidth="2"
-                strokeDasharray="7 11"
-                strokeLinecap="round"
-                vectorEffect="non-scaling-stroke"
-                opacity=".95"
-              />
-            </svg>
-            <Example />
-            <Steps />
-            <Missing />
-            <PrivacyStrip />
-            <Faq />
-          </div>
-          <Closing onStart={goToForm} />
-        </>
-      )}
+      {sections}
     </div>
   );
 }

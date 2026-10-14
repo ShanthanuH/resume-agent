@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 
 /** The product on its own: the hero with the form, without the sections. */
 export default function TryPage() {
-  return <Flow variant="try" sections={false} />;
+  return <Flow variant="try" />;
 }

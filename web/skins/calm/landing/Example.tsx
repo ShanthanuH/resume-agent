@@ -1,12 +1,11 @@
-"use client";
-
-import { Fragment, useId, useState } from "react";
+import { Fragment } from "react";
 import { copy, fill } from "@/lib/copy";
 import { diffWords } from "@/lib/diff";
 import { EXAMPLE_RUN, excerpt } from "@/lib/example";
 import { companyLine, jobHeading } from "@/lib/job-heading";
 import { Before, Mark } from "../parts";
 import { IDS } from "../flow/contracts";
+import { Disclosure } from "./Disclosure";
 
 // Which requirements of the recorded run the card shows. They were picked to
 // match the design's example: query tuning, Redis and tests were matched, and
@@ -27,10 +26,8 @@ export function Example() {
 
   const shown = excerpt(result, "Experience", 0, [1, 4]);
   const entry = shown.sections[0]?.entries[0];
-  const base = useId();
   // The first changed line starts open.
   const firstChanged = entry?.lines.find((line) => line.bullet_id)?.evidence_id;
-  const [open, setOpen] = useState<Record<string, boolean>>(firstChanged ? { [firstChanged]: true } : {});
 
   return (
     <section id={IDS.how} className="relative mx-auto box-border max-w-[1200px] scroll-mt-4 px-5 pt-16 pb-10 wide:px-[clamp(20px,4vw,40px)] wide:pt-[110px] wide:pb-[70px]">
@@ -73,28 +70,20 @@ export function Example() {
             {entry.lines.map((line) => {
               const bullet = line.bullet_id ? result.bullets.find((b) => b.id === line.bullet_id) : undefined;
               if (!bullet) return <div key={line.evidence_id}>{line.original}</div>;
-              const isOpen = Boolean(open[line.evidence_id]);
-              const boxId = `${base}-${line.evidence_id}`;
               const pieces = diffWords(line.original, bullet.text);
               return (
                 <div key={line.evidence_id} className="flex flex-col gap-2">
-                  <button
-                    type="button"
-                    className="textbtn"
-                    aria-expanded={isOpen}
-                    aria-controls={boxId}
-                    onClick={() => setOpen((o) => ({ ...o, [line.evidence_id]: !o[line.evidence_id] }))}
-                  >
-                    {pieces.map((piece, i) => (
+                  <Disclosure
+                    startOpen={line.evidence_id === firstChanged}
+                    buttonClassName="textbtn"
+                    label={pieces.map((piece, i) => (
                       <Fragment key={i}>
                         {i > 0 && " "}
                         {piece.changed ? <Mark>{piece.text}</Mark> : piece.text}
                       </Fragment>
                     ))}
-                  </button>
-                  <div id={boxId} hidden={!isOpen}>
-                    <Before text={line.original} className="px-3 py-2.5 text-[13px] leading-[1.5] wide:px-3.5 wide:py-3 wide:text-[14px]" />
-                  </div>
+                    panel={<Before text={line.original} className="px-3 py-2.5 text-[13px] leading-[1.5] wide:px-3.5 wide:py-3 wide:text-[14px]" />}
+                  />
                 </div>
               );
             })}

@@ -1,12 +1,9 @@
-"use client";
-
-import { useId, useState } from "react";
-import { SiteLink } from "@/components/SiteLink";
+import Link from "next/link";
 import { copy } from "@/lib/copy";
-import { Chevron, Glass, Struck } from "../parts";
+import { Glass, Struck } from "../parts";
 
-const SECTION = "relative mx-auto box-border max-w-[1200px] px-5 wide:px-[clamp(20px,4vw,40px)]";
-const H2 = "m-0 font-serif text-[40px] leading-[1.02] font-normal wide:text-[clamp(38px,4.4vw,60px)] wide:tracking-[-0.5px]";
+export const SECTION = "relative mx-auto box-border max-w-[1200px] px-5 wide:px-[clamp(20px,4vw,40px)]";
+export const H2 = "m-0 font-serif text-[40px] leading-[1.02] font-normal wide:text-[clamp(38px,4.4vw,60px)] wide:tracking-[-0.5px]";
 
 const STEPS = [
   { title: copy.calm_home_step_1_title, text: copy.calm_home_step_1_text },
@@ -65,55 +62,13 @@ export function PrivacyStrip() {
           <h3 className="m-0 font-serif text-[30px] leading-[1.1] font-normal wide:text-[34px]">{copy.calm_home_privacy_title}</h3>
           <p className="m-0 text-[15px] leading-[1.55] text-ink-700 wide:text-[16px]">{copy.calm_home_privacy_text}</p>
         </div>
-        <SiteLink
+        <Link
           href="/privacy"
           className="glass lift mt-1 inline-flex min-h-11 items-center rounded-full px-4 py-[11px] text-[14px] font-semibold no-underline wide:mt-0 wide:px-5 wide:py-3 wide:text-[15px]"
         >
           {copy.calm_home_privacy_link}
-        </SiteLink>
+        </Link>
       </Glass>
-    </section>
-  );
-}
-
-const FAQ = [
-  { q: copy.calm_faq_1_q, a: copy.calm_faq_1_a },
-  { q: copy.calm_faq_2_q, a: copy.calm_faq_2_a },
-  { q: copy.calm_faq_3_q, a: copy.calm_faq_3_a },
-  { q: copy.calm_faq_4_q, a: copy.calm_faq_4_a },
-];
-
-/** Questions as an accordion. The first starts open; several can be open. */
-export function Faq() {
-  const base = useId();
-  const [open, setOpen] = useState(() => FAQ.map((_, i) => i === 0));
-  return (
-    <section className="relative mx-auto box-border max-w-[860px] px-5 pt-10 pb-16 wide:px-[clamp(20px,4vw,40px)] wide:pt-20 wide:pb-[120px]">
-      <h2 className={`${H2} mb-2.5 wide:mb-7`}>{copy.calm_faq_title}</h2>
-      <div className="flex flex-col gap-2.5 wide:gap-3">
-        {FAQ.map((item, i) => {
-          const id = `${base}-${i}`;
-          return (
-            <Glass key={item.q} className="rounded-[20px] wide:rounded-[22px]">
-              <h3 className="m-0">
-                <button
-                  type="button"
-                  aria-expanded={open[i]}
-                  aria-controls={id}
-                  onClick={() => setOpen((o) => o.map((v, j) => (j === i ? !v : v)))}
-                  className="flex min-h-11 w-full items-center justify-between gap-3 border-0 bg-transparent px-5 py-[18px] text-left font-sans text-[16px] font-semibold text-ink-900 wide:gap-4 wide:px-6 wide:py-5 wide:text-[17px]"
-                >
-                  {item.q}
-                  <Chevron size={20} className={open[i] ? "rotate-180" : ""} />
-                </button>
-              </h3>
-              <div id={id} hidden={!open[i]}>
-                <p className="m-0 px-5 pb-[18px] text-[15px] leading-[1.55] text-ink-700 wide:px-6 wide:pb-[22px] wide:text-[16px]">{item.a}</p>
-              </div>
-            </Glass>
-          );
-        })}
-      </div>
     </section>
   );
 }
