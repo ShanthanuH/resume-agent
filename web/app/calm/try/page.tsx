@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: copy.flow_meta_description,
 };
 
-/** The product: drop your resume, paste the job post, press one button. */
+/** The product on its own: the hero with the form, without the sections. */
 export default function TryPage() {
-  return <Flow variant="try" />;
+  return <Flow variant="try" sections={false} />;
 }

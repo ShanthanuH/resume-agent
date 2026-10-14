@@ -18,9 +18,12 @@ export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   url.pathname = `/${skin}${pathname === "/" ? "" : pathname}`;
   const response = NextResponse.rewrite(url);
-  // Remember a choice made in the address, so it holds on the next page.
-  if (asked === skin) {
+  // ?design=bold is remembered, so it holds on the next page. ?design=calm
+  // forgets it: calm is the default, so no cookie is needed for it.
+  if (asked === "bold") {
     response.cookies.set(SKIN_COOKIE, skin, { path: "/", maxAge: SKIN_COOKIE_MAX_AGE, sameSite: "lax" });
+  } else if (asked === "calm") {
+    response.cookies.delete(SKIN_COOKIE);
   }
   return response;
 }

@@ -1,18 +1,8 @@
-import { Hero } from "@/skins/calm/home/Hero";
-import { Closing, Faq, HowItWorks, LeftOut } from "@/skins/calm/home/Sections";
-import { TraceDemo } from "@/skins/calm/home/TraceDemo";
+import { Flow } from "@/skins/calm/flow/Flow";
 
-// The calm home page: the photo with the upload box, the recorded run, what
-// was left out, how it works, the questions, one last button.
+// The calm home page: the sky photo with the form, the example, the steps,
+// what's missing, privacy, the questions and the closing. Pressing the button
+// turns the hero into the running card and then the result, with no reload.
 export default function HomePage() {
-  return (
-    <>
-      <Hero />
-      <TraceDemo />
-      <LeftOut />
-      <HowItWorks />
-      <Faq />
-      <Closing />
-    </>
-  );
+  return <Flow variant="try" />;
 }

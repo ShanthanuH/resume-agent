@@ -5,17 +5,19 @@
 // the address they see.
 //
 // Which skin a visitor gets, first match wins:
-//   1. ?design=calm or ?design=bold in the address (then remembered)
+//   1. ?design=calm or ?design=bold in the address. ?design=bold is then
+//      remembered in a cookie; ?design=calm forgets it (calm is the default).
 //   2. the remembered choice, in a cookie
-//   3. NEXT_PUBLIC_DESIGN, set per deployment (default "calm")
+//   3. NEXT_PUBLIC_DESIGN, set per deployment (default "calm"). Setting it to
+//      "bold" is an emergency switch only.
 
 export const SKINS = ["calm", "bold"] as const;
 export type Skin = (typeof SKINS)[number];
 
 /** The cookie that remembers a ?design= choice. */
 export const SKIN_COOKIE = "design";
-/** How long the choice is remembered: 30 days. */
-export const SKIN_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+/** How long a ?design=bold choice is remembered: one year. */
+export const SKIN_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 export function isSkin(value: string | null | undefined): value is Skin {
   return (SKINS as readonly string[]).includes(value ?? "");

@@ -13,9 +13,9 @@
 # The dev server, the build and the tests run the same check.
 #
 # The home page may hold 150 visible words at most (keys that start with nav_,
-# footer_ and home_), and so may the calm skin's (keys that start with calm_hero_
-# and calm_home_). Keys that start with home_more_ sit behind a toggle and
-# are not counted. The FAQ is not counted.
+# footer_ and home_). The calm skin's home page may hold 220 (keys that start
+# with calm_hero_ and calm_home_). Keys that start with home_more_ sit behind a
+# toggle and are not counted. The FAQ is not counted.
 
 # ==========================================================================
 # EVERY PAGE: browser tab, link preview, header, footer
@@ -1408,41 +1408,747 @@ states_paused:
     Demo paused
 
 # ==========================================================================
-# CALM SKIN: shared (hero, gaps heading)
+# CALM SKIN: every page
 # ==========================================================================
 
-calm_hero_title:
-  where: Calm home page, the one big line over the sky photo
-  max: 40
-  text: >-
-    Resume? Tailored. You? Hired.
-
-calm_hero_sub:
-  where: Calm home page, the line under the big line, over the sky photo
-  max: 100
-  text: >-
-    Every change comes from a line you wrote. Free. No account. Nothing stored.
-
-calm_hero_alt:
-  where: Calm home page, read by screen readers for the sky photo
-  max: 120
-  text: >-
-    A paper airplane folded from a printed resume page, rising above the clouds in morning light
-
-calm_gaps_title:
-  where: Calm skin, home page and result, the heading above the crossed-out skills
+calm_meta_title:
+  where: Calm skin, browser tab and link preview title, home page
   max: 50
   text: >-
-    Not on your resume, so we left them out
+    SwooshCV: every job gets its own resume
 
-calm_home_closing_title:
-  where: Calm home page, the closing section title
+calm_meta_description:
+  where: Calm skin, link preview on X, LinkedIn and Google, under the title
+  max: 120
+  text: >-
+    Drop your resume, paste the job post, and get a version written for that
+    role. Free, no sign up.
+
+calm_footer_privacy:
+  where: Calm skin, footer link to the privacy page
+  max: 20
+  text: >-
+    Privacy
+
+calm_footer_made_by:
+  where: Calm skin, footer link to the maker's site
+  max: 20
+  text: >-
+    Made by Shaan
+
+calm_missing_label:
+  where: Calm skin, home page and result, small heading above the crossed-out skills
   max: 40
   text: >-
-    Try it on your resume
+    Asked for, but not on your resume
 
-calm_home_closing_cta:
-  where: Calm home page, the closing section button
+calm_missing_sr:
+  where: Calm skin, read by screen readers after each crossed-out skill ("Kubernetes, not on your resume")
   max: 30
   text: >-
-    Start with my resume
+    , not on your resume
+
+calm_before:
+  where: Calm skin, home page example and result, bold start of the green box with the original line
+  max: 20
+  text: >-
+    Before:
+
+# ==========================================================================
+# CALM SKIN: home page, top to bottom
+# ==========================================================================
+
+calm_nav_how:
+  where: Calm home page, top right, glass button that scrolls to the example
+  max: 20
+  text: >-
+    See how it works
+
+calm_nav_start:
+  where: Calm home page, top right and closing, ink button that goes to the form
+  max: 20
+  text: >-
+    Tailor my resume
+
+calm_hero_title_1:
+  where: Calm home page, the big line, first part
+  max: 20
+  text: >-
+    Every job gets
+
+calm_hero_title_2:
+  where: Calm home page, the big line, second part, in italics
+  max: 20
+  text: >-
+    its own resume.
+
+calm_hero_sub:
+  where: Calm home page, the line under the big line
+  max: 90
+  text: >-
+    Drop your resume, paste the job post, and get a version written for that
+    role.
+
+calm_hero_facts:
+  where: Calm home page, small line under the form
+  max: 50
+  text: >-
+    Free, no sign up. Takes a minute or two.
+
+calm_form_drop:
+  where: Calm form, first line inside the drop area (wide screens)
+  max: 30
+  text: >-
+    Drop your resume here
+
+calm_form_drop_phone:
+  where: Calm form, first line inside the drop area (phones)
+  max: 30
+  text: >-
+    Choose your resume
+
+calm_form_drop_hint:
+  where: Calm form, second line inside the drop area (wide screens). Must match the real limits
+  max: 50
+  text: >-
+    PDF, up to 2 MB, or click to choose
+
+calm_form_drop_hint_phone:
+  where: Calm form, second line inside the drop area (phones). Must match the real limits
+  max: 20
+  text: >-
+    PDF, up to 2 MB
+
+calm_form_drop_now:
+  where: Calm form, drop area, while a file is dragged over the page
+  max: 20
+  text: >-
+    Let go to add it
+
+calm_form_change:
+  where: Calm form, small text button next to the chosen file name
+  max: 20
+  text: >-
+    Change
+
+calm_form_paste:
+  where: Calm form, small text link under the drop area
+  max: 30
+  text: >-
+    Or paste it as text
+
+calm_form_upload:
+  where: Calm form, small text link under the resume text box
+  max: 20
+  text: >-
+    Or upload a PDF
+
+calm_form_resume_label:
+  where: Calm form, label of the resume text box
+  max: 20
+  text: >-
+    Your resume
+
+calm_form_resume_placeholder:
+  where: Calm form, grey text inside the empty resume text box
+  max: 40
+  text: >-
+    Paste your whole resume here
+
+calm_form_job_label:
+  where: Calm form, label of the job post box
+  max: 20
+  text: >-
+    The job post
+
+calm_form_job_placeholder:
+  where: Calm form, grey text inside the empty job post box
+  max: 40
+  text: >-
+    Paste the whole job post here
+
+calm_form_submit:
+  where: Calm form, the main button
+  max: 20
+  text: >-
+    Tailor my resume
+
+calm_form_submit_replay:
+  where: Calm form, the main button on preview builds (plays the recorded run)
+  max: 30
+  text: >-
+    Play the recorded run
+
+calm_form_bot_wait:
+  where: Calm form, under the button, when it was pressed before the bot check finished
+  max: 60
+  text: >-
+    Checking you're a person. It starts by itself.
+
+calm_home_example_title:
+  where: Calm home page, example section title
+  max: 40
+  text: >-
+    Here's one we tailored earlier.
+
+calm_home_example_lead:
+  where: Calm home page, example section, line under the title
+  max: 110
+  text: >-
+    A made-up resume and a sample job post. Tap a highlighted line to see
+    what it said before.
+
+calm_example_job_label:
+  where: Calm home page, example, small label at the top of the job post card
+  max: 20
+  text: >-
+    The job post
+
+calm_example_asks:
+  where: Calm home page, example, label above the list of what the job asks for
+  max: 20
+  text: >-
+    What it asks for
+
+calm_example_missing:
+  where: Calm home page, example, after the crossed-out requirement
+  max: 30
+  text: >-
+    , not on the resume
+
+calm_home_example_count:
+  where: Calm home page, example, line under both cards. {count} comes from the recorded run
+  max: 100
+  keep: count
+  text: >-
+    {count} lines changed for this job. Everything else stays exactly as you
+    wrote it.
+
+calm_home_steps_title:
+  where: Calm home page, steps section title
+  max: 30
+  text: >-
+    Three steps, no sign up.
+
+calm_home_step_1_title:
+  where: Calm home page, step 1 card title
+  max: 30
+  text: >-
+    Drop in your resume
+
+calm_home_step_1_text:
+  where: Calm home page, step 1 card text
+  max: 70
+  text: >-
+    A PDF works best. It reads every line, so nothing gets lost.
+
+calm_home_step_2_title:
+  where: Calm home page, step 2 card title
+  max: 30
+  text: >-
+    Paste the job post
+
+calm_home_step_2_text:
+  where: Calm home page, step 2 card text
+  max: 70
+  text: >-
+    All of it. The more detail it has, the better the match.
+
+calm_home_step_3_title:
+  where: Calm home page, step 3 card title
+  max: 20
+  text: >-
+    Get your version
+
+calm_home_step_3_text:
+  where: Calm home page, step 3 card text
+  max: 90
+  text: >-
+    See what changed, keep any line you liked better before, and download
+    the PDF.
+
+calm_home_missing_title:
+  where: Calm home page, missing skills section title
+  max: 40
+  text: >-
+    It also tells you what's missing.
+
+calm_home_missing_lead:
+  where: Calm home page, missing skills section, line under the title
+  max: 170
+  text: >-
+    Skills the job asks for that aren't on your resume get their own list,
+    so you know what to learn next, or what to bring up in the interview.
+
+calm_home_missing_skills:
+  where: Calm home page, the crossed-out sample skills. Separate them with a comma and a space
+  max: 50
+  text: >-
+    Kubernetes, Kafka, Terraform, Go, GraphQL
+
+calm_home_missing_note:
+  where: Calm home page, small line under the crossed-out skills
+  max: 50
+  text: >-
+    You get this list with every result.
+
+calm_home_privacy_title:
+  where: Calm home page, privacy card title
+  max: 30
+  text: >-
+    Your resume stays yours.
+
+calm_home_privacy_text:
+  where: Calm home page, privacy card text. Must stay true to what the code hides
+  max: 120
+  text: >-
+    We don't keep it. Your email, phone and links are hidden from the AI and
+    put back when you download.
+
+calm_home_privacy_link:
+  where: Calm home page, privacy card button to the privacy page
+  max: 30
+  text: >-
+    How we handle your data
+
+calm_faq_title:
+  where: Calm home page, questions section title
+  max: 30
+  text: >-
+    Questions people ask
+
+calm_faq_1_q:
+  where: Calm home page, question 1
+  max: 30
+  text: >-
+    Is it actually free?
+
+calm_faq_1_a:
+  where: Calm home page, answer 1
+  max: 90
+  text: >-
+    Yes. There's a small daily limit so the free version can keep running.
+
+calm_faq_2_q:
+  where: Calm home page, question 2
+  max: 40
+  text: >-
+    Will it add skills I don't have?
+
+calm_faq_2_a:
+  where: Calm home page, answer 2
+  max: 110
+  text: >-
+    No. It only rewords what's already on your resume. Anything missing goes
+    in its own list.
+
+calm_faq_3_q:
+  where: Calm home page, question 3
+  max: 40
+  text: >-
+    Will it get me past ATS filters?
+
+calm_faq_3_a:
+  where: Calm home page, answer 3
+  max: 140
+  text: >-
+    It helps your resume use the job's own words. Nobody can promise more
+    than that, so be careful with anyone who does.
+
+calm_faq_4_q:
+  where: Calm home page, question 4
+  max: 30
+  text: >-
+    What can I upload?
+
+calm_faq_4_a:
+  where: Calm home page, answer 4. Must match the real file types and limit
+  max: 130
+  text: >-
+    A PDF with real text in it, up to 2 MB, or the text pasted in. Scanned
+    photos of a resume won't work yet.
+
+calm_home_closing_title_1:
+  where: Calm home page, closing title, first part
+  max: 20
+  text: >-
+    Stop sending
+
+calm_home_closing_title_2:
+  where: Calm home page, closing title, second part, in italics
+  max: 20
+  text: >-
+    the same resume.
+
+calm_home_closing_lead:
+  where: Calm home page, closing, line under the title
+  max: 40
+  text: >-
+    Give the next job its own version.
+
+calm_home_closing_cta:
+  where: Calm home page, closing button that goes to the form
+  max: 20
+  text: >-
+    Tailor my resume
+
+# ==========================================================================
+# CALM SKIN: while a run is going
+# ==========================================================================
+
+calm_run_title:
+  where: Calm running card, title
+  max: 40
+  text: >-
+    Matching your resume to the job
+
+calm_run_step_of:
+  where: Calm running card, under the progress bar, left. Keep {step}
+  max: 20
+  keep: step
+  text: >-
+    Step {step} of 5
+
+calm_run_hint:
+  where: Calm running card, line under the progress bar
+  max: 60
+  text: >-
+    Usually takes a minute or two. Keep this tab open.
+
+calm_run_show_steps:
+  where: Calm running card, label of the switch that shows the list of steps
+  max: 20
+  text: >-
+    Show steps
+
+calm_run_step_1:
+  where: Calm running card, step 1, once done. {count} is the number of lines
+  max: 40
+  keep: count
+  text: >-
+    Read your resume: {count} lines
+
+calm_run_step_1_now:
+  where: Calm running card, step 1, before it is done
+  max: 30
+  text: >-
+    Reading your resume
+
+calm_run_step_2:
+  where: Calm running card, step 2, once done. {count} is the number of requirements
+  max: 60
+  keep: count
+  text: >-
+    Read the job post: it asks for {count} things
+
+calm_run_step_2_now:
+  where: Calm running card, step 2, before it is done
+  max: 30
+  text: >-
+    Reading the job post
+
+calm_run_step_3:
+  where: Calm running card, step 3
+  max: 40
+  text: >-
+    Matching your lines to the job
+
+calm_run_step_4:
+  where: Calm running card, step 4
+  max: 40
+  text: >-
+    Rewriting the lines that fit
+
+calm_run_step_5:
+  where: Calm running card, step 5
+  max: 20
+  text: >-
+    Building your PDF
+
+# ==========================================================================
+# CALM SKIN: when something is wrong
+# ==========================================================================
+
+calm_err_resume_missing:
+  where: Calm form, under the resume, when none was added
+  max: 30
+  text: >-
+    Add your resume first.
+
+calm_err_file_type:
+  where: Calm form, under the resume, when the file is not a PDF. Must match the real types
+  max: 50
+  text: >-
+    That file type won't work. Use a PDF.
+
+calm_err_file_big:
+  where: Calm form, under the resume, when the file is too big. Must match the real limit
+  max: 50
+  text: >-
+    That file is over 2 MB. Try a smaller one.
+
+calm_err_file_no_text:
+  where: Calm form, under the resume, when the PDF has no text (a scan)
+  max: 120
+  text: >-
+    We couldn't read any text in that PDF. If it's a scan, export it again
+    from Word or Google Docs.
+
+calm_err_file_unreadable:
+  where: Calm form, under the resume, when the PDF cannot be opened
+  max: 80
+  text: >-
+    We couldn't open that PDF. Export it again, or paste it as text.
+
+calm_err_resume_short:
+  where: Calm form, under the pasted resume, when it is too short
+  max: 60
+  text: >-
+    That resume looks too short. Paste the whole thing.
+
+calm_err_resume_long:
+  where: Calm form, under the pasted resume, when it is too long
+  max: 60
+  text: >-
+    That resume is very long. Paste up to four pages.
+
+calm_err_job_missing:
+  where: Calm form, under the job post, when it is empty
+  max: 30
+  text: >-
+    Paste the job post first.
+
+calm_err_job_short:
+  where: Calm form, under the job post, when it is too short
+  max: 70
+  text: >-
+    That job post looks too short. Paste the whole thing.
+
+calm_err_job_long:
+  where: Calm form, under the job post, when it is too long
+  max: 90
+  text: >-
+    That job post is very long. Paste the role, the duties and the
+    requirements.
+
+calm_err_run_title:
+  where: Calm running card, title when the run failed
+  max: 20
+  text: >-
+    That didn't work.
+
+calm_err_run_body:
+  where: Calm running card, text when the run failed on our side
+  max: 90
+  text: >-
+    Something broke on our side. Your resume wasn't saved. Try again in a
+    minute.
+
+calm_err_retry:
+  where: Calm running card, button after a failed run
+  max: 20
+  text: >-
+    Try again
+
+calm_err_timeout:
+  where: Calm running card, text when the run took too long
+  max: 80
+  text: >-
+    This one took too long. Try again, or paste a shorter job post.
+
+calm_err_offline:
+  where: Calm running card, text when the connection dropped
+  max: 70
+  text: >-
+    The connection dropped. Your resume wasn't saved. Try again.
+
+calm_limit_title:
+  where: Calm form or running card, title when today's runs are used up
+  max: 30
+  text: >-
+    That's all for today.
+
+calm_limit_body:
+  where: Calm form or running card, text when today's runs are used up
+  max: 90
+  text: >-
+    Today's free runs are used up. Come back tomorrow, or look at the
+    example.
+
+calm_see_example:
+  where: Calm form or running card, button that plays the recorded run
+  max: 20
+  text: >-
+    See the example
+
+calm_paused_title:
+  where: Calm form or running card, title when live runs are off
+  max: 30
+  text: >-
+    Runs are paused for now.
+
+calm_paused_body:
+  where: Calm form or running card, text when live runs are off
+  max: 70
+  text: >-
+    New runs are off for a short while. The example still works.
+
+calm_bot_title:
+  where: Calm running card, title when the bot check failed
+  max: 50
+  text: >-
+    We couldn't check that you're a person.
+
+calm_bot_body:
+  where: Calm running card, text when the bot check failed
+  max: 40
+  text: >-
+    Reload the page and try again.
+
+calm_reload:
+  where: Calm running card and error page, button that reloads the page
+  max: 20
+  text: >-
+    Reload the page
+
+# ==========================================================================
+# CALM SKIN: the result
+# ==========================================================================
+
+calm_result_try_another:
+  where: Calm result, top right, glass button back to the form
+  max: 30
+  text: >-
+    Try another job post
+
+calm_result_for:
+  where: Calm result panel, small label above the job title
+  max: 20
+  text: >-
+    Tailored for
+
+calm_result_job_fallback:
+  where: Calm result panel, in place of the job title when the job post has no clear title
+  max: 20
+  text: >-
+    This job post
+
+calm_result_count_many:
+  where: Calm result panel, big number line. Keep {count}
+  max: 30
+  keep: count
+  text: >-
+    {count} lines changed
+
+calm_result_count_one:
+  where: Calm result panel, big number line, when one line changed
+  max: 20
+  text: >-
+    1 line changed
+
+calm_result_same:
+  where: Calm result panel, line under the big number
+  max: 50
+  text: >-
+    Everything else is exactly as you wrote it.
+
+calm_result_none_title:
+  where: Calm result panel, big line when the run changed nothing
+  max: 30
+  text: >-
+    Nothing to change.
+
+calm_result_none_body:
+  where: Calm result panel, line under it when the run changed nothing
+  max: 90
+  text: >-
+    None of your lines needed new words for this job. You can still download
+    it.
+
+calm_result_show_changes:
+  where: Calm result panel, label of the switch that shows the highlights
+  max: 20
+  text: >-
+    Show changes
+
+calm_result_keep:
+  where: Calm result panel, button on each changed line
+  max: 20
+  text: >-
+    Keep my original
+
+calm_result_use_new:
+  where: Calm result panel, the same button after it was pressed (undo)
+  max: 30
+  text: >-
+    Use the new version
+
+calm_result_no_missing:
+  where: Calm result panel, when nothing the job asks for is missing
+  max: 50
+  text: >-
+    Nothing missing that we could find.
+
+calm_result_download:
+  where: Calm result, the main button
+  max: 20
+  text: >-
+    Download PDF
+
+calm_result_busy:
+  where: Calm result, the main button while the PDF is made
+  max: 20
+  text: >-
+    Making your PDF…
+
+calm_result_pdf_failed:
+  where: Calm result, under the main button when the PDF failed
+  max: 40
+  text: >-
+    The PDF didn't build. Try again.
+
+calm_result_page_label:
+  where: Calm result, screen-reader name of the resume page
+  max: 30
+  text: >-
+    Your tailored resume
+
+# ==========================================================================
+# CALM SKIN: other pages
+# ==========================================================================
+
+calm_example_note:
+  where: Calm recorded-run page, small glass note at the top
+  max: 80
+  text: >-
+    This is a recorded example. The resume and the company are made up.
+
+calm_example_link:
+  where: Calm recorded-run page, link in the note to the home page form
+  max: 20
+  text: >-
+    Try it with yours
+
+calm_404_title:
+  where: Calm 404 page, title
+  max: 40
+  text: >-
+    This page flew off somewhere.
+
+calm_404_button:
+  where: Calm 404 page, button
+  max: 20
+  text: >-
+    Back to the start
+
+calm_500_title:
+  where: Calm error page, title
+  max: 40
+  text: >-
+    Something broke on our side.
+
+calm_500_button:
+  where: Calm error page, button
+  max: 20
+  text: >-
+    Reload the page

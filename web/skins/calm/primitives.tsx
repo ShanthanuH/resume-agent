@@ -79,29 +79,3 @@ export function Original({ children, label = copy.trace_original, className = ""
 export function Strike({ children }: { children: ReactNode }) {
   return <s className="strike">{children}</s>;
 }
-
-/**
- * The hero photo: a paper airplane folded from a resume page, above the
- * clouds. Tall on a phone, wide from 768 px. AVIF where the browser has it,
- * WebP otherwise. Loaded first: it is the largest thing on the first screen.
- * It fills its parent (give the parent position and size).
- */
-export function SkyPhoto({ className = "" }: { className?: string }) {
-  return (
-    <picture>
-      <source media="(min-width: 768px)" type="image/avif" srcSet="/hero/hero-wide.avif" />
-      <source media="(min-width: 768px)" type="image/webp" srcSet="/hero/hero-wide.webp" />
-      <source type="image/avif" srcSet="/hero/hero-tall.avif" />
-      {/* A plain img: next/image would add a loader script for no gain here. */}
-      <img
-        src="/hero/hero-tall.webp"
-        alt={copy.calm_hero_alt}
-        width={941}
-        height={1672}
-        fetchPriority="high"
-        decoding="async"
-        className={`absolute inset-0 h-full w-full object-cover ${className}`}
-      />
-    </picture>
-  );
-}

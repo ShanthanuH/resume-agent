@@ -35,7 +35,7 @@ export const BUDGETS = [
   },
   {
     name: "the calm home page",
-    max: 150,
+    max: 220,
     note: "the FAQ and text behind a toggle are not counted",
     counts: (key) => /^calm_(hero|home)_/.test(key) && !key.startsWith("calm_home_more_"),
   },
