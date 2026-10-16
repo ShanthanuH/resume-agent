@@ -22,24 +22,6 @@ export function LandingSections() {
         <Cloud className="wide:hidden" style={{ width: 360, height: 160, left: -140, top: 120, opacity: 0.8 }} />
         <Cloud className="wide:hidden" style={{ width: 380, height: 170, right: -160, top: 1200, opacity: 0.75 }} />
         <Cloud className="wide:hidden" style={{ width: 340, height: 150, left: -120, top: 2300, opacity: 0.7 }} />
-        {/* The contrail from the plane in the hero down to the star (wide only). */}
-        <svg
-          aria-hidden
-          viewBox="0 0 100 1000"
-          preserveAspectRatio="none"
-          className="pointer-events-none absolute inset-0 hidden h-full w-full [filter:drop-shadow(0_1px_1px_rgba(16,44,80,0.18))] wide:block"
-        >
-          <path
-            d="M 21 0 C 40 90, 92 140, 86 260 S 12 420, 16 560 S 90 760, 82 1000"
-            fill="none"
-            stroke="#FFFFFF"
-            strokeWidth="2"
-            strokeDasharray="7 11"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-            opacity=".95"
-          />
-        </svg>
         <Example />
         <Steps />
         <Missing />
