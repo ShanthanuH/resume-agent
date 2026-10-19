@@ -18,33 +18,12 @@ from resume_agent import llm
 from resume_agent.agent import run_agent, start_session
 from resume_agent.api.payload import arrival_times, build_result, describe_step, restore_all
 from resume_agent.api.redact import redact
-from resume_agent.api.render import ResumeDoc, render_pdf, split_header
+from resume_agent.api.render import ResumeDoc, doc_from_result, header_lines, render_pdf
 
 
 def accept_all(result: dict) -> ResumeDoc:
     """The resume with every proposed bullet accepted, ready to render."""
-    text = {b["id"]: b["text"] for b in result["bullets"]}
-    return ResumeDoc(
-        header=result["header"],
-        links=result["links"],
-        sections=[
-            {
-                "name": section["name"],
-                "entries": [
-                    {
-                        **{k: entry[k] for k in ("title", "organization", "dates")},
-                        # A rewritten line shows its bullet; any other its original.
-                        "lines": [
-                            text.get(line["bullet_id"], line["original"])
-                            for line in entry["lines"]
-                        ],
-                    }
-                    for entry in section["entries"]
-                ],
-            }
-            for section in result["sections"]
-        ],
-    )
+    return doc_from_result(result)  # no bullet kept back: every rewrite goes in
 
 
 def main() -> None:
@@ -54,7 +33,7 @@ def main() -> None:
     started = time.monotonic()
     session = start_session(safe_text, jd_text, [], lambda question: "")
     run_agent(session)
-    header = split_header(safe_text, list(session.evidence.values()))
+    header = header_lines(safe_text)
     result = restore_all(build_result(session, header, time.monotonic() - started), found)
     # "at" is when each step would have reached the browser in a live run.
     steps = [

@@ -9,8 +9,9 @@ screen: the browser is given the texts, never the IDs.
 from typing import Any
 
 from resume_agent.api.redact import restore
-from resume_agent.models import TraceStep
+from resume_agent.models import Styled, TailoredBullet, TraceStep
 from resume_agent.session import Session
+from resume_agent.structure import section_kind
 
 # Trace steps with these decisions are answers the user was actually asked for.
 _ASKED = {"no answer", "answered"}
@@ -126,18 +127,43 @@ def questions(session: Session) -> list[str]:
     ]
 
 
-def build_result(session: Session, header: list[str], seconds: float) -> dict[str, Any]:
-    """Everything the result screen needs. Still holds placeholders."""
+def _shown_text(bullet: TailoredBullet, session: Session) -> str:
+    """A bullet's text as the visitor sees it.
+
+    The writer is told to end lines without a full stop. A rewritten sentence
+    of a paragraph (the summary) gets back the stop its original ended with,
+    so the paragraph still reads as sentences.
+    """
+    line = session.evidence.get(bullet.replaces or "")
+    text = bullet.text.rstrip()
+    if line and line.kind == "sentence" and line.text[-1:] in ".!?" and text[-1:] not in ".!?":
+        return text + line.text[-1]
+    return bullet.text
+
+
+def build_result(
+    session: Session, header: list[str] | list[Styled], seconds: float
+) -> dict[str, Any]:
+    """Everything the result screen needs. Still holds placeholders.
+
+    `header` is the name and contact lines, as plain text or with their links.
+    """
     assert session.resume is not None  # run_agent always assembles before returning
     costs = [step.cost for step in session.trace]
+    styled = [h if isinstance(h, Styled) else Styled(text=h) for h in header]
     return {
-        "header": header,
+        "header": [h.text for h in styled],
+        # The links and bold words of each header line, by position.
+        "header_marks": [[m.model_dump() for m in h.marks] for h in styled],
         "links": [link.model_dump() for link in session.resume.links],
         "sections": [
             {
                 "name": section.name,
+                "kind": section_kind(section.name),  # "summary", "experience", ...
                 "entries": [
                     {
+                        # title, organization, dates, location, and the
+                        # header_lines as written (left and right text).
                         **entry.entry.model_dump(),
                         "lines": [
                             {
@@ -146,6 +172,13 @@ def build_result(session: Session, header: list[str], seconds: float) -> dict[st
                                 # original" puts back, and what the trace shows.
                                 "original": session.evidence[line.evidence_id].text,
                                 "bullet_id": line.bullet_id,
+                                "kind": line.kind,  # bullet, line, sentence or fixed
+                                "join": line.join,  # continues the paragraph above
+                                # Bold, italic and links in the original text.
+                                "marks": [
+                                    m.model_dump()
+                                    for m in session.evidence[line.evidence_id].marks
+                                ],
                             }
                             for line in entry.lines
                         ],
@@ -158,7 +191,7 @@ def build_result(session: Session, header: list[str], seconds: float) -> dict[st
         "bullets": [
             {
                 "id": bullet.id,
-                "text": bullet.text,
+                "text": _shown_text(bullet, session),
                 "replaces": bullet.replaces,
                 "source_ids": bullet.source_ids,
                 "requirement_ids": bullet.requirement_ids,

@@ -7,8 +7,9 @@ __pycache__/
 data/
 # resume PDFs are personal data, never in git
 *.pdf
-# except the example page's PDF, which is a fictional resume
+# except the example page's PDF and the test fixture, both fictional resumes
 !web/public/example.pdf
+!tests/fixtures/fictional_resume.pdf
 .vercel
 
 # taste-skill working files (direction sheet, inspector screenshots)

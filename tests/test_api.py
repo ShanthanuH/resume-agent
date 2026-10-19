@@ -46,11 +46,7 @@ def test_same_value_gets_the_same_placeholder():
 
 
 def test_header_is_the_lines_above_the_first_section():
-    entry = Entry(title="Software Engineer", organization="Lakeshore")
-    evidence = [
-        EvidenceLine(id="E1", section="Experience", entry=entry, text="Served 1,200,000 requests a day")
-    ]
-    assert split_header(RESUME, evidence) == [
+    assert split_header(RESUME) == [
         "Meera Kulkarni",
         "Pune | +91 98200 55501 | meera@example.com | github.com/meera-k",
     ]
@@ -198,10 +194,7 @@ def test_empty_contact_items_are_dropped_on_screen_and_in_the_pdf():
     assert clean_contact(" | • | ") == ""  # nothing but gaps: the line goes
     # The name line is kept as written; the contact line under it is cleaned.
     text = "Meera Kulkarni\nPune |  | meera@example.com |\n\nExperience\n• Served 1,200,000 requests a day\n"
-    evidence = [
-        EvidenceLine(id="E1", section="Experience", entry=Entry(), text="Served 1,200,000 requests a day")
-    ]
-    assert split_header(text, evidence) == ["Meera Kulkarni", "Pune | meera@example.com"]
+    assert split_header(text) == ["Meera Kulkarni", "Pune | meera@example.com"]
     # /api/pdf renders what the browser sends, so it cleans the header again.
     doc = ResumeDoc(header=["Meera Kulkarni", "Pune |  | meera@example.com |", " | "], links=[], sections=[])
     data, _ = render_pdf(doc)

@@ -40,12 +40,44 @@ export type Step = {
 
 export type Link = { label: string; url: string };
 
-/** One position on the resume: the original text, and the rewrite proposed for it. */
-export type Line = { evidence_id: string; original: string; bullet_id: string | null };
+/** Bold, italic or a link on part of a line: the n-th time `text` appears in it. */
+export type Mark = { text: string; n: number; bold: boolean; italic: boolean; url: string | null };
 
-export type Entry = { title: string; organization: string; dates: string; lines: Line[] };
+/** A piece of text as written, with its bold, italic and linked words. */
+export type Styled = { text: string; marks: Mark[] };
 
-export type Section = { name: string; entries: Entry[] };
+/** One line of an entry header as written: left text, and the right-hand column. */
+export type HeaderLine = { left: Styled; right: Styled };
+
+/**
+ * How a line sits on the page: a bulleted line, a line on its own (a skills
+ * row), one sentence of a paragraph (the summary), or a line kept as written.
+ */
+export type LineKind = "bullet" | "line" | "sentence" | "fixed";
+
+/**
+ * One position on the resume: the original text, and the rewrite proposed for it.
+ * kind, join and marks are missing from runs saved before they existed.
+ */
+export type Line = {
+  evidence_id: string;
+  original: string;
+  bullet_id: string | null;
+  kind?: LineKind;
+  join?: boolean; // continues the paragraph of the line before it
+  marks?: Mark[]; // bold, italic and links in the original text
+};
+
+export type Entry = {
+  title: string;
+  organization: string;
+  dates: string;
+  location?: string;
+  header_lines?: HeaderLine[]; // the header exactly as printed, one item per line
+  lines: Line[];
+};
+
+export type Section = { name: string; kind?: string; entries: Entry[] };
 
 /** A rewritten line. Every one here passed the check against its source lines. */
 export type Bullet = {
@@ -66,6 +98,7 @@ export type Requirement = {
 
 export type Result = {
   header: string[]; // name first, then contact lines
+  header_marks?: Mark[][]; // the links of each header line, by position
   links: Link[];
   sections: Section[];
   bullets: Bullet[];

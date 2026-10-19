@@ -32,8 +32,8 @@ from resume_agent.agent import run_agent, start_session
 from resume_agent.api import limits
 from resume_agent.api.payload import build_result, describe_step, restore_all
 from resume_agent.api.redact import redact
-from resume_agent.api.render import ResumeDoc, render_pdf, split_header
-from resume_agent.extract import Link, extract_resume_pdf
+from resume_agent.api.render import ResumeDoc, header_lines, render_pdf
+from resume_agent.extract import Link, ResumeText, extract_resume_pdf
 from resume_agent.session import Session
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
@@ -106,8 +106,9 @@ def _sse(event: str, data: dict[str, Any]) -> str:
     return f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
 
-def _read_pdf(data: bytes) -> tuple[str, list[Link]]:
-    """Extract text and links from an uploaded PDF, then delete the temp file."""
+def _read_pdf(data: bytes) -> tuple[ResumeText, list[Link]]:
+    """Extract text (with its layout) and links from an uploaded PDF, then
+    delete the temp file."""
     # extract_resume_pdf takes a path, so the upload is written to a temp file.
     # Leaving the with block deletes it, even if extraction raises.
     with tempfile.NamedTemporaryFile(suffix=".pdf") as handle:
@@ -183,7 +184,11 @@ async def run(
                 "file_no_text",
                 "That PDF has no selectable text. It may be a scan. Paste the text instead.",
             )
-    resume_text, jd_text = resume_text.strip(), jd_text.strip()
+    jd_text = jd_text.strip()
+    # Pasted text is trimmed. Text from a PDF is already trimmed, and strip()
+    # would turn it into a plain str without the layout the parser reads.
+    if not isinstance(resume_text, ResumeText):
+        resume_text = resume_text.strip()
     if len(resume_text) < limits.MIN_CHARS:
         return _error(422, "resume_too_short", "Add your resume: upload a PDF or paste the text.")
     if len(jd_text) < limits.MIN_CHARS:
@@ -297,7 +302,7 @@ async def _live_run(
             yield _sse("failed", {"code": code, "message": message})
             return
         session = holder["session"]
-        result = build_result(session, split_header(safe_text, list(session.evidence.values())), seconds)
+        result = build_result(session, header_lines(safe_text), seconds)
         stats = result["stats"]
         # Numbers only. No resume text, no job text, no IP address.
         log.info(

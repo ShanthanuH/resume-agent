@@ -1,9 +1,11 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { copy } from "@/lib/copy";
 import { diffWords } from "@/lib/diff";
+import { headerLines, styledPieces } from "@/lib/marks";
 import { lineAnchor } from "@/lib/result-text";
-import type { Bullet, Entry, Line, Result } from "@/lib/types";
+import type { Bullet, Entry, Line, Mark as TextMark, Result } from "@/lib/types";
 import { Before, Mark } from "../parts";
 
 /** A contact line without its empty items ("Pune |  | a@b.com" -> "Pune | a@b.com"). */
@@ -65,11 +67,31 @@ export function ResumePage({ result, kept, showChanges, openId, onToggle }: Prop
 
 type EntryProps = Omit<Props, "result"> & { entry: Entry; bullets: Map<string, Bullet> };
 
+/** Bold and italic words of a line, as the PDF prints them. */
+function Styled({ text, marks }: { text: string; marks?: TextMark[] }) {
+  return (
+    <>
+      {styledPieces(text, marks).map((piece, i) => {
+        const inner = piece.italic ? <i>{piece.text}</i> : piece.text;
+        return piece.bold ? <b key={i}>{inner}</b> : <span key={i}>{inner}</span>;
+      })}
+    </>
+  );
+}
+
+/**
+ * An entry: its header lines as printed (left text, and dates or a place on
+ * the right that never wrap), then its lines. Sentences of one paragraph (the
+ * summary) run together; bullets get a bullet; other lines stand alone.
+ */
 function EntryBlock({ entry, bullets, kept, showChanges, openId, onToggle }: EntryProps) {
-  const heading = Boolean(entry.title || entry.organization);
-  // A line that only repeats the entry title adds nothing: the PDF leaves it out.
-  const lines = entry.lines.filter((line) => squash(line.original) !== squash(entry.title));
-  const rows = lines.map((line, i) => (
+  const header = headerLines(entry);
+  const saved = entry.lines.some((line) => line.kind === undefined); // a run saved before kinds existed
+  const headed = Boolean(entry.title || entry.organization);
+  // In an older run, a line that only repeats the entry title adds nothing: the PDF leaves it out.
+  const lines = saved ? entry.lines.filter((line) => squash(line.original) !== squash(entry.title)) : entry.lines;
+  const kindOf = (line: Line) => line.kind ?? (headed ? "bullet" : "line");
+  const row = (line: Line, i: number, inline = false) => (
     <LineRow
       key={i}
       line={line}
@@ -78,22 +100,58 @@ function EntryBlock({ entry, bullets, kept, showChanges, openId, onToggle }: Ent
       showChanges={showChanges}
       openId={openId}
       onToggle={onToggle}
-      bulleted={heading}
+      kind={inline ? "sentence" : kindOf(line)}
     />
-  ));
+  );
+
+  // Group the lines: a run of bullets is one list, a paragraph is one block.
+  const blocks: ReactNode[] = [];
+  for (let i = 0; i < lines.length; ) {
+    const kind = kindOf(lines[i]);
+    let end = i + 1;
+    if (kind === "bullet") {
+      while (end < lines.length && kindOf(lines[end]) === "bullet") end++;
+      blocks.push(
+        <ul key={i} className="m-0 flex list-none flex-col gap-2 p-0">
+          {lines.slice(i, end).map((line, j) => row(line, i + j))}
+        </ul>,
+      );
+    } else if (kind === "sentence") {
+      while (end < lines.length && kindOf(lines[end]) === "sentence" && lines[end].join) end++;
+      // A div, not a p: an opened "Before" box inside it is a block.
+      blocks.push(
+        <div key={i}>
+          {lines.slice(i, end).map((line, j) => (
+            <span key={i + j}>
+              {j > 0 && " "}
+              {row(line, i + j, true)}
+            </span>
+          ))}
+        </div>,
+      );
+    } else {
+      blocks.push(row(lines[i], i));
+    }
+    i = end;
+  }
+
   return (
     <div className="flex flex-col gap-1.5">
-      {(heading || entry.dates) && (
-        <div className="flex justify-between gap-4">
-          <span>
-            {entry.title && <b>{entry.title}</b>}
-            {entry.title && entry.organization && ", "}
-            {entry.organization}
-          </span>
-          <span className="shrink-0 text-right">{entry.dates}</span>
+      {header.length > 0 && (
+        <div className="flex flex-col">
+          {header.map((line, i) => (
+            <div key={i} className="flex justify-between gap-4">
+              <span className="min-w-0">
+                <Styled text={line.left.text} marks={line.left.marks} />
+              </span>
+              <span className="shrink-0 whitespace-nowrap text-right">
+                <Styled text={line.right.text} marks={line.right.marks} />
+              </span>
+            </div>
+          ))}
         </div>
       )}
-      {heading ? <ul className="m-0 flex list-none flex-col gap-2 p-0">{rows}</ul> : rows}
+      {blocks}
     </div>
   );
 }
@@ -105,15 +163,17 @@ type RowProps = {
   showChanges: boolean;
   openId: string | null;
   onToggle: (bulletId: string) => void;
-  bulleted: boolean;
+  kind: "bullet" | "line" | "sentence" | "fixed";
 };
 
-function LineRow({ line, bullet, kept, showChanges, openId, onToggle, bulleted }: RowProps) {
+function LineRow({ line, bullet, kept, showChanges, openId, onToggle, kind }: RowProps) {
   const rewritten = bullet !== undefined && !kept.has(bullet.id);
-  const final = rewritten ? bullet.text : line.original;
   const marked = rewritten && showChanges;
   const open = marked && openId === bullet.id;
   const beforeId = bullet ? `before-${bullet.id}` : undefined;
+  // An unchanged line keeps its bold and italic words. A rewrite shows plain,
+  // or with its changed words marked.
+  const final = rewritten ? bullet.text : <Styled text={line.original} marks={line.marks} />;
 
   const body = marked ? (
     <>
@@ -132,7 +192,8 @@ function LineRow({ line, bullet, kept, showChanges, openId, onToggle, bulleted }
   );
 
   const id = bullet ? lineAnchor(bullet.id) : undefined;
-  if (!bulleted) return <div id={id}>{body}</div>;
+  if (kind === "sentence") return <span id={id}>{body}</span>;
+  if (kind !== "bullet") return <div id={id}>{body}</div>;
   return (
     <li id={id} className="flex gap-2">
       <span aria-hidden>•</span>

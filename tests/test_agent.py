@@ -285,11 +285,11 @@ def bullet(bullet_id, replaces, text):
     )
 
 
-def test_build_resume_swaps_bullets_and_orders_sections():
+def test_build_resume_swaps_bullets_and_keeps_section_order():
     resume = build_resume(LINES, [bullet("B1", "E2", "Moved jobs to Kubernetes")], LINKS)
-    # Education was last in the resume but comes first in Jake's order.
-    assert [s.name for s in resume.sections] == ["Education", "Experience"]
-    experience = resume.sections[1].entries[0].lines
+    # Sections stay in the resume's own order: Education was last, and stays last.
+    assert [s.name for s in resume.sections] == ["Experience", "Education"]
+    experience = resume.sections[0].entries[0].lines
     assert [(l.text, l.bullet_id) for l in experience] == [
         ("Built a FastAPI service", None),
         ("Moved jobs to Kubernetes", "B1"),

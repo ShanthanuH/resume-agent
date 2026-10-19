@@ -1,4 +1,9 @@
-"""parse_resume and parse_jd. The model reads; the code checks and assigns IDs."""
+"""parse_resume and parse_jd.
+
+The resume is split by code (structure.py), from the PDF's layout: every line
+is copied as printed, so it is verbatim by construction. The JD is read by the
+model; the code checks it and assigns IDs.
+"""
 
 import logging
 from typing import Literal
@@ -7,28 +12,13 @@ from pydantic import BaseModel
 
 from resume_agent import llm
 from resume_agent.models import Entry, EvidenceLine, Requirement
+from resume_agent.structure import ParsedResume, parse_layout
 
 log = logging.getLogger(__name__)
 
 
 # "Draft" models are what the model is allowed to return. They have no id field,
 # so the model cannot assign IDs even if it tries.
-class _EntryDraft(BaseModel):
-    title: str
-    organization: str
-    dates: str
-
-
-class _LineDraft(BaseModel):
-    section: str
-    entry: _EntryDraft
-    text: str
-
-
-class _ResumeDraft(BaseModel):
-    lines: list[_LineDraft]
-
-
 class _RequirementDraft(BaseModel):
     text: str
     priority: Literal["must_have", "nice_to_have"]
@@ -50,19 +40,6 @@ def is_verbatim(snippet: str, source: str) -> bool:
     return normalize(snippet) in normalize(source)
 
 
-RESUME_SYSTEM = """You split a resume into evidence lines.
-Return one line per bullet point or standalone fact (a degree, a skills row).
-Rules:
-- A bullet that wraps over several lines in the resume is ONE evidence line. Return
-  the whole bullet, with the wrapped parts joined by a single space. Never return
-  half a sentence.
-- text: copy the characters exactly from the resume. Do not fix typos, reword,
-  shorten or merge. Leave out only the leading bullet symbol.
-- section: the section heading the line sits under, copied exactly.
-- entry: the job, project or degree the line belongs to. title, organization and
-  dates are copied exactly from the resume. Use an empty string for any that is absent.
-- Skip the name and contact details at the top."""
-
 JD_SYSTEM = """You extract requirements from a job description.
 Rules:
 - One requirement is one single skill, tool, qualification or type of experience.
@@ -72,40 +49,50 @@ Rules:
 - Skip company description, benefits and anything that is not asked of the candidate."""
 
 
-def parse_resume(text: str) -> list[EvidenceLine]:
-    """Split the resume into verbatim EvidenceLines with code-assigned IDs."""
-    draft = llm.generate_structured(
-        model=llm.CHEAP_MODEL,
-        system=RESUME_SYSTEM,
-        user=llm.wrap_untrusted("resume", text),
-        schema=_ResumeDraft,
-    )
+def evidence_lines(parsed: ParsedResume) -> list[EvidenceLine]:
+    """Every line of the parsed resume as an EvidenceLine, with IDs in order.
+
+    Bullets, rows and summary sentences can be rewritten. An entry with no
+    lines under it (a degree, say) still needs the matcher to see it, so each
+    of its header lines becomes a "header" line, which is never rewritten. A
+    section with nothing in it keeps its heading the same way. Assembly
+    rebuilds the resume from these lines alone, so every entry needs one.
+    """
     lines: list[EvidenceLine] = []
-    for item in draft.lines:
-        # The core guarantee: a line the model reworded or invented never gets in.
-        if not item.text.strip() or not is_verbatim(item.text, text):
-            log.warning("dropped non-verbatim line: %r", item.text)
-            continue
-        entry = Entry(
-            # Entry fields feed the verifier later, so they get the same check.
-            # A field that fails is blanked rather than trusted.
-            title=item.entry.title if is_verbatim(item.entry.title, text) else "",
-            organization=(
-                item.entry.organization
-                if is_verbatim(item.entry.organization, text)
-                else ""
-            ),
-            dates=item.entry.dates if is_verbatim(item.entry.dates, text) else "",
-        )
+
+    def add(section: str, entry: Entry, text: str, **fields) -> None:
         lines.append(
             EvidenceLine(
-                id=f"E{len(lines) + 1}",  # numbered by kept lines, so no gaps
-                section=item.section,
+                id=f"E{len(lines) + 1}",  # numbered in resume order, set in code
+                section=section,
                 entry=entry,
-                text=normalize(item.text),
+                text=text,
+                **fields,
             )
         )
+
+    for section in parsed.sections:
+        for parsed_entry in section.entries:
+            entry = parsed_entry.entry
+            for item in parsed_entry.items:
+                add(section.heading, entry, item.text.text, kind=item.kind,
+                    join=item.join, marks=item.text.marks)
+            if not parsed_entry.items:
+                for header in entry.header_lines:
+                    if header.left.text:
+                        add(section.heading, entry, header.left.text, kind="header")
+        if not section.entries:  # a heading with nothing under it
+            add(section.heading, Entry(), section.heading, kind="header")
     return lines
+
+
+def parse_resume(text: str) -> list[EvidenceLine]:
+    """Split the resume into verbatim EvidenceLines with code-assigned IDs.
+
+    `text` is a ResumeText when it came from a PDF (it carries the layout), or
+    plain pasted text. No model is called.
+    """
+    return evidence_lines(parse_layout(text))
 
 
 def parse_jd(text: str) -> list[Requirement]:

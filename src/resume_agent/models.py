@@ -5,13 +5,58 @@ from typing import Any, Literal
 from pydantic import BaseModel
 
 
+class Mark(BaseModel):
+    """Bold, italic or a link on part of a line: the n-th time `text` appears in it.
+
+    Marks name their words instead of character offsets, so they survive the
+    contact details being swapped for placeholders and back, and can be found
+    again in a rewritten line.
+    """
+
+    text: str
+    n: int = 0  # 0 is the first occurrence of `text` in the line
+    bold: bool = False
+    italic: bool = False
+    url: str | None = None
+
+
+class Styled(BaseModel):
+    """A piece of text as written, with its bold, italic and linked words."""
+
+    text: str = ""
+    marks: list[Mark] = []
+
+
+class HeaderLine(BaseModel):
+    """One line of an entry header as written: left text, and the right-hand
+    column that holds dates or a location."""
+
+    left: Styled = Styled()
+    right: Styled = Styled()
+
+
 class Entry(BaseModel):
     """The parent block a resume line sits under, e.g. one job or one degree."""
 
-    # All three default to "" because sections like Skills have no title or dates.
+    # All default to "" because sections like Skills have no title or dates.
     title: str = ""
     organization: str = ""
     dates: str = ""
+    location: str = ""
+    # The header exactly as printed, one item per line. The fields above are
+    # read from it; the PDF and the preview draw these lines, not the fields.
+    header_lines: list[HeaderLine] = []
+
+
+# How a line sits on the page:
+#   bullet    a bulleted line
+#   line      a line on its own without a bullet, e.g. a skills row
+#   sentence  one sentence of a paragraph, e.g. the summary
+#   header    the left text of an entry header, kept so the matcher can see an
+#             entry with no lines under it (a degree, say). Never rewritten.
+#   fixed     a line that fit no pattern, kept as written. Never rewritten.
+LineKind = Literal["bullet", "line", "sentence", "header", "fixed"]
+LOCKED_KINDS = {"header", "fixed"}  # kinds that are printed as written, always
 
 
 class EvidenceLine(BaseModel):
@@ -21,6 +66,9 @@ class EvidenceLine(BaseModel):
     section: str
     entry: Entry
     text: str  # must be a substring of the resume text
+    kind: LineKind = "bullet"
+    join: bool = False  # True: continues the paragraph of the line before it
+    marks: list[Mark] = []  # bold, italic and links inside `text`
 
 
 class Requirement(BaseModel):

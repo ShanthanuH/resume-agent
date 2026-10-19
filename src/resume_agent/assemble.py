@@ -1,18 +1,20 @@
 """assemble_resume: put the chosen bullets back into the resume and check the result.
 
 All plain code. The agent chooses which bullets go in; this module builds the
-resume from that choice and refuses the result if a check fails.
+resume from that choice and refuses the result if a check fails. Sections,
+entries and lines stay in the resume's own order, under its own headings.
 """
+
+import logging
 
 from pydantic import BaseModel
 
 from resume_agent.extract import Link
-from resume_agent.models import Entry, EvidenceLine, TailoredBullet
+from resume_agent.models import LOCKED_KINDS, Entry, EvidenceLine, LineKind, Mark, TailoredBullet
 from resume_agent.parsing import normalize
+from resume_agent.structure import carry_marks
 
-# Jake's Resume order (spec section 6). A section is placed by the first keyword
-# its heading contains; sections matching none keep their original order after these.
-SECTION_ORDER = ["education", "experience", "project", "skill"]
+log = logging.getLogger(__name__)
 
 # How much longer than the original the tailored resume may be, in characters.
 # The original fits one page, so staying near its length keeps the page count.
@@ -24,6 +26,9 @@ class ResumeLine(BaseModel):
     text: str
     evidence_id: str  # the original line this position belongs to
     bullet_id: str | None = None  # set when a tailored bullet replaced the original
+    kind: LineKind = "bullet"
+    join: bool = False  # continues the paragraph of the line before it
+    marks: list[Mark] = []  # bold, italic and links inside `text`
 
 
 class ResumeEntry(BaseModel):
@@ -41,11 +46,21 @@ class ResumeJson(BaseModel):
     links: list[Link]
 
 
-def _section_rank(name: str) -> int:
-    for rank, keyword in enumerate(SECTION_ORDER):
-        if keyword in name.lower():
-            return rank
-    return len(SECTION_ORDER)  # unknown sections go after the known ones
+def _blocked(line: EvidenceLine, bullet: TailoredBullet) -> str | None:
+    """Why `bullet` cannot take the place of `line`, or None if it can."""
+    if line.kind in LOCKED_KINDS:
+        return (
+            f"Line {line.id} is printed as written (an entry header or a line kept "
+            f"as is), so bullet {bullet.id} cannot replace it. Leave {bullet.id} out."
+        )
+    _, lost = carry_marks(line.marks, bullet.text)
+    links = [m for m in lost if m.url]
+    if links:
+        return (
+            f'Bullet {bullet.id} drops the link on "{links[0].text}", so line '
+            f"{line.id} keeps its original text. Leave {bullet.id} out."
+        )
+    return None
 
 
 def build_resume(
@@ -61,16 +76,25 @@ def build_resume(
         entries = sections[-1].entries
         if not entries or entries[-1].entry != line.entry:
             entries.append(ResumeEntry(entry=line.entry, lines=[]))
+        if line.kind == "header":
+            continue  # drawn as part of the entry header, from header_lines
         bullet = replacement.get(line.id)
+        if bullet and _blocked(line, bullet):
+            # The original stays, and check_resume tells the agent why. IDs
+            # only in the log: resume text must not reach it.
+            log.warning("bullet %s kept off line %s", bullet.id, line.id)
+            bullet = None
         entries[-1].lines.append(
             ResumeLine(
                 text=bullet.text if bullet else line.text,
                 evidence_id=line.id,
                 bullet_id=bullet.id if bullet else None,
+                kind=line.kind,
+                join=line.join,
+                # Bold, italic and links move onto the new words by position.
+                marks=carry_marks(line.marks, bullet.text)[0] if bullet else line.marks,
             )
         )
-    # sorted() is stable: sections with the same rank keep their original order.
-    sections = sorted(sections, key=lambda s: _section_rank(s.name))
     return ResumeJson(sections=sections, links=links)
 
 
@@ -84,8 +108,9 @@ def check_resume(
     problems: list[str] = []
     lines = [l for s in resume.sections for e in s.entries for l in e.lines]
 
-    # One page (estimated by length, see PAGE_SLACK).
-    budget = int(sum(len(e.text) for e in evidence) * PAGE_SLACK)
+    # One page (estimated by length, see PAGE_SLACK). Header lines are printed
+    # from the entry header either way, so they do not count.
+    budget = int(sum(len(e.text) for e in evidence if e.kind != "header") * PAGE_SLACK)
     used = sum(len(l.text) for l in lines)
     if used > budget:
         problems.append(
@@ -99,12 +124,15 @@ def check_resume(
         if link.url not in kept_urls:
             problems.append(f"The link {link.url} is missing.")
 
-    # No duplicate claims: two bullets for one line, or the same text twice.
+    # No duplicate claims: two bullets for one line, or a bullet repeating a line.
     targets = [b.replaces for b in bullets]
     for target in {t for t in targets if targets.count(t) > 1}:
         problems.append(f"More than one bullet replaces line {target}.")
     texts = [normalize(l.text).lower() for l in lines]
-    for text in {t for t in texts if texts.count(t) > 1}:
+    new = {normalize(l.text).lower() for l in lines if l.bullet_id}
+    # Two original lines that read the same are the resume's own; only a
+    # rewrite that repeats a line is a problem.
+    for text in {t for t in texts if texts.count(t) > 1 and t in new}:
         problems.append(f'The same line appears twice: "{text[:60]}"')
 
     # No section lost.
@@ -114,8 +142,12 @@ def check_resume(
             problems.append(f"The section {name} is missing.")
 
     # Every chosen bullet must land somewhere.
+    by_id = {e.id: e for e in evidence}
     placed = {l.bullet_id for l in lines}
     for bullet in bullets:
-        if bullet.id not in placed:
-            problems.append(f"Bullet {bullet.id} has no line to replace.")
+        if bullet.id in placed:
+            continue
+        line = by_id.get(bullet.replaces or "")
+        problem = _blocked(line, bullet) if line else None
+        problems.append(problem or f"Bullet {bullet.id} has no line to replace.")
     return problems
