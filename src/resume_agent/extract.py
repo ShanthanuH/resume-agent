@@ -169,16 +169,36 @@ def _chars(page: pymupdf.Page) -> list[list[_Char]]:
     return pieces
 
 
-def _spans(chars: list[_Char]) -> list[Span]:
-    """Characters of one printed line (sorted left to right) as styled runs."""
+CLOSERS = set(")]},")  # punctuation that sits right after the word before it
+
+
+def _icons(page: pymupdf.Page) -> list[pymupdf.Rect]:
+    """Small vector drawings on the page, like a link arrow after a word."""
+    return [d["rect"] for d in page.get_drawings() if 2 <= d["rect"].height <= 20 and d["rect"].width <= 20]
+
+
+def _spans(chars: list[_Char], icons: list[pymupdf.Rect] = ()) -> list[Span]:
+    """Characters of one printed line (sorted left to right) as styled runs.
+    `icons` are small drawings on the page (see _icons)."""
     spans: list[Span] = []
-    for c, x0, x1, _, _, _, size, bold, italic, url in chars:
+    for c, x0, x1, top, bottom, _, size, bold, italic, url in chars:
         if c.isspace():
             c = " "
         last = spans[-1] if spans else None
         gap = x0 - last.x1 if last else 0.0  # from the last visible character
+        # A drawn icon leaves room in the text, often as a wide space. Before a
+        # closing bracket or a comma that room is not a word gap: "(live ↗)"
+        # reads "(live)", not "(live )". The icon itself is not text.
+        icon_gap = (
+            last is not None
+            and c in CLOSERS
+            and any(r.x0 < x0 and r.x1 > last.x1 and r.y0 < bottom and r.y1 > top for r in icons)
+        )
+        if icon_gap:
+            last.text = last.text.rstrip(" ")
+            gap = 0.0  # so the bracket joins the word's run, as if the icon were not there
         # A visible gap with no space character in it still separates words.
-        if last and gap > 0.15 * size and not last.text.endswith(" ") and c != " ":
+        elif last and gap > 0.15 * size and not last.text.endswith(" ") and c != " ":
             last.text += " "
         # A bullet sign at the start of a line gets a run of its own, so the
         # text after it has its own start position (wrapped lines align to it).
@@ -277,10 +297,11 @@ def _page_lines(page: pymupdf.Page, number: int) -> list[LayoutLine]:
             (0, [p for p in wide if p[0][5] > bottom]),
         ]
     lines: list[LayoutLine] = []
+    icons = _icons(page)
     for column, region in regions:
         for chars in _group(region):
             chars.sort(key=lambda c: c[1])
-            spans = _spans(chars)
+            spans = _spans(chars, icons)
             if spans:
                 lines.append(
                     LayoutLine(
@@ -334,6 +355,8 @@ def split_columns(lines: list[LayoutLine]) -> None:
             others = [g for j, g in enumerate(gaps) if j != i - 1]
             alone = all(g < WIDE_GAP * size and 3 * g <= gap for g in others)
             after_bullet = i == 1 and spans[0].text.strip() in BULLET_SIGNS
+            if spans[i].text.lstrip()[:1] in CLOSERS:
+                continue  # ")" or "," belongs to the word before it, never a column
             short = spans[-1].x1 - spans[i].x0 <= 0.4 * (edge - spans[0].x0)
             if gap >= COLUMN_GAP * size or (gap >= WIDE_GAP * size and alone and short and not after_bullet):
                 line.left, line.right = spans[:i], spans[i:]

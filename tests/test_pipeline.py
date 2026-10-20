@@ -427,6 +427,28 @@ def test_a_bullet_that_wraps_early_is_still_one_bullet():
     assert items[0].text.text.endswith("accuracy at 120 ms inference on plant hardware")
 
 
+def test_room_left_for_a_drawn_icon_is_not_a_space(tmp_path):
+    # A link arrow drawn after "live" leaves room in the text layer, as a space
+    # or as a gap. Before ")" or "," that room must not print as "(live )".
+    doc = pymupdf.open()
+    page = doc.new_page()
+    rows = [("Tidepool (live ", "), code", True), ("Kestrel (live", ", code)", True), ("Plain (text ", ")", False)]
+    for n, (before, after, icon) in enumerate(rows):
+        y = 100 + 20 * n
+        x = 72 + pymupdf.get_text_length(before, fontsize=10)
+        page.insert_text((72, y), before, fontsize=10)
+        if icon:
+            page.draw_rect(pymupdf.Rect(x + 1, y - 7, x + 6, y - 2), color=(0, 0, 0))
+        page.insert_text((x + 8, y), after, fontsize=10)
+    path = tmp_path / "icons.pdf"
+    doc.save(path)
+    assert extract_resume_pdf(path).text.splitlines() == [
+        "Tidepool (live), code",
+        "Kestrel (live, code)",
+        "Plain (text )",  # no icon: the space is the text's own
+    ]
+
+
 def test_a_labelled_skills_row_under_a_full_one_is_its_own_row():
     # The first row ends 15 pt short of the edge, where "ML:" would just about
     # fit: by width alone it looks wrapped.
