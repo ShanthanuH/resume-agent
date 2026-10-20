@@ -277,15 +277,16 @@ def test_a_rewrite_that_drops_a_link_keeps_the_original_line():
     resume = build_resume([LINKED, DEGREE], [rewrite], [])
     line = resume.sections[0].entries[0].lines[0]
     assert (line.text, line.bullet_id) == (LINKED.text, None)
-    problems = check_resume(resume, [LINKED, DEGREE], [rewrite], [])
-    assert problems == ['Bullet B1 drops the link on "live", so line E1 keeps its original text. Leave B1 out.']
+    assert resume.skipped == {"B1": "it drops a link"}
+    assert check_resume(resume, [LINKED, DEGREE], [rewrite], []) == []  # skipped, not failed
 
 
 def test_header_lines_are_never_rewritten():
     rewrite = bullet("E2", "B.Tech with a focus on data")
     resume = build_resume([LINKED, DEGREE], [rewrite], [])
     assert resume.sections[1].entries[0].lines == []  # drawn from the entry header only
-    assert "printed as written" in check_resume(resume, [LINKED, DEGREE], [rewrite], [])[0]
+    assert resume.skipped == {"B1": "the line is printed as written"}
+    assert check_resume(resume, [LINKED, DEGREE], [rewrite], []) == []
 
 
 def test_a_rewritten_summary_sentence_keeps_its_full_stop():

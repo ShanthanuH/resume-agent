@@ -84,7 +84,9 @@ def describe_step(step: TraceStep, session: Session) -> dict[str, Any]:
         kind, facts = "asked", {"question": given.get("question", "")}
     elif tool == "assemble_resume":
         if decision == "assembled":
-            kind, facts = "assembled", {"count": out["bullets_used"]}
+            # Bullets on the resume: assembly may have skipped some the agent chose.
+            count = len(_placed(session)) if session.resume else out["bullets_used"]
+            kind, facts = "assembled", {"count": count}
         elif decision == "fallback":
             kind = "assembled_fallback"  # out of turns: finished in code
         else:
@@ -141,6 +143,18 @@ def _shown_text(bullet: TailoredBullet, session: Session) -> str:
     return bullet.text
 
 
+def _placed(session: Session) -> list[TailoredBullet]:
+    """The session's bullets that are on the assembled resume, in its order."""
+    assert session.resume is not None
+    on_page = {
+        line.bullet_id
+        for section in session.resume.sections
+        for entry in section.entries
+        for line in entry.lines
+    }
+    return [b for b in session.bullets.values() if b.id in on_page]
+
+
 def build_result(
     session: Session, header: list[str] | list[Styled], seconds: float
 ) -> dict[str, Any]:
@@ -151,6 +165,7 @@ def build_result(
     assert session.resume is not None  # run_agent always assembles before returning
     costs = [step.cost for step in session.trace]
     styled = [h if isinstance(h, Styled) else Styled(text=h) for h in header]
+    placed = _placed(session)  # bullets assembly skipped are not offered
     return {
         "header": [h.text for h in styled],
         # The links and bold words of each header line, by position.
@@ -196,7 +211,7 @@ def build_result(
                 "source_ids": bullet.source_ids,
                 "requirement_ids": bullet.requirement_ids,
             }
-            for bullet in session.bullets.values()
+            for bullet in placed
         ],
         # Every line a bullet can cite, by ID, so the trace can show its source.
         "evidence": {
@@ -209,9 +224,7 @@ def build_result(
                 "text": req.text,
                 "priority": req.priority,
                 # Rewritten bullets that cover it.
-                "bullet_ids": [
-                    b.id for b in session.bullets.values() if req.id in b.requirement_ids
-                ],
+                "bullet_ids": [b.id for b in placed if req.id in b.requirement_ids],
                 # Original lines the writer chose not to change that cover it.
                 "kept_line_ids": [
                     line_id

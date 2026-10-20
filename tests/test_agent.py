@@ -6,7 +6,8 @@ import pytest
 from google.genai import types
 from google.genai.errors import APIError
 
-from resume_agent import agent, llm, session as session_module
+from resume_agent import agent, llm
+from resume_agent import session as session_module
 from resume_agent.assemble import build_resume, check_resume
 from resume_agent.extract import Link
 from resume_agent.models import (
@@ -301,20 +302,56 @@ def test_check_resume_catches_each_problem():
     long = bullet("B1", "E1", "Built a FastAPI service " + "and more " * 20)
     assert "one-page budget" in check_resume(build_resume(LINES, [long], LINKS), LINES, [long], LINKS)[0]
 
-    twice = [bullet("B1", "E1", "Built an API"), bullet("B2", "E1", "Made an API")]
-    assert "More than one bullet replaces line E1." in check_resume(
-        build_resume(LINES, twice, LINKS), LINES, twice, LINKS
-    )
-
-    copy = bullet("B1", "E1", "Migrated jobs to Kubernetes")  # same text as E2
-    assert any(
-        "appears twice" in p
-        for p in check_resume(build_resume(LINES, [copy], LINKS), LINES, [copy], LINKS)
-    )
-
     no_links = build_resume(LINES, [], [])
     assert check_resume(no_links, LINES, [], LINKS) == [
         "The link https://github.com/example is missing."
+    ]
+
+
+def test_a_bullet_that_cannot_go_in_is_skipped_and_the_rest_go_through():
+    good = bullet("B3", "E2", "Moved jobs to Kubernetes")
+    cases = {
+        "another bullet already replaces its line": [
+            bullet("B1", "E1", "Built an API"), bullet("B2", "E1", "Made an API")
+        ],
+        "it repeats another line": [bullet("B2", "E1", "CGPA 8.0")],  # E3's text
+        "it has no line to replace": [bullet("B2", "E9", "Built an API")],
+    }
+    for why, bullets in cases.items():
+        chosen = [*bullets, good]
+        resume = build_resume(LINES, chosen, LINKS)
+        assert resume.skipped == {"B2": why}
+        assert check_resume(resume, LINES, chosen, LINKS) == []  # nothing fails the resume
+        assert "B3" in {l.bullet_id for s in resume.sections for e in s.entries for l in e.lines}
+
+
+def test_a_rewrite_of_a_locked_line_never_drops_the_other_rewrites(caplog):
+    # E4 is an entry header, printed as written. A rewrite of it is skipped with
+    # a log line; the rewrite of E1 still goes in, both when the agent assembles
+    # and when the run ran out of turns and code assembles (the fallback).
+    degree = EvidenceLine(id="E4", section="Education", entry=Entry(title="M.Tech"), text="M.Tech", kind="header")
+    session = make_session()
+    session.evidence["E4"] = degree
+    session.bullets = {
+        "B1": bullet("B1", "E1", "Wrote a FastAPI service"),
+        "B2": bullet("B2", "E4", "M.Tech in machine learning"),
+    }
+    session.verified = {"B1", "B2"}
+
+    with caplog.at_level("WARNING", logger="resume_agent.assemble"):
+        outcome = session.assemble_resume(
+            [session_module.AssembleResume(bullet_ids=["B1", "B2"], reason="all verified")]
+        )
+    assert outcome == [("assembled", {"ok": True, "bullets_used": 2})]
+    lines = [l for s in session.resume.sections for e in s.entries for l in e.lines]
+    assert [(l.evidence_id, l.bullet_id) for l in lines] == [("E1", "B1"), ("E2", None), ("E3", None)]
+    assert session.resume.skipped == {"B2": "the line is printed as written"}
+    assert "bullet B2 skipped" in caplog.text and "M.Tech" not in caplog.text  # IDs only
+
+    session.resume = None
+    session.assemble_fallback()
+    assert [l.bullet_id for s in session.resume.sections for e in s.entries for l in e.lines] == [
+        "B1", None, None
     ]
 
 

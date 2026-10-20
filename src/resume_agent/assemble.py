@@ -3,14 +3,27 @@
 All plain code. The agent chooses which bullets go in; this module builds the
 resume from that choice and refuses the result if a check fails. Sections,
 entries and lines stay in the resume's own order, under its own headings.
+
+A bullet that cannot go in (its line is locked, it drops a link, it repeats a
+line) is skipped: its line keeps the original text and the skip is logged. It
+never fails the whole resume, because a failed assembly at the end of a run
+falls back to no rewrites at all (Session.assemble_fallback).
 """
 
 import logging
+from collections import Counter
 
 from pydantic import BaseModel
 
 from resume_agent.extract import Link
-from resume_agent.models import LOCKED_KINDS, Entry, EvidenceLine, LineKind, Mark, TailoredBullet
+from resume_agent.models import (
+    LOCKED_KINDS,
+    Entry,
+    EvidenceLine,
+    LineKind,
+    Mark,
+    TailoredBullet,
+)
 from resume_agent.parsing import normalize
 from resume_agent.structure import carry_marks
 
@@ -44,30 +57,59 @@ class ResumeSection(BaseModel):
 class ResumeJson(BaseModel):
     sections: list[ResumeSection]
     links: list[Link]
+    # Bullets that could not go in, by ID, with the reason. Their lines kept
+    # their original text.
+    skipped: dict[str, str] = {}
 
 
 def _blocked(line: EvidenceLine, bullet: TailoredBullet) -> str | None:
     """Why `bullet` cannot take the place of `line`, or None if it can."""
     if line.kind in LOCKED_KINDS:
-        return (
-            f"Line {line.id} is printed as written (an entry header or a line kept "
-            f"as is), so bullet {bullet.id} cannot replace it. Leave {bullet.id} out."
-        )
+        return "the line is printed as written"  # an entry header, or a fixed line
     _, lost = carry_marks(line.marks, bullet.text)
-    links = [m for m in lost if m.url]
-    if links:
-        return (
-            f'Bullet {bullet.id} drops the link on "{links[0].text}", so line '
-            f"{line.id} keeps its original text. Leave {bullet.id} out."
-        )
+    if any(m.url for m in lost):
+        return "it drops a link"
     return None
+
+
+def _choose(evidence: list[EvidenceLine], bullets: list[TailoredBullet]) -> tuple[dict, dict]:
+    """Which bullet replaces which line. Returns (line id -> bullet, bullet id -> why skipped)."""
+    lines = {line.id: line for line in evidence}
+    chosen: dict[str, TailoredBullet] = {}
+    skipped: dict[str, str] = {}
+    for bullet in bullets:
+        line = lines.get(bullet.replaces or "")
+        why = "it has no line to replace" if line is None else _blocked(line, bullet)
+        if not why and line.id in chosen:
+            why = "another bullet already replaces its line"
+        if why:
+            skipped[bullet.id] = why
+        else:
+            chosen[line.id] = bullet
+    # A rewrite that reads the same as another line on the resume says the same
+    # thing twice. The later one is skipped, until no line appears twice in a way
+    # a rewrite caused. (Two original lines that read the same are the resume's own.)
+    while True:
+        final = {
+            line.id: normalize(chosen[line.id].text if line.id in chosen else line.text).lower()
+            for line in evidence
+            if line.kind != "header"
+        }
+        counts = Counter(final.values())
+        repeats = [i for i, text in final.items() if i in chosen and counts[text] > 1]
+        if not repeats:
+            return chosen, skipped
+        skipped[chosen.pop(repeats[-1]).id] = "it repeats another line"
 
 
 def build_resume(
     evidence: list[EvidenceLine], bullets: list[TailoredBullet], links: list[Link]
 ) -> ResumeJson:
     """Rebuild the resume line by line, swapping in the chosen bullets."""
-    replacement = {b.replaces: b for b in bullets}  # original line id -> new bullet
+    replacement, skipped = _choose(evidence, bullets)  # original line id -> new bullet
+    for bullet_id, why in skipped.items():
+        # IDs and fixed reasons only: resume text must not reach the log.
+        log.warning("bullet %s skipped, its line keeps the original: %s", bullet_id, why)
     sections: list[ResumeSection] = []
     for line in evidence:  # evidence is in the resume's original order
         # Start a new section or entry whenever the heading changes.
@@ -79,11 +121,6 @@ def build_resume(
         if line.kind == "header":
             continue  # drawn as part of the entry header, from header_lines
         bullet = replacement.get(line.id)
-        if bullet and _blocked(line, bullet):
-            # The original stays, and check_resume tells the agent why. IDs
-            # only in the log: resume text must not reach it.
-            log.warning("bullet %s kept off line %s", bullet.id, line.id)
-            bullet = None
         entries[-1].lines.append(
             ResumeLine(
                 text=bullet.text if bullet else line.text,
@@ -95,7 +132,7 @@ def build_resume(
                 marks=carry_marks(line.marks, bullet.text)[0] if bullet else line.marks,
             )
         )
-    return ResumeJson(sections=sections, links=links)
+    return ResumeJson(sections=sections, links=links, skipped=skipped)
 
 
 def check_resume(
@@ -124,30 +161,16 @@ def check_resume(
         if link.url not in kept_urls:
             problems.append(f"The link {link.url} is missing.")
 
-    # No duplicate claims: two bullets for one line, or a bullet repeating a line.
-    targets = [b.replaces for b in bullets]
-    for target in {t for t in targets if targets.count(t) > 1}:
-        problems.append(f"More than one bullet replaces line {target}.")
-    texts = [normalize(l.text).lower() for l in lines]
-    new = {normalize(l.text).lower() for l in lines if l.bullet_id}
-    # Two original lines that read the same are the resume's own; only a
-    # rewrite that repeats a line is a problem.
-    for text in {t for t in texts if texts.count(t) > 1 and t in new}:
-        problems.append(f'The same line appears twice: "{text[:60]}"')
-
     # No section lost.
     kept_sections = {s.name for s in resume.sections}
     for name in dict.fromkeys(e.section for e in evidence):  # unique, in order
         if name not in kept_sections:
             problems.append(f"The section {name} is missing.")
 
-    # Every chosen bullet must land somewhere.
-    by_id = {e.id: e for e in evidence}
+    # Every chosen bullet is on the resume, or was skipped by build_resume with a
+    # reason. Two bullets for one line, or a repeated line, are skipped there.
     placed = {l.bullet_id for l in lines}
     for bullet in bullets:
-        if bullet.id in placed:
-            continue
-        line = by_id.get(bullet.replaces or "")
-        problem = _blocked(line, bullet) if line else None
-        problems.append(problem or f"Bullet {bullet.id} has no line to replace.")
+        if bullet.id not in placed and bullet.id not in resume.skipped:
+            problems.append(f"Bullet {bullet.id} was lost in assembly.")
     return problems
