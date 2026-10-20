@@ -71,6 +71,9 @@ _DATE = re.compile(
     r"|\b(present|current|now|ongoing)\b",
     re.IGNORECASE,
 )
+# A whole line that is only a date or a date range: "Jan 2022 – Present", "2016 – 2019".
+_WHEN = r"(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+)?(?:19|20)\d{2}|present|current|now|ongoing"
+_DATE_ONLY = re.compile(rf"\s*(?:{_WHEN})(?:\s*(?:–|—|-|to)\s*(?:{_WHEN}))?\s*", re.IGNORECASE)
 _EMAIL = re.compile(r"[\w.+-]+@[\w-]+(\.[\w-]+)+")
 _PHONE = re.compile(r"\+?\d[\d\s().-]{6,}\d")
 # A URL, or a bare domain with a lower-case ending: "site.dev/x". "B.Tech" is not one.
@@ -242,6 +245,11 @@ def _starts_bold(line: LayoutLine) -> bool:
     return bool(first and first.bold)
 
 
+def _all_bold(line: LayoutLine) -> bool:
+    spans = [s for s in line.left if any(c.isalnum() for c in s.text)]
+    return bool(spans) and all(s.bold for s in spans)
+
+
 def _all_styled(line: LayoutLine) -> bool:
     """Every letter in the line is bold or italic, as in an entry title line."""
     spans = [s for s in line.left if any(c.isalnum() for c in s.text)]
@@ -267,12 +275,20 @@ def is_heading(line: LayoutLine, body_size: float, from_pdf: bool) -> bool:
         return known or (caps and not digits and len(words) <= 4)
     bold = all(s.bold for s in line.left if any(c.isalpha() for c in s.text))
     bigger = line.size > body_size + 0.5
+    # Google Docs headings are often only bigger: regular weight, Title Case.
+    much_bigger = line.size >= body_size + 2.0
     return (
         known
         or line.rule_below
+        or much_bigger
         or (bigger and (bold or caps))
         or (bold and caps and not digits)
     )
+
+
+def is_date_only(text: str) -> bool:
+    """The whole text is a date or a date range, as on a line of its own."""
+    return bool(_DATE_ONLY.fullmatch(text))
 
 
 def is_contact(text: str) -> bool:
@@ -287,6 +303,30 @@ def is_contact(text: str) -> bool:
         or _PLACEHOLDER.search(p)
         or sum(c.isdigit() for c in p) >= 7 and _PHONE.search(p)
         for p in items
+    )
+
+
+_LABEL = re.compile(r"[^\W\d][^:]{0,28}:\s")  # "ML: ", "AI & LLMs: ", "Tools: "
+
+
+def _label_row(text: str) -> bool:
+    """A labelled list row: a short label and a colon, then the items."""
+    match = _LABEL.match(text.lstrip())
+    return bool(match) and len(match.group().split()) <= 4
+
+
+def _list_break(prev: str, line: str) -> bool:
+    """`prev` and `line` are two lines of a list, not one line that wrapped:
+    contact details one per line, or a comma list whose line ends without a
+    comma ("Go, Python, SQL" above "Docker, Kubernetes"). A list that wraps
+    breaks after a comma."""
+    if is_contact(prev) and is_contact(line):
+        return True
+    parts = prev.split(",")
+    return (
+        len(parts) >= 2
+        and all(len(p.split()) <= 3 for p in parts)
+        and not prev.rstrip().endswith((",", "&", " and"))
     )
 
 
@@ -316,19 +356,26 @@ def _sentences(text: str) -> list[tuple[int, int]]:
 
 def entry_fields(lines: list[HeaderLine], kind: str) -> Entry:
     """Organisation, title, dates and location, read from the header as written."""
-    lefts = [h.left.text for h in lines if h.left.text]
+    # A line that is only a date (under "Company — Role", say) gives the dates.
+    date_lines = [h.left.text for h in lines if not h.right.text and is_date_only(h.left.text)]
+    lefts = [h.left.text for h in lines if h.left.text and h.left.text not in date_lines]
     rights = [h.right.text for h in lines if h.right.text]
     dates = next((r for r in rights if _DATE.search(r)), rights[0] if rights else "")
+    dates = dates or (date_lines[0] if date_lines else "")
     location = next((r for r in rights if r != dates), "")
     title = organization = ""
     if kind == "projects" or len(lefts) == 1:
         single = lefts[0] if lefts else ""
-        parts = re.split(r" \| |, | [–—-] | at ", single, maxsplit=1)
-        if kind != "projects" and len(parts) == 2 and (_ROLE.search(parts[0]) or _ROLE.search(parts[1])):
-            first_is_role = bool(_ROLE.search(parts[0]))
-            title, organization = parts if first_is_role else parts[::-1]
-        else:
-            title = single  # a project's name and its stack, as written
+        title = single  # a project's name and its stack, as written
+        if kind != "projects":
+            # "Company, Place — Role": a dash parts organisation and role before
+            # a comma does, so the dashes are tried first.
+            for separator in (" — ", " – ", " - ", " | ", " at ", ", "):
+                parts = single.split(separator, 1)
+                if len(parts) == 2 and (_ROLE.search(parts[0]) or _ROLE.search(parts[1])):
+                    first_is_role = bool(_ROLE.search(parts[0]))
+                    title, organization = parts if first_is_role else parts[::-1]
+                    break
     elif lefts:
         first, second = lefts[0], lefts[1]
         if _ROLE.search(first) and not _ROLE.search(second):
@@ -404,8 +451,15 @@ class _Parser:
         self.lines = text.layout
         self.from_pdf = text.from_pdf
         self.body = _body_size(self.lines)
-        # The right edge of the text: where the furthest line ends.
-        self.edge = max((s.x1 for line in self.lines for s in line.left + line.right), default=0.0)
+        # Per column (a page can have two, see extract.LayoutLine.column): the
+        # right edge, where its furthest line ends, and the margin, where its
+        # leftmost line starts.
+        self.edges = extract.column_edges(self.lines)
+        self.margins: dict[int, float] = {}
+        for line in self.lines:
+            if line.left:
+                x0 = _text_x0(line.left)
+                self.margins[line.column] = min(self.margins.get(line.column, x0), x0)
         self.sections: list[tuple[str, list[_EntryDraft]]] = []
         self.warnings: list[str] = []
 
@@ -430,17 +484,27 @@ class _Parser:
         if not self.from_pdf or line.right:
             return False
         size = line.size or self.body
-        return _text_x0(line.left) > 0.6 * self.edge and line.left[-1].x1 >= self.edge - 2 * size
+        edge, margin = self.edges[line.column], self.margins.get(line.column, 0.0)
+        return _text_x0(line.left) > margin + 0.6 * (edge - margin) and line.left[-1].x1 >= edge - 2 * size
 
-    def wraps_onto(self, prev: LayoutLine, line: LayoutLine, x0: float, limit: float) -> bool:
+    def wraps_onto(
+        self, prev: LayoutLine, line: LayoutLine, x0: float, limit: float, hanging: bool = False
+    ) -> bool:
         """True if `line` is text that wrapped from `prev`: it starts at `x0`,
         sits right under it, and the first word of `line` would not have fitted
-        on `prev` before `limit`, the right end of the space it had."""
+        on `prev` before `limit`, the right end of the space it had.
+
+        `hanging`: `x0` is indented past the margin, as a bullet's text is.
+        Nothing else starts there, so `prev` only has to be mostly full. Line
+        breaking does not always fill a line: "120 ms" with a non-breaking space
+        moves down as one word."""
         size = line.size or self.body
         if line.page == prev.page and line.top - prev.bottom > 0.6 * size:
             return False  # a gap between them: a new block
         if abs(_text_x0(line.left) - x0) > 1.5:
             return False  # starts somewhere else: not the same column of text
+        if hanging:
+            return prev.left[-1].x1 >= x0 + 0.75 * (limit - x0)
         words = line.text.split()
         first = _MEASURE.text_length(words[0], size) if words else 0.0
         # A space is about 0.3 of the font size; one point covers rounding.
@@ -455,7 +519,12 @@ class _Parser:
             # under a bullet.
             first = line.text.lstrip()[:1]
             return first.islower() or (draft.kind == "bullet" and _text_x0(line.left) > draft.x0)
-        return self.wraps_onto(draft.last, line, draft.x0, self.edge)
+        if draft.kind == "line" and _list_break(draft.last.text, line.text):
+            return False
+        if draft.kind == "line" and _label_row(_join(draft.spans)[0]) and _label_row(line.text):
+            return False  # "ML: PyTorch" under "AI & LLMs: RAG, ...": the next row
+        hanging = draft.kind == "bullet" and draft.x0 > self.margins.get(line.column, 0.0) + 1.5
+        return self.wraps_onto(draft.last, line, draft.x0, self.edges[line.column], hanging)
 
     def continues_header(self, head: _HeadDraft, line: LayoutLine) -> bool:
         """True if `line` is the wrapped rest of a header line's left text. Its
@@ -488,12 +557,27 @@ class _Parser:
         lines = self.lines
         header = [styled(lines[0].left + lines[0].right)] if lines else []
         i = 1
-        while i < len(lines) and not self.heading(i):
+        while i < len(lines):
             text = lines[i].text
-            # A short line right above a contact line (a city, say) is contact too.
+            # A short line right above a contact line (a city, or a subtitle in a
+            # bigger font such as "Data Scientist") belongs to the header too.
             nxt = lines[i + 1].text if i + 1 < len(lines) else ""
-            short_before = len(text.split()) <= 4 and is_contact(nxt) and not self.heading(i + 1)
-            if not (is_contact(text) or short_before):
+            short_before = (
+                len(text.split()) <= 4
+                and is_contact(nxt)
+                and not self.heading(i + 1)
+                and _normal_heading(text) not in HEADINGS
+            )
+            # A subtitle right under the name, when the sections start at once
+            # (in a sidebar layout the contact details are a section of their own).
+            subtitle = (
+                i == 1
+                and len(text.split()) <= 4
+                and i + 1 < len(lines)
+                and self.heading(i + 1)
+                and _normal_heading(text) not in HEADINGS
+            )
+            if not (short_before or subtitle or (is_contact(text) and not self.heading(i))):
                 break
             header.append(styled(lines[i].left + lines[i].right))
             i += 1
@@ -526,9 +610,24 @@ class _Parser:
                     head.right = list(line.left)  # a date that sat on its own line
                 else:
                     self.keep_as_written(line, i)
-            elif nxt is not None and (nxt.right or _bullet(nxt)) and not (current and current.items and kind == "summary"):
-                # A line right above an entry header or a bullet starts an entry
-                # (a school above its degree line, a project name above its bullets).
+            elif current and current.header and not current.items and is_date_only(line.text):
+                self.new_header_line(line)  # dates on a line of their own, under the header
+            elif (
+                self.from_pdf
+                and kind in ("experience", "education", "projects")
+                and _all_bold(line)
+                and nxt is not None
+                and not _bullet(nxt)
+            ):
+                self.new_header_line(line)  # a bold name starts an entry: "Goa University"
+            elif (
+                nxt is not None
+                and (nxt.right or _bullet(nxt) or is_date_only(nxt.text))
+                and not (current and current.items and kind == "summary")
+            ):
+                # A line right above an entry header, a bullet or a date line starts
+                # an entry (a school above its degree line, a project name above its
+                # bullets, "Company — Role" above its dates).
                 self.new_header_line(line)
             elif (
                 self.from_pdf

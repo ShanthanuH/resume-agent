@@ -1,0 +1,83 @@
+% A fictional two-column resume: a sidebar on the left (contact, skills,
+% education, languages) and the main column on the right, under a full-width
+% name. Sidebar headings have no rule; main headings do. Helvetica, A4.
+% The person and every detail are made up.
+%
+% Build: pdflatex sidebar_resume.tex
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=0.6in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\pdfgentounicode=1
+\input{glyphtounicode}
+
+\newcommand{\sidehead}[1]{\vspace{9pt}{\large\bfseries #1}\par\vspace{3pt}}
+\newcommand{\mainhead}[1]{\vspace{8pt}{\large\bfseries #1}\par\vspace{-5pt}\rule{\linewidth}{0.6pt}\par\vspace{3pt}}
+\setlist[itemize]{leftmargin=12pt,itemsep=1pt,topsep=2pt,parsep=0pt}
+
+\begin{document}
+{\Huge\bfseries Sara Fernandes}\par
+\vspace{4pt}{\large Backend Engineer}\par
+\vspace{6pt}
+
+\begin{minipage}[t]{0.29\textwidth}
+\sidehead{Contact}
+Goa, India\\
++91-90000-33333\\
+\href{mailto:sara.fernandes@example.com}{sara.fernandes@example.com}\\
+\href{https://github.com/sara-f-example}{github.com/sara-f-example}
+
+\sidehead{Skills}
+Go, Python, SQL\\
+PostgreSQL, Redis, Kafka\\
+Docker, Kubernetes\\
+gRPC, REST, OpenAPI
+
+\sidehead{Education}
+\textbf{Goa University}\\
+B.E., Information Technology\\
+2015 -- 2019
+
+\sidehead{Languages}
+English, Konkani, Hindi
+\end{minipage}\hfill
+\begin{minipage}[t]{0.65\textwidth}
+\mainhead{Summary}
+Backend engineer with five years of building payment and booking services in Go
+and Python. Cares about clear APIs, boring deploys and good on-call notes.
+
+\mainhead{Experience}
+\textbf{Harbourline Payments} \hfill 2021 -- Present\\
+\textit{Senior Backend Engineer} \hfill Bengaluru
+\begin{itemize}
+\item Rebuilt the refunds service in Go, cutting p99 latency from 900 ms to 180 ms
+  while traffic doubled.
+\item Moved four services from a shared database to their own PostgreSQL schemas.
+\item Wrote the on-call runbook used by three teams.
+\end{itemize}
+\vspace{4pt}
+\textbf{Tripwell} \hfill 2019 -- 2021\\
+\textit{Backend Engineer} \hfill Remote
+\begin{itemize}
+\item Built the booking API in Python and Flask, serving 2 million requests a day.
+\item Added contract tests between the booking and payment services.
+\end{itemize}
+
+\mainhead{Projects}
+\textbf{Ledgerlite} (\href{https://ledgerlite.example.com}{live},
+\href{https://github.com/sara-f-example/ledgerlite}{code}) \hfill 2024
+\begin{itemize}
+\item A double-entry ledger service in Go with an append-only event log.
+\end{itemize}
+\vspace{4pt}
+\textbf{Queue Peek} (\href{https://queuepeek.example.org}{live}) \hfill 2023
+\begin{itemize}
+\item A small web view of Kafka topics for debugging consumers.
+\end{itemize}
+\end{minipage}
+\end{document}
