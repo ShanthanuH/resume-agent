@@ -27,7 +27,9 @@ export function NoticeCard(props: NoticeCardProps) {
     body =
       props.code === "timeout"
         ? copy.calm_err_timeout
-        : props.code === "offline"
+        : props.code === "busy"
+          ? copy.calm_err_busy
+          : props.code === "offline"
           ? copy.calm_err_offline
           : copy.calm_err_run_body;
     action = { label: copy.calm_err_retry, run: props.onRetry };

@@ -33,7 +33,7 @@ function latestOf(steps: Step[]): string {
  * The wait: one whole screen of lemon, the colour of a changed word, because
  * changing words is what is going on. One large sentence says what is
  * happening, a row of blocks shows the stage, the clock ticks, and under them
- * the newest step is shown as it arrives: a run takes a minute or two, and
+ * the newest step is shown as it arrives: a run takes a few minutes, and
  * watching it check each line is the most convincing thing the product does.
  */
 export function Running({ steps, queued, startedAt, source, onSkip, speed = 1 }: Props) {

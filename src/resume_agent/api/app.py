@@ -28,6 +28,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from google.genai.errors import APIError
 
+from resume_agent import llm
 from resume_agent.agent import run_agent, start_session
 from resume_agent.api import limits
 from resume_agent.api.payload import build_result, describe_step, restore_all
@@ -43,7 +44,13 @@ log = logging.getLogger("resume_agent.api")
 logging.getLogger("resume_agent.parsing").setLevel(logging.ERROR)
 logging.getLogger("httpx").setLevel(logging.WARNING)  # no line per model request
 
-RUN_TIMEOUT_SECONDS = 240  # a normal run takes well under two minutes
+# Vercel ends the function 300 s after the request arrives (maxDuration, Hobby
+# plan), so the run clock starts on arrival too, and stops the run 20 s before.
+# A one-page run took 157 s on 2026-10-19.
+RUN_TIMEOUT_SECONDS = 280
+# The longest a run waits for another run to finish. Past it the visitor is told
+# the site is busy, and the run is neither started nor counted.
+QUEUE_SECONDS = 30
 POLL_SECONDS = 0.3  # how often the stream looks for new trace steps
 HEARTBEAT_SECONDS = 10  # send something this often so proxies keep the stream open
 # Path to a saved run (the example page's JSON). When set, /api/run replays it
@@ -165,6 +172,7 @@ async def run(
     resume_file: UploadFile | None = None,
 ):
     """Validate the input, then stream the agent's steps and the final result."""
+    arrived = time.monotonic()  # the run clock starts here, as Vercel's does
     links: list[Link] = []
     if resume_file is not None and resume_file.filename:
         # Read one byte past the limit: enough to know the file is too big
@@ -215,7 +223,7 @@ async def run(
         except limits.LimitReached as reached:
             return _error(429, reached.code, str(reached))
 
-    stream = _replay() if REPLAY_FILE else _live_run(resume_text, jd_text, links, counted_ip)
+    stream = _replay() if REPLAY_FILE else _live_run(resume_text, jd_text, links, counted_ip, arrived)
     return StreamingResponse(
         stream,
         media_type="text/event-stream",
@@ -224,26 +232,50 @@ async def run(
     )
 
 
+async def _wait_for_slot() -> bool:
+    """Take the one-run slot, waiting at most QUEUE_SECONDS. False if it stayed taken."""
+    try:
+        async with asyncio.timeout(QUEUE_SECONDS):
+            await run_slot.acquire()
+    except TimeoutError:
+        return False
+    return True
+
+
 async def _live_run(
-    resume_text: str, jd_text: str, links: list[Link], ip: str | None
+    resume_text: str, jd_text: str, links: list[Link], ip: str | None, arrived: float
 ) -> AsyncIterator[str]:
-    """Run the agent in a worker thread and stream its trace as it grows."""
+    """Run the agent in a worker thread and stream its trace as it grows.
+
+    `arrived` is when the request came in (time.monotonic()). The run is stopped
+    RUN_TIMEOUT_SECONDS after it, however long it waited for the slot.
+    """
     run_id = uuid.uuid4().hex[:8]  # only for matching log lines; says nothing about the user
     safe_text, found = redact(resume_text)  # contact details never reach a model
     holder: dict[str, Session] = {}
+    # Ends the agent, and its model call in flight, when the run times out or the
+    # visitor leaves. Without it the thread would run on to MAX_TURNS, paid for.
+    stop = llm.Stop()
 
     def work() -> None:
-        # ask_user always answers with nothing. The questions are shown to the
-        # visitor after the run, in the result (see payload.questions).
-        session = start_session(safe_text, jd_text, links, lambda question: "")
-        holder["session"] = session  # from here on the stream can see the trace
-        if not session.evidence or not session.requirements:
-            raise NothingParsed
-        run_agent(session)
+        with llm.stoppable(stop):
+            # ask_user always answers with nothing. The questions are shown to the
+            # visitor after the run, in the result (see payload.questions).
+            session = start_session(safe_text, jd_text, links, lambda question: "")
+            holder["session"] = session  # from here on the stream can see the trace
+            if not session.evidence or not session.requirements:
+                raise NothingParsed
+            run_agent(session)
 
     if run_slot.locked():
         yield _sse("status", {"code": "queued"})  # another run holds the slot
-    async with run_slot:
+    if not await _wait_for_slot():
+        log.info("run %s turned away: another run held the slot for %ss", run_id, QUEUE_SECONDS)
+        if ip is not None:  # never started, so it is not counted
+            await counter.refund(ip)
+        yield _sse("failed", {"code": "busy", "message": "Another run is going. Try again in a few minutes."})
+        return
+    try:
         started = time.monotonic()
         yield _sse("status", {"code": "started"})
         # The agent code is blocking, so it runs in a thread and this coroutine
@@ -252,33 +284,43 @@ async def _live_run(
         sent = 0  # how many trace steps the browser already has
         last_event = time.monotonic()
         timed_out = False
-        while True:
-            finished = task.done()  # read BEFORE draining, so no late step is missed
-            session = holder.get("session")
-            if session is not None:
-                # When these steps reached the browser, in milliseconds from the
-                # start. A saved run keeps it, so a replay can move the same way.
-                at = int((time.monotonic() - started) * 1000)
-                for step in session.trace[sent:]:
-                    described = {**describe_step(step, session), "at": at}
-                    yield _sse("step", restore_all(described, found))
+        try:
+            while True:
+                finished = task.done()  # read BEFORE draining, so no late step is missed
+                session = holder.get("session")
+                if session is not None:
+                    # When these steps reached the browser, in milliseconds from the
+                    # start. A saved run keeps it, so a replay can move the same way.
+                    at = int((time.monotonic() - started) * 1000)
+                    for step in session.trace[sent:]:
+                        described = {**describe_step(step, session), "at": at}
+                        yield _sse("step", restore_all(described, found))
+                        last_event = time.monotonic()
+                    sent = len(session.trace)
+                if finished:
+                    break
+                if time.monotonic() - arrived > RUN_TIMEOUT_SECONDS:
+                    timed_out = True
+                    break
+                if time.monotonic() - last_event > HEARTBEAT_SECONDS:
+                    yield ": keep-alive\n\n"  # a comment line: browsers ignore it
                     last_event = time.monotonic()
-                sent = len(session.trace)
-            if finished:
-                break
-            if time.monotonic() - started > RUN_TIMEOUT_SECONDS:
-                timed_out = True
-                break
-            if time.monotonic() - last_event > HEARTBEAT_SECONDS:
-                yield ": keep-alive\n\n"  # a comment line: browsers ignore it
-                last_event = time.monotonic()
-            await asyncio.sleep(POLL_SECONDS)
+                await asyncio.sleep(POLL_SECONDS)
+        finally:
+            # Reached with the agent still working when the run timed out, or when
+            # the visitor left: the server cancels this stream when the browser
+            # disconnects, or closes it after a failed send.
+            if not task.done():
+                stop.stop()
+                # The thread now ends with Stopped. Nobody reads that, so it is
+                # read here, or asyncio logs "exception was never retrieved".
+                task.add_done_callback(lambda done: done.cancelled() or done.exception())
 
         seconds = time.monotonic() - started
         if timed_out:
-            # The thread cannot be stopped; MAX_TURNS ends it soon. Wait for it
-            # here so the next run does not start while it still uses the counter.
-            log.warning("run %s timed out after %.0fs", run_id, seconds)
+            # stop() has ended the agent. Wait the moment that takes, so the next
+            # run does not start while this one still uses the counter.
+            log.warning("run %s timed out %.0fs after it arrived", run_id, time.monotonic() - arrived)
             yield _sse("failed", {"code": "timeout", "message": "This run took too long and was stopped."})
             if ip is not None:  # None: an owner run, which was never counted
                 await counter.refund(ip)
@@ -311,6 +353,8 @@ async def _live_run(
             stats["tokens_out"], stats["cost_usd"], len(result["bullets"]),
         )
         yield _sse("done", restore_all(result, found))
+    finally:
+        run_slot.release()
 
 
 async def _replay() -> AsyncIterator[str]:

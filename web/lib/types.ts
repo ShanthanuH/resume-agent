@@ -132,6 +132,7 @@ export type ErrorCode =
   | "limit_visitor" // this visitor has had today's run
   | "paused" // live runs are switched off, or the model account is out
   | "timeout"
+  | "busy" // another run held the slot too long; this one never started
   | "nothing_parsed"
   | "model_error"
   | "offline" // the request never reached the server, or the stream broke

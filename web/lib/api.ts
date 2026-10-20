@@ -25,7 +25,7 @@ const KNOWN: ErrorCode[] = [
   "file_too_big", "file_not_pdf", "file_no_text", "file_unreadable",
   "resume_too_short", "resume_too_long", "job_too_short", "job_too_long",
   "bot_check", "limit_site", "limit_visitor", "paused",
-  "timeout", "nothing_parsed", "model_error",
+  "timeout", "busy", "nothing_parsed", "model_error",
 ];
 
 function toCode(value: unknown): ErrorCode {

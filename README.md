@@ -128,7 +128,7 @@ Production also needs `TURNSTILE_SECRET`, `KV_REST_API_URL` and `KV_REST_API_TOK
 - Your name, and any address in the resume, are still sent to the model.
 - PDFs must contain real text. Scanned PDFs are refused, and there is no DOCX upload.
 - The live demo allows 3 runs a day and one run at a time. The first run after idle starts slowly.
-- A run takes about a minute.
+- A run takes a few minutes.
 - PDFs are A4 only.
 
 ## Stack

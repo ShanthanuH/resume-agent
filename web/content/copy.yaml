@@ -617,7 +617,7 @@ run_hint:
   where: Running, small line under the sentence
   max: 80
   text: >-
-    This can take a minute or two. Keep this tab open.
+    This can take a few minutes. Keep this tab open.
 
 run_elapsed_label:
   where: Running, screen-reader name of the clock
@@ -1008,6 +1008,13 @@ error_timeout:
   max: 120
   text: >-
     This run took too long, so we stopped it. It was not counted.
+
+error_busy:
+  where: Flow page, under "That did not work", another visitor's run went on too long
+  max: 120
+  text: >-
+    Another run is going right now, so yours did not start. It was not
+    counted. Try again in a few minutes.
 
 error_nothing_parsed:
   where: Flow page, under "That did not work", nothing usable in the text
@@ -1487,7 +1494,7 @@ calm_hero_facts:
   where: Calm home page, small line under the form
   max: 50
   text: >-
-    Free, no sign up. Takes a minute or two.
+    Free, no sign up. Takes a few minutes.
 
 calm_form_drop:
   where: Calm form, first line inside the drop area (wide screens)
@@ -1801,7 +1808,7 @@ calm_run_hint:
   where: Calm running card, line under the progress bar
   max: 60
   text: >-
-    Usually takes a minute or two. Keep this tab open.
+    Usually takes a few minutes. Keep this tab open.
 
 calm_run_show_steps:
   where: Calm running card, label of the switch that shows the list of steps
@@ -1943,6 +1950,12 @@ calm_err_timeout:
   max: 80
   text: >-
     This one took too long. Try again, or paste a shorter job post.
+
+calm_err_busy:
+  where: Calm running card, text when another visitor's run went on too long
+  max: 80
+  text: >-
+    Someone else's run is still going. Yours wasn't counted. Try again soon.
 
 calm_err_offline:
   where: Calm running card, text when the connection dropped

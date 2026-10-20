@@ -66,6 +66,7 @@ export function errorSentence(code: ErrorCode): string {
   if (code === "offline") return copy.error_offline;
   if (code === "model_error") return copy.error_model;
   if (code === "timeout") return copy.error_timeout;
+  if (code === "busy") return copy.error_busy;
   if (code === "nothing_parsed") return copy.error_nothing_parsed;
   if (code === "bot_check") return copy.error_bot_check;
   return copy.error_unknown;
