@@ -12,3 +12,7 @@ eval/runs/
 eval/scores/
 eval/cache/
 eval/labels/
+# logs can hold request headers or API keys, never in git
+*.log
+# variants such as .env.local hold keys too
+.env.*
