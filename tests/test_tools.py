@@ -21,58 +21,39 @@ def fake_llm(monkeypatch, reply):
     monkeypatch.setattr(llm, "generate_structured", lambda **kwargs: reply)
 
 
-def draft_line(text, title="Backend Engineer", organization="Acme Corp"):
-    return parsing._LineDraft(
-        section="Experience",
-        entry=parsing._EntryDraft(
-            title=title, organization=organization, dates="Jan 2022 - Present"
-        ),
-        text=text,
-    )
-
-
 def test_is_verbatim_ignores_whitespace_only():
     # The bullet wraps over two lines in RESUME; the joined form must still match.
     assert parsing.is_verbatim("requests per day, cutting p95 latency by 40%", RESUME)
     assert not parsing.is_verbatim("cutting p95 latency by 50%", RESUME)
 
 
+# The resume used to be split by the model, and these two tests checked that
+# its invented lines and fields were thrown away. The split is now done by
+# code, with no model call, so they check the same guarantees on that.
+
+
 def test_parse_resume_keeps_only_verbatim_lines_and_assigns_ids(monkeypatch):
-    fake_llm(
-        monkeypatch,
-        parsing._ResumeDraft(
-            lines=[
-                draft_line("Led migration of 12 services to Kubernetes"),
-                draft_line("Led migration of 20 services to Kubernetes"),  # invented
-                draft_line(
-                    "Built a FastAPI service handling 2M requests per day, "
-                    "cutting p95 latency by 40%"
-                ),
-            ]
-        ),
-    )
+    def no_model(**kwargs):
+        raise AssertionError("parse_resume must not call the model")
+
+    monkeypatch.setattr(llm, "generate_structured", no_model)
     lines = parsing.parse_resume(RESUME)
-    # The invented line is gone and IDs have no gap where it was.
-    assert [e.id for e in lines] == ["E1", "E2"]
+    # The wrapped bullet is one line; IDs run in resume order with no gaps.
+    assert [(e.id, e.text) for e in lines] == [
+        ("E1", "Built a FastAPI service handling 2M requests per day, cutting p95 latency by 40%"),
+        ("E2", "Led migration of 12 services to Kubernetes"),
+    ]
     # The spec's test: every text is a substring of the input.
     assert all(parsing.is_verbatim(e.text, RESUME) for e in lines)
 
 
-def test_parse_resume_blanks_entry_fields_not_in_resume(monkeypatch):
-    fake_llm(
-        monkeypatch,
-        parsing._ResumeDraft(
-            lines=[
-                draft_line(
-                    "Led migration of 12 services to Kubernetes",
-                    title="Senior Staff Engineer",  # not in the resume
-                )
-            ]
-        ),
-    )
+def test_parse_resume_takes_entry_fields_from_the_resume():
     entry = parsing.parse_resume(RESUME)[0].entry
-    assert entry.title == ""
+    assert entry.title == "Backend Engineer"
     assert entry.organization == "Acme Corp"
+    assert entry.dates == "Jan 2022 - Present"
+    for value in (entry.title, entry.organization, entry.dates):
+        assert parsing.is_verbatim(value, RESUME)
 
 
 def test_parse_jd_assigns_ids_in_order(monkeypatch):

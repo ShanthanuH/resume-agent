@@ -1,0 +1,2161 @@
+# Every word a visitor can read on SwooshCV is in this file.
+#
+# How to edit:
+#   - Change only the lines under "text:". Keep them indented by 4 spaces.
+#   - "where" says where the text shows. "max" is the most characters allowed.
+#   - If a text has a word in curly brackets, like {count}, keep that word
+#     exactly. The site puts a number or a time there. "keep" lists them.
+#   - No quotes needed. Do not rename a key (the name before the colon).
+#
+# After editing, run "npm run copy" in the web folder. It tells you in plain
+# words if a text is too long or a key is missing, for example:
+#   copy.yaml: home_title_1 is 61 characters, max is 50
+# The dev server, the build and the tests run the same check.
+#
+# The home page may hold 150 visible words at most (keys that start with nav_,
+# footer_ and home_). The calm skin's home page may hold 220 (keys that start
+# with calm_hero_ and calm_home_). Keys that start with home_more_ sit behind a
+# toggle and are not counted. The FAQ is not counted.
+
+# ==========================================================================
+# EVERY PAGE: browser tab, link preview, header, footer
+# ==========================================================================
+
+meta_title:
+  where: Browser tab and link preview title, home page
+  max: 60
+  text: >-
+    SwooshCV: tailor your resume to the job
+
+meta_title_suffix:
+  where: Browser tab, after the page name on every other page ("Privacy | SwooshCV")
+  max: 20
+  text: >-
+    SwooshCV
+
+meta_description:
+  where: Link preview on X, LinkedIn and Google, under the title
+  max: 160
+  text: >-
+    Tailor your resume to any job post. Every change comes from a line you
+    wrote. Free, no account.
+
+og_title_1:
+  where: Link preview image (1200 x 630), big text, first line
+  max: 32
+  text: >-
+    Resume? Tailored.
+
+og_title_2:
+  where: Link preview image, big text, second line, in italics
+  max: 24
+  text: >-
+    You? Hired.
+
+og_line:
+  where: Link preview image, small line at the bottom
+  max: 60
+  text: >-
+    Every change comes from a line you wrote.
+
+og_alt:
+  where: Link preview image, text for screen readers
+  max: 120
+  text: >-
+    SwooshCV. Resume? Tailored. You? Hired.
+
+skip_link:
+  where: Every page, hidden link for keyboard users, shows on first Tab press
+  max: 30
+  text: >-
+    Skip to the content
+
+nav_brand:
+  where: Every page, top left, the name of the site
+  max: 12
+  text: >-
+    SwooshCV
+
+nav_home_label:
+  where: Every page, screen-reader name of the logo link
+  max: 30
+  text: >-
+    SwooshCV home
+
+nav_try:
+  where: Every page, top right button
+  max: 20
+  text: >-
+    Tailor my resume
+
+footer_example:
+  where: Every page, footer link to the recorded run
+  max: 24
+  text: >-
+    Watch a real run
+
+footer_privacy:
+  where: Every page, footer link
+  max: 16
+  text: >-
+    Privacy
+
+footer_github:
+  where: Every page, footer link to the code
+  max: 16
+  text: >-
+    GitHub
+
+# ==========================================================================
+# HOME PAGE, top to bottom
+# ==========================================================================
+
+home_title_1:
+  where: Home page, top, biggest text, first sentence
+  max: 40
+  text: >-
+    Resume? Tailored.
+
+home_title_2:
+  where: Home page, top, biggest text, second sentence, in italics
+  max: 30
+  text: >-
+    You? Hired.
+
+home_lead:
+  where: Home page, one line under the big text
+  max: 80
+  text: >-
+    Every change comes from a line you wrote.
+
+home_cta:
+  where: Home page, main button, under the lead and again at the bottom
+  max: 24
+  text: >-
+    Tailor my resume
+
+home_facts:
+  where: Home page, small line next to the main button
+  max: 50
+  text: >-
+    Free. No account. Nothing stored.
+
+home_demo_label:
+  where: Home page, top of the demo box, says what the visitor is watching
+  max: 40
+  text: >-
+    Recorded run, made-up resume
+
+home_demo_speed:
+  where: Home page, demo box, small line. {time} is the run's real length, {speed} how much faster it plays
+  max: 60
+  keep: time, speed
+  text: >-
+    Real time {time}. Shown {speed}x faster.
+
+home_demo_hint:
+  where: Home page, under the demo box, once the run has finished
+  max: 60
+  text: >-
+    Tap a highlight to see the original line.
+
+home_demo_again:
+  where: Home page, demo box, small button to play the run again
+  max: 20
+  text: >-
+    Play again
+
+home_demo_full:
+  where: Home page, demo box, link to the full recorded run
+  max: 30
+  text: >-
+    Watch it at real speed
+
+home_demo_region:
+  where: Home page, screen-reader name of the demo box
+  max: 60
+  text: >-
+    A recorded run on an example resume
+
+home_demo_paper:
+  where: Home page, screen-reader name of the resume inside the demo box
+  max: 60
+  text: >-
+    Part of the example resume
+
+home_how_title:
+  where: Home page, heading of the three steps
+  max: 30
+  text: >-
+    How it works
+
+home_how_1:
+  where: Home page, step 1 (6 words at most)
+  max: 40
+  text: >-
+    Drop your resume.
+
+home_how_2:
+  where: Home page, step 2 (6 words at most)
+  max: 40
+  text: >-
+    Paste the job post.
+
+home_how_3:
+  where: Home page, step 3 (6 words at most)
+  max: 40
+  text: >-
+    Download your tailored PDF.
+
+pdf_preview_alt:
+  where: Home page, wide screens, read by screen readers for the picture of the PDF under the headline
+  max: 80
+  text: >-
+    The top of the example resume as a tailored PDF
+
+home_how_stop_1:
+  where: Home page, "How it works" slider, the name under its first stop
+  max: 12
+  text: >-
+    Resume
+
+home_how_stop_2:
+  where: Home page, "How it works" slider, the name under its second stop
+  max: 12
+  text: >-
+    Job post
+
+home_how_stop_3:
+  where: Home page, "How it works" slider, the name under its last stop
+  max: 12
+  text: >-
+    PDF
+
+home_how_toggle:
+  where: Home page, under the three steps, opens the details
+  max: 40
+  text: >-
+    What happens in between
+
+home_more_how_1:
+  where: Home page, behind the "What happens in between" toggle, first paragraph
+  max: 200
+  text: >-
+    It reads your resume line by line. Those lines are the only facts it
+    may use.
+
+home_more_how_2:
+  where: Home page, behind the toggle, second paragraph
+  max: 200
+  text: >-
+    For each thing the job asks for, it looks for a line that shows it. If no
+    line does, it writes nothing and tells you.
+
+home_more_how_3:
+  where: Home page, behind the toggle, third paragraph
+  max: 200
+  text: >-
+    A second check compares each rewritten line with your original. A line
+    that says more than yours is redone or dropped.
+
+home_proof_title:
+  where: Home page, heading of the "does it work" section
+  max: 30
+  text: >-
+    Does it work?
+
+home_proof_text:
+  where: Home page, one honest line under "Does it work?"
+  max: 120
+  text: >-
+    We are still measuring it. There is no accuracy number yet.
+
+home_proof_link:
+  where: Home page, link to the evaluation on GitHub
+  max: 40
+  text: >-
+    See the test on GitHub
+
+home_privacy_title:
+  where: Home page, heading of the privacy section
+  max: 40
+  text: >-
+    Your resume stays yours.
+
+home_privacy_text:
+  where: Home page, one line under the privacy heading
+  max: 100
+  text: >-
+    We do not store your resume or the job post.
+
+home_privacy_link:
+  where: Home page, link to the privacy page
+  max: 40
+  text: >-
+    How your data is handled
+
+home_faq_title:
+  where: Home page, heading above the questions
+  max: 30
+  text: >-
+    Questions
+
+home_end_title:
+  where: Home page, last heading, above the main button
+  max: 40
+  text: >-
+    Try it on your resume.
+
+# The FAQ: 5 questions at most. Each answer is 2 sentences at most.
+
+faq_1_q:
+  where: Home page, FAQ, question 1
+  max: 80
+  text: >-
+    Will it add skills I do not have?
+
+faq_1_a:
+  where: Home page, FAQ, answer 1
+  max: 220
+  text: >-
+    It is built not to. If the job asks for something your resume does not
+    show, it is listed as missing and left out.
+
+faq_2_q:
+  where: Home page, FAQ, question 2
+  max: 80
+  text: >-
+    Will this get me past an ATS?
+
+faq_2_a:
+  where: Home page, FAQ, answer 2
+  max: 220
+  text: >-
+    We do not promise that. The PDF is one column of real text with standard
+    headings, which resume software can read.
+
+faq_3_q:
+  where: Home page, FAQ, question 3
+  max: 80
+  text: >-
+    Why did it change so few lines?
+
+faq_3_a:
+  where: Home page, FAQ, answer 3
+  max: 220
+  text: >-
+    It rewrites a line only when the new one fits the job better and passes
+    the check. Every other line stays as you wrote it.
+
+faq_4_q:
+  where: Home page, FAQ, question 4
+  max: 80
+  text: >-
+    What can I upload?
+
+faq_4_a:
+  where: Home page, FAQ, answer 4
+  max: 220
+  text: >-
+    A PDF with text you can select, up to 2 MB, or pasted text. Scanned PDFs
+    do not work.
+
+faq_5_q:
+  where: Home page, FAQ, question 5
+  max: 80
+  text: >-
+    Is it free?
+
+faq_5_a:
+  where: Home page, FAQ, answer 5
+  max: 220
+  text: >-
+    Yes. It is a demo with a few live runs a day, and you can watch a
+    recorded run at any time.
+
+# ==========================================================================
+# THE FLOW (/try): step 1, step 2, the button
+# ==========================================================================
+
+flow_meta_title:
+  where: Browser tab on the flow page
+  max: 40
+  text: >-
+    Tailor your resume
+
+flow_meta_description:
+  where: Link preview of the flow page
+  max: 160
+  text: >-
+    Drop your resume, paste the job post, press one button. Free, no account.
+
+flow_title:
+  where: Flow page, heading
+  max: 40
+  text: >-
+    Tailor your resume
+
+flow_preview_note:
+  where: Flow page, top, only on preview builds where no live run can start
+  max: 120
+  text: >-
+    Preview build. The button plays a recorded run. Nothing you add here is
+    sent anywhere.
+
+flow_step_resume:
+  where: Flow page, step 1 label
+  max: 30
+  text: >-
+    Your resume
+
+flow_drop:
+  where: Flow page, step 1, inside the empty drop area, first line
+  max: 40
+  text: >-
+    Drop your resume PDF here
+
+flow_drop_hint:
+  where: Flow page, step 1, inside the empty drop area, second line
+  max: 60
+  text: >-
+    or tap to choose a file. Up to 2 MB.
+
+flow_drop_now:
+  where: Flow page, step 1, while a file is dragged over the drop area
+  max: 30
+  text: >-
+    Let go to add it
+
+flow_file_change:
+  where: Flow page, step 1, small button next to the added file
+  max: 24
+  text: >-
+    Choose another
+
+flow_file_remove:
+  where: Flow page, step 1, small button next to the added file
+  max: 16
+  text: >-
+    Remove
+
+flow_paste_instead:
+  where: Flow page, step 1, small option under the drop area
+  max: 30
+  text: >-
+    Paste text instead
+
+flow_upload_instead:
+  where: Flow page, step 1, small option under the text box
+  max: 30
+  text: >-
+    Upload a PDF instead
+
+flow_resume_placeholder:
+  where: Flow page, step 1, grey text inside the empty resume text box
+  max: 60
+  text: >-
+    Paste the full text of your resume
+
+flow_resume_text_label:
+  where: Flow page, step 1, screen-reader name of the resume text box
+  max: 30
+  text: >-
+    Your resume as text
+
+flow_step_job:
+  where: Flow page, step 2 label
+  max: 30
+  text: >-
+    The job post
+
+flow_job_placeholder:
+  where: Flow page, step 2, grey text inside the empty job box
+  max: 80
+  text: >-
+    Paste the text of the job post. A link will not work.
+
+flow_submit:
+  where: Flow page, the main button
+  max: 24
+  text: >-
+    Tailor my resume
+
+flow_submit_replay:
+  where: Flow page, the main button on preview builds
+  max: 30
+  text: >-
+    Play the recorded run
+
+flow_facts:
+  where: Flow page, small line under the main button
+  max: 100
+  text: >-
+    Free. No account. Your resume is not stored.
+
+flow_facts_link:
+  where: Flow page, link after the small line under the button
+  max: 30
+  text: >-
+    How your data is handled
+
+flow_bot_wait:
+  where: Flow page, under the button, when it was pressed before the bot check finished
+  max: 80
+  text: >-
+    Checking that you are not a bot. This starts by itself.
+
+# --- What a field says when something is wrong with it ---
+
+problem_resume_missing:
+  where: Flow page, step 1, the button was pressed with no resume
+  max: 80
+  text: >-
+    Add your resume first.
+
+problem_resume_too_short:
+  where: Flow page, step 1, the pasted resume is too short
+  max: 100
+  text: >-
+    That looks too short. Paste your whole resume.
+
+problem_resume_too_long:
+  where: Flow page, step 1, the resume is too long
+  max: 100
+  text: >-
+    That is too long. Keep your resume under about four pages.
+
+problem_job_missing:
+  where: Flow page, step 2, the button was pressed with no job post
+  max: 80
+  text: >-
+    Paste the job post first.
+
+problem_job_too_short:
+  where: Flow page, step 2, the job post is too short
+  max: 100
+  text: >-
+    That looks too short. Paste the whole job post.
+
+problem_job_too_long:
+  where: Flow page, step 2, the job post is too long
+  max: 100
+  text: >-
+    That is too long. Paste only the job post.
+
+problem_file_too_big:
+  where: Flow page, step 1, the file is over 2 MB
+  max: 120
+  text: >-
+    That file is over 2 MB. Save a smaller PDF, or paste the text instead.
+
+problem_file_not_pdf:
+  where: Flow page, step 1, the file is not a PDF
+  max: 120
+  text: >-
+    That is not a PDF. Choose a PDF, or paste the text instead.
+
+problem_file_no_text:
+  where: Flow page, step 1, the PDF is a scan (a picture of text)
+  max: 140
+  text: >-
+    This PDF has no text we can read. It may be a scan. Paste the text
+    instead.
+
+problem_file_unreadable:
+  where: Flow page, step 1, the PDF is broken or locked
+  max: 120
+  text: >-
+    We could not open that PDF. Paste the text instead.
+
+# ==========================================================================
+# WHILE A RUN IS GOING
+# ==========================================================================
+
+run_reading:
+  where: Running, the one sentence, stage 1
+  max: 50
+  text: >-
+    Reading your resume
+
+run_matching:
+  where: Running, the one sentence, stage 2
+  max: 50
+  text: >-
+    Finding what matches the job
+
+run_rewriting:
+  where: Running, the one sentence, stage 3
+  max: 50
+  text: >-
+    Rewriting lines that match
+
+run_checking:
+  where: Running, the one sentence, stage 4
+  max: 50
+  text: >-
+    Checking every line against your resume
+
+run_fixing:
+  where: Running, the one sentence, when a rewrite failed the check and is redone
+  max: 50
+  text: >-
+    Redoing a line that did not pass
+
+run_building:
+  where: Running, the one sentence, last stage
+  max: 50
+  text: >-
+    Putting your resume together
+
+run_queued:
+  where: Running, the one sentence, while another visitor's run is ahead
+  max: 60
+  text: >-
+    Another run is ahead of yours. Yours is next.
+
+run_hint:
+  where: Running, small line under the sentence
+  max: 80
+  text: >-
+    This can take a few minutes. Keep this tab open.
+
+run_elapsed_label:
+  where: Running, screen-reader name of the clock
+  max: 30
+  text: >-
+    Time so far
+
+run_progress_label:
+  where: Running, screen-reader name of the progress bar
+  max: 30
+  text: >-
+    Progress
+
+run_leave_confirm:
+  where: Browser question box, when a link is pressed while your own run is going
+  max: 120
+  text: >-
+    Your run is still going. If you leave this page it is lost. Leave anyway?
+
+run_show_steps:
+  where: Running and result, small toggle that opens the list of steps
+  max: 20
+  text: >-
+    Show steps
+
+run_hide_steps:
+  where: Running and result, the same toggle when the list is open
+  max: 20
+  text: >-
+    Hide steps
+
+run_steps_empty:
+  where: Running, inside the open list before the first step
+  max: 60
+  text: >-
+    Steps show here as they happen.
+
+replay_label:
+  where: Recorded run, small tag at the top
+  max: 24
+  text: >-
+    Recorded run
+
+replay_note:
+  where: Recorded run, line next to the tag
+  max: 100
+  text: >-
+    The resume and the job are made up. The run is real, at its real speed.
+
+replay_skip:
+  where: Recorded run, button to jump to the end
+  max: 24
+  text: >-
+    Skip to the result
+
+replay_job_toggle:
+  where: Recorded run, toggle that shows the job post it was tailored to
+  max: 30
+  text: >-
+    Read the job post
+
+replay_again:
+  where: Recorded run, result, small button to play it from the start
+  max: 24
+  text: >-
+    Play it again
+
+# --- One sentence per step, in the "Show steps" list ---
+
+step_read_resume:
+  where: Steps list. {count} is the number of lines found
+  max: 60
+  keep: count
+  text: >-
+    Read your resume: {count} lines.
+
+step_read_job:
+  where: Steps list. {count} is how many things the job asks for
+  max: 60
+  keep: count
+  text: >-
+    Read the job post: it asks for {count} things.
+
+step_match_found:
+  where: Steps list. {requirement} is one thing the job asks for
+  max: 60
+  keep: requirement
+  text: >-
+    Your resume shows: {requirement}.
+
+step_match_missing:
+  where: Steps list. {requirement} is one thing the job asks for
+  max: 60
+  keep: requirement
+  text: >-
+    Not on your resume, left out: {requirement}.
+
+step_rewrote:
+  where: Steps list. {after} is the new line
+  max: 40
+  keep: after
+  text: >-
+    Rewrote a line: {after}
+
+step_kept:
+  where: Steps list. {before} is the line as you wrote it
+  max: 50
+  keep: before
+  text: >-
+    Kept a line as you wrote it: {before}
+
+step_rewrite_empty:
+  where: Steps list, no rewrite came back
+  max: 60
+  text: >-
+    A rewrite came back empty. Your line stays.
+
+step_check_passed:
+  where: Steps list, a rewrite passed the check
+  max: 70
+  text: >-
+    Checked a rewrite against your resume. It passed.
+
+step_check_failed:
+  where: Steps list, a rewrite failed the check
+  max: 70
+  text: >-
+    A rewrite said more than your resume does. Redoing it.
+
+step_dropped:
+  where: Steps list, a rewrite was given up
+  max: 60
+  text: >-
+    Dropped a rewrite. Your line stays.
+
+step_asked:
+  where: Steps list, the run has a question
+  max: 60
+  text: >-
+    Noted a question for you.
+
+step_assembled:
+  where: Steps list, the resume was put together
+  max: 60
+  text: >-
+    Put your resume together.
+
+step_assembled_fallback:
+  where: Steps list, the run hit its limit of turns
+  max: 80
+  text: >-
+    Ran out of turns. Kept the changes that passed the check.
+
+step_assemble_retry:
+  where: Steps list, putting it together failed once
+  max: 60
+  text: >-
+    Putting it together again.
+
+step_refused:
+  where: Steps list, a rule in the code blocked a step
+  max: 60
+  text: >-
+    Blocked a step that broke a rule.
+
+step_tool_error:
+  where: Steps list, a step failed and is tried again
+  max: 60
+  text: >-
+    A step failed. Trying it again.
+
+# ==========================================================================
+# THE RESULT
+# ==========================================================================
+
+result_summary_none:
+  where: Result, the one summary line, when no line changed
+  max: 120
+  text: >-
+    No lines changed. Your wording already fits this job.
+
+result_summary_all_kept:
+  where: Result, the one summary line, when you kept your original for every line
+  max: 120
+  text: >-
+    No lines changed. You kept all your originals.
+
+result_summary_one:
+  where: Result, the one summary line, when 1 line changed
+  max: 120
+  text: >-
+    1 line changed. It was checked against your resume.
+
+result_summary_many:
+  where: Result, the one summary line. {count} is the number of changed lines
+  max: 120
+  keep: count
+  text: >-
+    {count} lines changed. Each one was checked against your resume.
+
+result_hint:
+  where: Result, small line under the summary
+  max: 70
+  text: >-
+    Tap a highlighted line to see your original.
+
+result_download:
+  where: Result, the main button
+  max: 20
+  text: >-
+    Download PDF
+
+result_file_name:
+  where: Result, the name of the PDF file that is saved to your device. Keep ".pdf" at the end
+  max: 40
+  text: >-
+    resume-tailored.pdf
+
+result_download_busy:
+  where: Result, the main button while the PDF is being made
+  max: 24
+  text: >-
+    Making your PDF
+
+result_download_failed:
+  where: Result, under the button, when the PDF could not be made
+  max: 80
+  text: >-
+    The PDF could not be made. Try again.
+
+result_pdf_note:
+  where: Result, small line under the button
+  max: 60
+  text: >-
+    One column. Real text. Links kept. A4.
+
+result_pages:
+  where: Result, under the button, when the PDF came out longer than one page. {pages} is the page count
+  max: 100
+  keep: pages
+  text: >-
+    This PDF is {pages} pages. Shorten your resume to fit one.
+
+result_time:
+  where: Result, small line. {seconds} is how long the run took
+  max: 60
+  keep: seconds
+  text: >-
+    Done in {seconds} seconds. Nothing was saved.
+
+result_start_over:
+  where: Result, small button to go back to the inputs
+  max: 20
+  text: >-
+    Start over
+
+result_resume_label:
+  where: Result, screen-reader name of the resume
+  max: 30
+  text: >-
+    Your tailored resume
+
+trace_original:
+  where: Result, label of the original line that slides in under a changed line
+  max: 30
+  text: >-
+    Your original line
+
+trace_asked:
+  where: Result, under the original line. {things} is what the job asks for that this line shows
+  max: 40
+  keep: things
+  text: >-
+    The job asks for: {things}
+
+trace_keep_original:
+  where: Result, small button under the original line
+  max: 24
+  text: >-
+    Keep my original
+
+trace_use_rewrite:
+  where: Result, the same button after the original was kept
+  max: 24
+  text: >-
+    Use the rewrite
+
+trace_kept:
+  where: Result, label under a line where you kept your original
+  max: 50
+  text: >-
+    You kept your original. The rewrite was
+
+gaps_title:
+  where: Result, heading above the chips
+  max: 30
+  text: >-
+    Not on your resume
+
+gaps_text:
+  where: Result, one line under the chips
+  max: 120
+  text: >-
+    The job asks for these. Your resume does not show them, so we left them
+    out.
+
+questions_title_one:
+  where: Result, heading of the small card, when there is 1 question
+  max: 30
+  text: >-
+    A question for you
+
+questions_title_many:
+  where: Result, heading of the small card, when there are 2 or more
+  max: 30
+  text: >-
+    Questions for you
+
+questions_text:
+  where: Result, one line under the questions
+  max: 120
+  text: >-
+    If the answer is on your side, add it to your resume in your own words
+    and run again.
+
+# ==========================================================================
+# WHEN A RUN CANNOT START OR DOES NOT FINISH
+# ==========================================================================
+
+limited_site_title:
+  where: Flow page, heading when the day's free runs are used up
+  max: 40
+  text: >-
+    Today's free runs are gone.
+
+limited_visitor_title:
+  where: Flow page, heading when this visitor has used today's run
+  max: 40
+  text: >-
+    You have used today's free run.
+
+limited_text:
+  where: Flow page, under the heading. {time} is when runs open again, in the visitor's own time
+  max: 100
+  keep: time
+  text: >-
+    Watch a real run, or come back after {time}.
+
+paused_title:
+  where: Flow page, heading when live runs are switched off
+  max: 40
+  text: >-
+    The live demo is paused.
+
+paused_text:
+  where: Flow page, under the "paused" heading
+  max: 100
+  text: >-
+    You can still watch a real run.
+
+watch_run:
+  where: Flow page, main button when no live run can start
+  max: 24
+  text: >-
+    Watch a real run
+
+error_title:
+  where: Flow page, heading when a run failed
+  max: 40
+  text: >-
+    That did not work.
+
+error_offline:
+  where: Flow page, under "That did not work", no connection
+  max: 120
+  text: >-
+    We could not reach the server. Check your connection and try again.
+
+error_model:
+  where: Flow page, under "That did not work", the AI service failed
+  max: 120
+  text: >-
+    The AI service had a problem. Nothing was saved, and this run was not
+    counted.
+
+error_timeout:
+  where: Flow page, under "That did not work", the run took too long
+  max: 120
+  text: >-
+    This run took too long, so we stopped it. It was not counted.
+
+error_busy:
+  where: Flow page, under "That did not work", another visitor's run went on too long
+  max: 120
+  text: >-
+    Another run is going right now, so yours did not start. It was not
+    counted. Try again in a few minutes.
+
+error_nothing_parsed:
+  where: Flow page, under "That did not work", nothing usable in the text
+  max: 140
+  text: >-
+    We could not find resume lines or job requirements in that text. Check
+    both and try again.
+
+error_bot_check:
+  where: Flow page, under "That did not work", the bot check failed
+  max: 120
+  text: >-
+    The bot check did not pass. Reload the page and try again.
+
+error_unknown:
+  where: Flow page, under "That did not work", any other failure
+  max: 120
+  text: >-
+    Something went wrong on our side. Nothing was saved.
+
+error_retry:
+  where: Flow page, button under an error
+  max: 20
+  text: >-
+    Try again
+
+# ==========================================================================
+# THE RECORDED RUN PAGE (/example)
+# ==========================================================================
+
+example_meta_title:
+  where: Browser tab on the recorded run page
+  max: 40
+  text: >-
+    Watch a real run
+
+example_meta_description:
+  where: Link preview of the recorded run page
+  max: 160
+  text: >-
+    A real run on a made-up resume, played back step by step.
+
+example_cta_title:
+  where: Recorded run page, heading above the button at the bottom
+  max: 40
+  text: >-
+    Now try it on yours.
+
+# ==========================================================================
+# PRIVACY PAGE (/privacy)
+# Each line must stay true to what the code does. If the code changes, change
+# this page with it.
+# ==========================================================================
+
+privacy_meta_title:
+  where: Browser tab on the privacy page
+  max: 40
+  text: >-
+    Privacy
+
+privacy_meta_description:
+  where: Link preview of the privacy page
+  max: 160
+  text: >-
+    What is sent, to whom, and what is kept. In plain words.
+
+privacy_title:
+  where: Privacy page, heading
+  max: 40
+  text: >-
+    Privacy
+
+privacy_lead:
+  where: Privacy page, line under the heading
+  max: 160
+  text: >-
+    SwooshCV is built so you can check what it does. That includes what it
+    does with your data.
+
+privacy_keep_title:
+  where: Privacy page, section 1 heading
+  max: 50
+  text: >-
+    What we keep
+
+privacy_keep_1:
+  where: Privacy page, section 1, point 1
+  max: 260
+  text: >-
+    Nothing. Your resume and the job post are worked on in memory and are
+    gone when the run ends. There is no database of resumes and no account.
+
+privacy_keep_2:
+  where: Privacy page, section 1, point 2
+  max: 260
+  text: >-
+    If you upload a PDF, it is written to a temporary file so the text can be
+    read. That file is deleted straight away.
+
+privacy_keep_3:
+  where: Privacy page, section 1, point 3
+  max: 260
+  text: >-
+    Your result lives in your browser tab. Close or reload the tab and it is
+    gone.
+
+privacy_model_title:
+  where: Privacy page, section 2 heading
+  max: 50
+  text: >-
+    What is sent to the AI model
+
+privacy_model_1:
+  where: Privacy page, section 2, point 1
+  max: 260
+  text: >-
+    The text of your resume and the job post is sent to Google's Gemini API,
+    which does the reading and the rewriting.
+
+privacy_model_2:
+  where: Privacy page, section 2, point 2
+  max: 260
+  text: >-
+    Before that, your email address, phone number and web links are swapped
+    for placeholders, so the model never sees them. They are put back only in
+    the result shown to you.
+
+privacy_model_3:
+  where: Privacy page, section 2, point 3
+  max: 260
+  text: >-
+    Your name and anything else written in the resume, such as a city,
+    employers and schools, is sent as part of the text.
+
+privacy_model_4:
+  where: Privacy page, section 2, point 4
+  max: 260
+  text: >-
+    We use the paid Gemini API. Google's terms for the paid API say it does
+    not use that content to improve its products. Google may keep it for a
+    limited time to detect abuse.
+
+privacy_logs_title:
+  where: Privacy page, section 3 heading
+  max: 50
+  text: >-
+    What our logs hold
+
+privacy_logs_1:
+  where: Privacy page, section 3, point 1
+  max: 260
+  text: >-
+    For each run: how long it took, how many steps it took, how much text the
+    AI model read and wrote (as a count), what it cost us, and how many lines
+    it changed. No resume text and no job text.
+
+privacy_logs_2:
+  where: Privacy page, section 3, point 2
+  max: 300
+  text: >-
+    To hold the daily limit we count runs per IP address. The count is kept
+    for up to two days in a small database (Upstash Redis), under a scrambled
+    form of the address that cannot be turned back into it.
+
+privacy_others_title:
+  where: Privacy page, section 4 heading
+  max: 50
+  text: >-
+    Other companies involved
+
+privacy_others_1:
+  where: Privacy page, section 4, point 1
+  max: 260
+  text: >-
+    Hosting: the website and the tailoring both run on Vercel. Like any host,
+    it sees your IP address and the requests you make.
+
+privacy_others_2:
+  where: Privacy page, section 4, point 2
+  max: 260
+  text: >-
+    Bot check: before a run, Cloudflare Turnstile checks that you are a
+    person. Cloudflare sees your IP address and some browser details to do
+    that.
+
+privacy_others_3:
+  where: Privacy page, section 4, point 3
+  max: 260
+  text: >-
+    We set no cookies for visitors and run no advertising trackers on this
+    site.
+
+privacy_code:
+  where: Privacy page, last line, before the link
+  max: 80
+  text: >-
+    The code that does all of this is public.
+
+privacy_code_link:
+  where: Privacy page, last line, the link to GitHub
+  max: 40
+  text: >-
+    Read it on GitHub
+
+# ==========================================================================
+# ERROR PAGES
+# ==========================================================================
+
+notfound_title:
+  where: Page not found (404), heading
+  max: 40
+  text: >-
+    This page does not exist.
+
+notfound_text:
+  where: Page not found (404), line under the heading
+  max: 100
+  text: >-
+    The link may be old, or the address may have a typo.
+
+notfound_home:
+  where: Page not found (404), button
+  max: 24
+  text: >-
+    Go to the home page
+
+crash_title:
+  where: A page broke while loading, heading
+  max: 40
+  text: >-
+    This page broke.
+
+crash_text:
+  where: A page broke while loading, line under the heading
+  max: 100
+  text: >-
+    Nothing you added was saved or sent. Try loading it again.
+
+crash_retry:
+  where: A page broke while loading, button
+  max: 20
+  text: >-
+    Try again
+
+# ==========================================================================
+# OWNER PAGE (/owner): only the site's owner sees this
+# ==========================================================================
+
+owner_meta_title:
+  where: Browser tab on the owner page
+  max: 20
+  text: >-
+    Owner
+
+owner_title:
+  where: Owner page, heading
+  max: 30
+  text: >-
+    Owner mode
+
+owner_checking:
+  where: Owner page, while the page reads the key
+  max: 30
+  text: >-
+    Checking
+
+owner_on:
+  where: Owner page, a key is saved
+  max: 200
+  text: >-
+    A key is saved in this browser for 30 days. If it is the right one, your
+    runs are not counted against the limits.
+
+owner_off:
+  where: Owner page, the key was just removed
+  max: 80
+  text: >-
+    The key was removed from this browser.
+
+owner_none:
+  where: Owner page, no key is saved
+  max: 80
+  text: >-
+    No key is saved in this browser.
+
+owner_remove_hint:
+  where: Owner page, how to remove the key. {address} is the address to open
+  max: 80
+  keep: address
+  text: >-
+    To remove it, open {address}
+
+owner_go:
+  where: Owner page, button to the flow
+  max: 24
+  text: >-
+    Go to the flow
+
+# ==========================================================================
+# STATES PAGE (/states): preview builds only, for looking at every state
+# ==========================================================================
+
+states_meta_title:
+  where: Browser tab on the states page
+  max: 30
+  text: >-
+    Every state
+
+states_title:
+  where: States page, heading
+  max: 40
+  text: >-
+    Every state of the flow
+
+states_lead:
+  where: States page, line under the heading
+  max: 160
+  text: >-
+    Preview builds only. Each link opens the flow in one state, so the design
+    of every state can be checked without a live run.
+
+states_empty:
+  where: States page, link
+  max: 40
+  text: >-
+    Empty
+
+states_file_added:
+  where: States page, link
+  max: 40
+  text: >-
+    File added
+
+states_big:
+  where: States page, link
+  max: 40
+  text: >-
+    Bad file: over 2 MB
+
+states_sample_question:
+  where: States page, the made-up question shown in the "with a question" state
+  max: 120
+  text: >-
+    Which database did the nightly job read from?
+
+states_running:
+  where: States page, link
+  max: 40
+  text: >-
+    Running, at real speed
+
+states_running_fast:
+  where: States page, link
+  max: 40
+  text: >-
+    Running, 8x faster
+
+states_done:
+  where: States page, link
+  max: 40
+  text: >-
+    Done
+
+states_questions:
+  where: States page, link
+  max: 40
+  text: >-
+    Done, with a question for you
+
+states_scan:
+  where: States page, link
+  max: 40
+  text: >-
+    Bad file: a scanned PDF
+
+states_error:
+  where: States page, link
+  max: 40
+  text: >-
+    Error
+
+states_limited:
+  where: States page, link
+  max: 40
+  text: >-
+    Daily limit reached
+
+states_limited_visitor:
+  where: States page, link
+  max: 40
+  text: >-
+    Your own run is used
+
+states_paused:
+  where: States page, link
+  max: 40
+  text: >-
+    Demo paused
+
+# ==========================================================================
+# CALM SKIN: every page
+# ==========================================================================
+
+calm_meta_title:
+  where: Calm skin, browser tab and link preview title, home page
+  max: 50
+  text: >-
+    SwooshCV: every job gets its own resume
+
+calm_meta_description:
+  where: Calm skin, link preview on X, LinkedIn and Google, under the title
+  max: 120
+  text: >-
+    Drop your resume, paste the job post, and get a version written for that
+    role. Free, no sign up.
+
+calm_footer_privacy:
+  where: Calm skin, footer link to the privacy page
+  max: 20
+  text: >-
+    Privacy
+
+calm_footer_made_by:
+  where: Calm skin, footer link to the maker's site
+  max: 20
+  text: >-
+    Made by Shaan
+
+calm_missing_label:
+  where: Calm skin, home page and result, small heading above the crossed-out skills
+  max: 40
+  text: >-
+    Asked for, but not on your resume
+
+calm_missing_sr:
+  where: Calm skin, read by screen readers after each crossed-out skill ("Kubernetes, not on your resume")
+  max: 30
+  text: >-
+    , not on your resume
+
+calm_before:
+  where: Calm skin, home page example and result, bold start of the green box with the original line
+  max: 20
+  text: >-
+    Before:
+
+# ==========================================================================
+# CALM SKIN: home page, top to bottom
+# ==========================================================================
+
+calm_nav_how:
+  where: Calm home page, top right, glass button that scrolls to the example
+  max: 20
+  text: >-
+    See how it works
+
+calm_hero_title_1:
+  where: Calm home page, the big line, first part
+  max: 20
+  text: >-
+    Every job gets
+
+calm_hero_title_2:
+  where: Calm home page, the big line, second part, in italics
+  max: 20
+  text: >-
+    its own resume.
+
+calm_hero_sub:
+  where: Calm home page, the line under the big line
+  max: 90
+  text: >-
+    Drop your resume, paste the job post, and get a version written for that
+    role.
+
+calm_hero_facts:
+  where: Calm home page, small line under the form
+  max: 50
+  text: >-
+    Free, no sign up. Takes a few minutes.
+
+calm_form_drop:
+  where: Calm form, first line inside the drop area (wide screens)
+  max: 30
+  text: >-
+    Drop your resume here
+
+calm_form_drop_phone:
+  where: Calm form, first line inside the drop area (phones)
+  max: 30
+  text: >-
+    Choose your resume
+
+calm_form_drop_hint:
+  where: Calm form, second line inside the drop area (wide screens). Must match the real limits
+  max: 50
+  text: >-
+    PDF, up to 2 MB, or click to choose
+
+calm_form_drop_hint_phone:
+  where: Calm form, second line inside the drop area (phones). Must match the real limits
+  max: 20
+  text: >-
+    PDF, up to 2 MB
+
+calm_form_drop_now:
+  where: Calm form, drop area, while a file is dragged over the page
+  max: 20
+  text: >-
+    Let go to add it
+
+calm_form_change:
+  where: Calm form, small text button next to the chosen file name
+  max: 20
+  text: >-
+    Change
+
+calm_form_paste:
+  where: Calm form, small text link under the drop area
+  max: 30
+  text: >-
+    Or paste it as text
+
+calm_form_upload:
+  where: Calm form, small text link under the resume text box
+  max: 20
+  text: >-
+    Or upload a PDF
+
+calm_form_resume_label:
+  where: Calm form, label of the resume text box
+  max: 20
+  text: >-
+    Your resume
+
+calm_form_resume_placeholder:
+  where: Calm form, grey text inside the empty resume text box
+  max: 40
+  text: >-
+    Paste your whole resume here
+
+calm_form_job_label:
+  where: Calm form, label of the job post box
+  max: 20
+  text: >-
+    The job post
+
+calm_form_job_placeholder:
+  where: Calm form, grey text inside the empty job post box
+  max: 40
+  text: >-
+    Paste the whole job post here
+
+calm_form_submit:
+  where: Calm form, the main button
+  max: 20
+  text: >-
+    Tailor my resume
+
+calm_form_bot_wait:
+  where: Calm form, under the button, when it was pressed before the bot check finished
+  max: 60
+  text: >-
+    Checking you're a person. It starts by itself.
+
+calm_home_example_title:
+  where: Calm home page, example section title
+  max: 40
+  text: >-
+    Here's one we tailored earlier.
+
+calm_home_example_lead:
+  where: Calm home page, example section, line under the title
+  max: 110
+  text: >-
+    A made-up resume and a sample job post. Tap a highlighted line to see
+    what it said before.
+
+calm_example_job_label:
+  where: Calm home page, example, small label at the top of the job post card
+  max: 20
+  text: >-
+    The job post
+
+calm_example_asks:
+  where: Calm home page, example, label above the list of what the job asks for
+  max: 20
+  text: >-
+    What it asks for
+
+calm_example_missing:
+  where: Calm home page, example, after the crossed-out requirement
+  max: 30
+  text: >-
+    , not on the resume
+
+calm_home_example_count:
+  where: Calm home page, example, line under both cards. {count} comes from the recorded run
+  max: 100
+  keep: count
+  text: >-
+    {count} lines changed for this job. Everything else stays exactly as you
+    wrote it.
+
+calm_home_steps_title:
+  where: Calm home page, steps section title
+  max: 30
+  text: >-
+    Three steps, no sign up.
+
+calm_home_step_1_title:
+  where: Calm home page, step 1 card title
+  max: 30
+  text: >-
+    Drop in your resume
+
+calm_home_step_1_text:
+  where: Calm home page, step 1 card text
+  max: 70
+  text: >-
+    A PDF works best. It reads every line, so nothing gets lost.
+
+calm_home_step_2_title:
+  where: Calm home page, step 2 card title
+  max: 30
+  text: >-
+    Paste the job post
+
+calm_home_step_2_text:
+  where: Calm home page, step 2 card text
+  max: 70
+  text: >-
+    All of it. The more detail it has, the better the match.
+
+calm_home_step_3_title:
+  where: Calm home page, step 3 card title
+  max: 20
+  text: >-
+    Get your version
+
+calm_home_step_3_text:
+  where: Calm home page, step 3 card text
+  max: 90
+  text: >-
+    See what changed, keep any line you liked better before, and download
+    the PDF.
+
+calm_home_missing_title:
+  where: Calm home page, missing skills section title
+  max: 40
+  text: >-
+    It also tells you what's missing.
+
+calm_home_missing_lead:
+  where: Calm home page, missing skills section, line under the title
+  max: 170
+  text: >-
+    Skills the job asks for that aren't on your resume get their own list,
+    so you know what to learn next, or what to bring up in the interview.
+
+calm_home_missing_skills:
+  where: Calm home page, the crossed-out sample skills. Separate them with a comma and a space
+  max: 50
+  text: >-
+    Kubernetes, Kafka, Terraform, Go, GraphQL
+
+calm_home_missing_note:
+  where: Calm home page, small line under the crossed-out skills
+  max: 50
+  text: >-
+    You get this list with every result.
+
+calm_home_privacy_title:
+  where: Calm home page, privacy card title
+  max: 30
+  text: >-
+    Your resume stays yours.
+
+calm_home_privacy_text:
+  where: Calm home page, privacy card text. Must stay true to what the code hides
+  max: 120
+  text: >-
+    We don't keep it. Your email, phone and links are hidden from the AI and
+    put back when you download.
+
+calm_home_privacy_link:
+  where: Calm home page, privacy card button to the privacy page
+  max: 30
+  text: >-
+    How we handle your data
+
+calm_faq_title:
+  where: Calm home page, questions section title
+  max: 30
+  text: >-
+    Questions people ask
+
+calm_faq_1_q:
+  where: Calm home page, question 1
+  max: 30
+  text: >-
+    Is it actually free?
+
+calm_faq_1_a:
+  where: Calm home page, answer 1
+  max: 90
+  text: >-
+    Yes. There's a small daily limit so the free version can keep running.
+
+calm_faq_2_q:
+  where: Calm home page, question 2
+  max: 40
+  text: >-
+    Will it add skills I don't have?
+
+calm_faq_2_a:
+  where: Calm home page, answer 2
+  max: 110
+  text: >-
+    No. It only rewords what's already on your resume. Anything missing goes
+    in its own list.
+
+calm_faq_3_q:
+  where: Calm home page, question 3
+  max: 40
+  text: >-
+    Will it get me past ATS filters?
+
+calm_faq_3_a:
+  where: Calm home page, answer 3
+  max: 140
+  text: >-
+    It helps your resume use the job's own words. Nobody can promise more
+    than that, so be careful with anyone who does.
+
+calm_faq_4_q:
+  where: Calm home page, question 4
+  max: 30
+  text: >-
+    What can I upload?
+
+calm_faq_4_a:
+  where: Calm home page, answer 4. Must match the real file types and limit
+  max: 130
+  text: >-
+    A PDF with real text in it, up to 2 MB, or the text pasted in. Scanned
+    photos of a resume won't work yet.
+
+calm_home_closing_title_1:
+  where: Calm home page, closing title, first part
+  max: 20
+  text: >-
+    Stop sending
+
+calm_home_closing_title_2:
+  where: Calm home page, closing title, second part, in italics
+  max: 20
+  text: >-
+    the same resume.
+
+calm_home_closing_lead:
+  where: Calm home page, closing, line under the title
+  max: 40
+  text: >-
+    Give the next job its own version.
+
+calm_home_closing_cta:
+  where: Calm home page, closing button that goes to the form
+  max: 20
+  text: >-
+    Tailor my resume
+
+# ==========================================================================
+# CALM SKIN: while a run is going
+# ==========================================================================
+
+calm_run_title:
+  where: Calm running card, title
+  max: 40
+  text: >-
+    Matching your resume to the job
+
+calm_run_step_of:
+  where: Calm running card, under the progress bar, left. Keep {step}
+  max: 20
+  keep: step
+  text: >-
+    Step {step} of 5
+
+calm_run_hint:
+  where: Calm running card, line under the progress bar
+  max: 60
+  text: >-
+    Usually takes a few minutes. Keep this tab open.
+
+calm_run_show_steps:
+  where: Calm running card, label of the switch that shows the list of steps
+  max: 20
+  text: >-
+    Show steps
+
+calm_run_step_1:
+  where: Calm running card, step 1, once done. {count} is the number of lines
+  max: 40
+  keep: count
+  text: >-
+    Read your resume: {count} lines
+
+calm_run_step_1_now:
+  where: Calm running card, step 1, before it is done
+  max: 30
+  text: >-
+    Reading your resume
+
+calm_run_step_2:
+  where: Calm running card, step 2, once done. {count} is the number of requirements
+  max: 60
+  keep: count
+  text: >-
+    Read the job post: it asks for {count} things
+
+calm_run_step_2_now:
+  where: Calm running card, step 2, before it is done
+  max: 30
+  text: >-
+    Reading the job post
+
+calm_run_step_3:
+  where: Calm running card, step 3
+  max: 40
+  text: >-
+    Matching your lines to the job
+
+calm_run_step_4:
+  where: Calm running card, step 4
+  max: 40
+  text: >-
+    Rewriting the lines that fit
+
+calm_run_step_5:
+  where: Calm running card, step 5
+  max: 20
+  text: >-
+    Building your PDF
+
+# ==========================================================================
+# CALM SKIN: when something is wrong
+# ==========================================================================
+
+calm_err_resume_missing:
+  where: Calm form, under the resume, when none was added
+  max: 30
+  text: >-
+    Add your resume first.
+
+calm_err_file_type:
+  where: Calm form, under the resume, when the file is not a PDF. Must match the real types
+  max: 50
+  text: >-
+    That file type won't work. Use a PDF.
+
+calm_err_file_big:
+  where: Calm form, under the resume, when the file is too big. Must match the real limit
+  max: 50
+  text: >-
+    That file is over 2 MB. Try a smaller one.
+
+calm_err_file_no_text:
+  where: Calm form, under the resume, when the PDF has no text (a scan)
+  max: 120
+  text: >-
+    We couldn't read any text in that PDF. If it's a scan, export it again
+    from Word or Google Docs.
+
+calm_err_file_unreadable:
+  where: Calm form, under the resume, when the PDF cannot be opened
+  max: 80
+  text: >-
+    We couldn't open that PDF. Export it again, or paste it as text.
+
+calm_err_resume_short:
+  where: Calm form, under the pasted resume, when it is too short
+  max: 60
+  text: >-
+    That resume looks too short. Paste the whole thing.
+
+calm_err_resume_long:
+  where: Calm form, under the pasted resume, when it is too long
+  max: 60
+  text: >-
+    That resume is very long. Paste up to four pages.
+
+calm_err_job_missing:
+  where: Calm form, under the job post, when it is empty
+  max: 30
+  text: >-
+    Paste the job post first.
+
+calm_err_job_short:
+  where: Calm form, under the job post, when it is too short
+  max: 70
+  text: >-
+    That job post looks too short. Paste the whole thing.
+
+calm_err_job_long:
+  where: Calm form, under the job post, when it is too long
+  max: 90
+  text: >-
+    That job post is very long. Paste the role, the duties and the
+    requirements.
+
+calm_err_run_title:
+  where: Calm running card, title when the run failed
+  max: 20
+  text: >-
+    That didn't work.
+
+calm_err_run_body:
+  where: Calm running card, text when the run failed on our side
+  max: 90
+  text: >-
+    Something broke on our side. Your resume wasn't saved. Try again in a
+    minute.
+
+calm_err_retry:
+  where: Calm running card, button after a failed run
+  max: 20
+  text: >-
+    Try again
+
+calm_err_timeout:
+  where: Calm running card, text when the run took too long
+  max: 80
+  text: >-
+    This one took too long. Try again, or paste a shorter job post.
+
+calm_err_busy:
+  where: Calm running card, text when another visitor's run went on too long
+  max: 80
+  text: >-
+    Someone else's run is still going. Yours wasn't counted. Try again soon.
+
+calm_err_offline:
+  where: Calm running card, text when the connection dropped
+  max: 70
+  text: >-
+    The connection dropped. Your resume wasn't saved. Try again.
+
+calm_limit_title:
+  where: Calm form or running card, title when today's runs are used up
+  max: 30
+  text: >-
+    That's all for today.
+
+calm_limit_body:
+  where: Calm form or running card, text when today's runs are used up
+  max: 90
+  text: >-
+    Today's free runs are used up. Come back tomorrow, or look at the
+    example.
+
+calm_see_example:
+  where: Calm form or running card, button that plays the recorded run
+  max: 20
+  text: >-
+    See the example
+
+calm_paused_title:
+  where: Calm form or running card, title when live runs are off
+  max: 30
+  text: >-
+    Runs are paused for now.
+
+calm_paused_body:
+  where: Calm form or running card, text when live runs are off
+  max: 70
+  text: >-
+    New runs are off for a short while. The example still works.
+
+calm_bot_title:
+  where: Calm running card, title when the bot check failed
+  max: 50
+  text: >-
+    We couldn't check that you're a person.
+
+calm_bot_body:
+  where: Calm running card, text when the bot check failed
+  max: 40
+  text: >-
+    Reload the page and try again.
+
+calm_reload:
+  where: Calm running card and error page, button that reloads the page
+  max: 20
+  text: >-
+    Reload the page
+
+# ==========================================================================
+# CALM SKIN: the result
+# ==========================================================================
+
+calm_result_try_another:
+  where: Calm result, top right, glass button back to the form
+  max: 30
+  text: >-
+    Try another job post
+
+calm_result_for:
+  where: Calm result panel, small label above the job title
+  max: 20
+  text: >-
+    Tailored for
+
+calm_result_job_fallback:
+  where: Calm result panel, in place of the job title when the job post has no clear title
+  max: 20
+  text: >-
+    This job post
+
+calm_result_count_many:
+  where: Calm result panel, big number line. Keep {count}
+  max: 30
+  keep: count
+  text: >-
+    {count} lines changed
+
+calm_result_count_one:
+  where: Calm result panel, big number line, when one line changed
+  max: 20
+  text: >-
+    1 line changed
+
+calm_result_same:
+  where: Calm result panel, line under the big number
+  max: 50
+  text: >-
+    Everything else is exactly as you wrote it.
+
+calm_result_none_title:
+  where: Calm result panel, big line when the run changed nothing
+  max: 30
+  text: >-
+    Nothing to change.
+
+calm_result_none_body:
+  where: Calm result panel, line under it when the run changed nothing
+  max: 90
+  text: >-
+    None of your lines needed new words for this job. You can still download
+    it.
+
+calm_result_show_changes:
+  where: Calm result panel, label of the switch that shows the highlights
+  max: 20
+  text: >-
+    Show changes
+
+calm_result_keep:
+  where: Calm result panel, button on each changed line
+  max: 20
+  text: >-
+    Keep my original
+
+calm_result_use_new:
+  where: Calm result panel, the same button after it was pressed (undo)
+  max: 30
+  text: >-
+    Use the new version
+
+calm_result_no_missing:
+  where: Calm result panel, when nothing the job asks for is missing
+  max: 50
+  text: >-
+    Nothing missing that we could find.
+
+calm_result_download:
+  where: Calm result, the main button
+  max: 20
+  text: >-
+    Download PDF
+
+calm_result_busy:
+  where: Calm result, the main button while the PDF is made
+  max: 20
+  text: >-
+    Making your PDF…
+
+calm_result_pdf_failed:
+  where: Calm result, under the main button when the PDF failed
+  max: 40
+  text: >-
+    The PDF didn't build. Try again.
+
+calm_result_page_label:
+  where: Calm result, screen-reader name of the resume page
+  max: 30
+  text: >-
+    Your tailored resume
+
+# ==========================================================================
+# CALM SKIN: other pages
+# ==========================================================================
+
+calm_example_note:
+  where: Calm recorded-run page, small glass note at the top
+  max: 80
+  text: >-
+    This is a recorded example. The resume and the company are made up.
+
+calm_example_link:
+  where: Calm recorded-run page, link in the note to the home page form
+  max: 20
+  text: >-
+    Try it with yours
+
+calm_privacy_title:
+  where: Calm privacy page, heading
+  max: 40
+  text: >-
+    How we handle your data
+
+calm_404_title:
+  where: Calm 404 page, title
+  max: 40
+  text: >-
+    This page flew off somewhere.
+
+calm_404_button:
+  where: Calm 404 page, button
+  max: 20
+  text: >-
+    Back to the start
+
+calm_500_title:
+  where: Calm error page, title
+  max: 40
+  text: >-
+    Something broke on our side.
+
+calm_500_button:
+  where: Calm error page, button
+  max: 20
+  text: >-
+    Reload the page

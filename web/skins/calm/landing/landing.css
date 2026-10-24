@@ -1,0 +1,61 @@
+/* Styles for the calm landing screens. Plain CSS; the shared parts are in ../calm.css. */
+@layer components {
+  /* The closing: the sunset photo. On phones it is drawn at 125% height and
+     shifted so the star sits at 80vw, 166px. From 861 px it is cropped to the
+     box; above 1140 px the box has the photo's own ratio, so the percent
+     positions of the star and its line match the photo. The photo is a lazy
+     <img> (.closing-photo), not a background, so it does not load with the
+     first screen. */
+  .closing {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    height: 720px;
+  }
+  .closing-photo {
+    position: absolute;
+    top: 0;
+    left: calc(80vw - 1393px);
+    height: 125%;
+    width: auto;
+    max-width: none;
+  }
+  @media (min-width: 861px) {
+    .closing {
+      height: auto;
+      min-height: 640px;
+    }
+    .closing-photo {
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+  }
+  @media (min-width: 1141px) {
+    .closing {
+      aspect-ratio: 1672 / 941;
+    }
+  }
+
+  /* On phones the example card is taller than the screen, and a blur that
+     large is slow to scroll: a plain translucent white instead. */
+  @media (max-width: 860px) {
+    .example-glass {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background: rgb(255 255 255 / 0.5);
+    }
+  }
+
+  /* The phone hero is a dark photo: white focus rings there. */
+  @media (max-width: 860px) {
+    .hero-dark nav :focus-visible {
+      outline-color: #ffffff;
+    }
+  }
+}

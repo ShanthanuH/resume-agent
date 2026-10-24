@@ -7,6 +7,13 @@ __pycache__/
 data/
 # resume PDFs are personal data, never in git
 *.pdf
+# except the example page's PDF and the test fixtures, all fictional resumes
+!web/public/example.pdf
+!tests/fixtures/fictional_resume.pdf
+!tests/fixtures/word_resume.pdf
+!tests/fixtures/gdocs_resume.pdf
+!tests/fixtures/sidebar_resume.pdf
+.vercel
 # eval outputs hold resume text: runs, scores, judge caches and the labelling sheet
 eval/runs/
 eval/scores/
@@ -14,5 +21,12 @@ eval/cache/
 eval/labels/
 # logs can hold request headers or API keys, never in git
 *.log
-# variants such as .env.local hold keys too
+# variants such as .env.local hold keys too; the example has no values
 .env.*
+!.env.example
+
+# taste-skill working files (direction sheet, inspector screenshots)
+.taste-skill/
+
+# Source PNGs of the hero photo (the site serves the AVIF/WebP in public/hero)
+web/assets/hero/*.png

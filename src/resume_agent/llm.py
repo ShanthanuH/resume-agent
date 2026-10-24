@@ -1,10 +1,15 @@
 """The one place that talks to Gemini. Every tool goes through generate_structured."""
 
+import asyncio
+import concurrent.futures
 import os
+import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine, Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from functools import lru_cache
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from google import genai
 from google.genai import types
@@ -56,6 +61,80 @@ USAGE: dict[str, list[int]] = {}
 def _client() -> genai.Client:
     # With no arguments the SDK reads the key from GEMINI_API_KEY.
     return genai.Client()
+
+
+# --- stopping a run --------------------------------------------------------------
+# A web run can end early: it hits the time limit, or the visitor closes the tab.
+# The agent must then stop at once, a model call halfway through included, or it
+# goes on spending tokens for nobody. A blocking HTTP call cannot be interrupted
+# from another thread, so every call runs as a task on one background event loop,
+# where the server can cancel it. Cancelling the task closes the connection.
+
+
+class Stopped(BaseException):
+    """The server stopped this run.
+
+    A BaseException, like KeyboardInterrupt, so that the `except Exception` which
+    keeps one failing tool from ending a run (Session.execute) lets it through.
+    """
+
+
+class Stop:
+    """The off switch for one run. The server calls stop() from its own thread."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()  # stop() and run() happen on different threads
+        self._stopped = False
+        self._call: concurrent.futures.Future | None = None  # the call in flight
+
+    def stop(self) -> None:
+        with self._lock:
+            self._stopped = True
+            if self._call is not None:
+                self._call.cancel()
+
+    def run(self, call: Coroutine[Any, Any, T]) -> T:
+        """Run one model call on the call loop and wait for it, unless stopped."""
+        with self._lock:
+            if self._stopped:
+                call.close()  # never started, so nothing was sent
+                raise Stopped
+            self._call = asyncio.run_coroutine_threadsafe(call, _loop())
+        try:
+            return self._call.result()
+        except concurrent.futures.CancelledError:
+            raise Stopped from None
+        finally:
+            with self._lock:
+                self._call = None
+
+
+@lru_cache  # one event loop for every model call, running on its own thread
+def _loop() -> asyncio.AbstractEventLoop:
+    loop = asyncio.new_event_loop()
+    threading.Thread(target=loop.run_forever, name="model-calls", daemon=True).start()
+    return loop
+
+
+# The Stop of the run this thread works for. The command line and the eval set
+# none, so nothing can stop their calls.
+_STOP: ContextVar[Stop | None] = ContextVar("stop", default=None)
+
+
+@contextmanager
+def stoppable(stop: Stop) -> Iterator[None]:
+    """Model calls made inside this block end as soon as stop.stop() is called."""
+    token = _STOP.set(stop)
+    try:
+        yield
+    finally:
+        _STOP.reset(token)
+
+
+def _generate(**kwargs: Any) -> types.GenerateContentResponse:
+    """One generate_content call, which the run's Stop can cut off midway."""
+    stop = _STOP.get() or Stop()  # a Stop that nobody calls, outside a web run
+    return stop.run(_client().aio.models.generate_content(**kwargs))
 
 
 # Retry policy for model calls. These status codes mean "try again later":
@@ -121,7 +200,7 @@ def generate_structured(*, model: str, system: str, user: str, schema: type[T]) 
     """Call Gemini and return the answer as a validated Pydantic object."""
     # The lambda wraps the call so _with_backoff can run it more than once.
     response = _with_backoff(
-        lambda: _client().models.generate_content(
+        lambda: _generate(
             model=model,
             contents=user,
             config=types.GenerateContentConfig(
@@ -148,7 +227,7 @@ def call_agent(
 ) -> types.GenerateContentResponse:
     """One turn of the agent: send the conversation, get back tool calls."""
     response = _with_backoff(
-        lambda: _client().models.generate_content(
+        lambda: _generate(
             model=AGENT_MODEL,
             contents=contents,
             config=types.GenerateContentConfig(

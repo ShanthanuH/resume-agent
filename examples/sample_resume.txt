@@ -1,0 +1,29 @@
+Meera Kulkarni
+Pune, India | +91 98200 55501 | meera.kulkarni@example.com | linkedin.com/in/meera-kulkarni-example | github.com/meera-k-example
+
+Education
+Vishwakarma Institute of Technology, Pune
+B.Tech in Computer Engineering                                                    2016 - 2020
+CGPA: 8.4/10
+
+Experience
+Software Engineer, Lakeshore Logistics                                            Jul 2022 - Present
+• Built a shipment tracking API in Python and FastAPI that serves 1.2 million requests a day
+• Cut median API response time from 420 ms to 150 ms by adding Redis caching and fixing slow PostgreSQL queries
+• Wrote a nightly job that reconciles 300,000 delivery records and flags mismatches for the operations team
+• Added unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%
+• Reviewed pull requests for a team of 5 engineers and wrote the team's API style guide
+
+Associate Software Engineer, Brightpath Systems                                   Aug 2020 - Jun 2022
+• Developed internal dashboards in React and TypeScript used by 40 support agents
+• Moved 12 cron jobs from a single server to Docker containers deployed through GitHub Actions
+• Fixed a data export bug that had caused duplicate invoices for 3 enterprise customers
+
+Projects
+Bus Arrival Predictor
+• Trained a gradient boosting model on 6 months of public GPS data to predict bus arrival times within 2 minutes on average
+• Served predictions through a small Flask app and wrote a README with setup steps
+
+Technical Skills
+Languages: Python, TypeScript, SQL, Java
+Frameworks and tools: FastAPI, Flask, React, Docker, GitHub Actions, Redis, PostgreSQL, pytest

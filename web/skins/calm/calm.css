@@ -1,0 +1,376 @@
+/* Tailwind reads only this skin's files and the shared ones, so the bold
+   skin's classes never end up in this stylesheet. */
+@import "tailwindcss" source(none);
+/* Each screen's own styles. Each file belongs to one part of the skin. */
+@import "./landing/landing.css";
+@import "./running/running.css";
+@import "./result/result.css";
+@import "./pages/pages.css";
+@source "./";
+@source "../../app/calm";
+@source "../../components";
+@source "../../lib";
+
+/* The calm look: a sky photo, frosted glass, ink text. The values come from
+   the design screens. Yellow is only for changed text, green only for your
+   original line, the red strike only for a skill the resume lacks. */
+@theme inline {
+  --color-ink-900: #0b2340; /* main text, ink buttons */
+  --color-ink-700: #1d3a5c; /* body text */
+  --color-ink-500: #46617f; /* muted text and hints */
+  --color-page: #eaf1f8; /* page background */
+  --color-paper-text: #1a1f29; /* text on the white resume page */
+  --color-paper-muted: #5a6472; /* dates on the white resume page */
+  --color-mark: #ffe45c; /* ONLY changed text */
+  --color-before-bg: rgb(46 125 50 / 0.1); /* ONLY the "Before" box */
+  --color-before-text: #1e5e24;
+  --color-strike: #c8432f; /* ONLY the line through a missing skill */
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  /* Above 860 px the landing page uses its desktop layout; from 1000 px the
+     result screen does. Use them as wide: and desk:. */
+  --breakpoint-wide: 53.8125rem; /* 861px */
+  --breakpoint-desk: 62.5rem; /* 1000px */
+}
+
+:root {
+  color-scheme: light;
+  /* The gradient behind the landing sections and the plain pages. */
+  --day: linear-gradient(180deg, #eaf1f8 0%, #ddebf8 28%, #cfe2f5 55%, #a9c5e6 82%, #5f89c0 100%);
+}
+
+@layer base {
+  html {
+    background: var(--color-page);
+    color: var(--color-ink-900);
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    font-family: var(--font-sans);
+  }
+  a {
+    color: var(--color-ink-900);
+  }
+  a:hover {
+    color: var(--color-ink-700);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ink-900);
+    outline-offset: 2px;
+  }
+  /* On the dark photo areas (phone hero, closing): a white ring. */
+  .on-dark :focus-visible {
+    outline-color: #ffffff;
+  }
+  ::placeholder {
+    color: var(--color-ink-500);
+    opacity: 1;
+  }
+  button:not(:disabled),
+  label[for] {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  /* ---- Photo backgrounds --------------------------------------------- */
+  .sky-wide {
+    background: url(/hero/hero-wide.webp) left center / cover no-repeat;
+  }
+  .sky-tall {
+    background: url(/hero/hero-tall.webp) center top / cover no-repeat;
+  }
+  /* The tall photo on phones, the wide one above 860 px. */
+  .sky-hero {
+    background: url(/hero/hero-tall.webp) center top / cover no-repeat;
+  }
+  @media (min-width: 861px) {
+    .sky-hero {
+      background: url(/hero/hero-wide.webp) left center / cover no-repeat;
+    }
+  }
+  .day {
+    background: var(--day);
+  }
+
+  /* ---- Frosted glass, with a highlight in the top-left corner --------- */
+  .glass {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgb(255 255 255 / 0.46), rgb(255 255 255 / 0.16));
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgb(255 255 255 / 0.62);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.9),
+      inset 0 -1px 0 rgb(255 255 255 / 0.22),
+      0 14px 34px rgb(16 44 80 / 0.13);
+  }
+  /* On the running and result screens the glass sits on a photo. */
+  .glass-photo {
+    background: linear-gradient(135deg, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0.2));
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border-color: rgb(255 255 255 / 0.65);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.9),
+      inset 0 -1px 0 rgb(255 255 255 / 0.22),
+      0 14px 34px rgb(16 44 80 / 0.15);
+  }
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(120% 70% at 18% 0%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 58%);
+    pointer-events: none;
+  }
+  .glass > * {
+    position: relative;
+  }
+
+  /* ---- The dark button ----------------------------------------------- */
+  .ink {
+    background: linear-gradient(180deg, rgb(29 62 104 / 0.95), rgb(11 35 64 / 0.95));
+    color: #ffffff;
+    border: 1px solid rgb(255 255 255 / 0.3);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.38),
+      0 10px 24px rgb(11 35 64 / 0.28);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .ink:hover:not(:disabled) {
+    transform: translateY(-1px);
+    color: #ffffff;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.45),
+      0 14px 30px rgb(11 35 64 / 0.32);
+  }
+  .ink:disabled {
+    opacity: 0.7;
+  }
+
+  /* ---- Hover lift for glass buttons and cards ------------------------ */
+  .lift {
+    transition: transform 0.2s ease;
+  }
+  .lift:hover {
+    transform: translateY(-1px);
+  }
+
+  /* ---- Inputs inside glass ------------------------------------------- */
+  .field {
+    background: rgb(255 255 255 / 0.42);
+    border: 1px solid rgb(255 255 255 / 0.75);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 2px rgb(16 44 80 / 0.08);
+  }
+  .field-drop {
+    border-style: dashed;
+    border-color: rgb(11 35 64 / 0.28);
+  }
+
+  /* A button that looks like plain text (the "Before" toggles). */
+  .textbtn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    width: 100%;
+  }
+
+  /* ---- Changed text and the original line ---------------------------- */
+  .mark {
+    background: var(--color-mark);
+    color: inherit;
+    padding: 1px 2px;
+    border-radius: 3px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .before {
+    background: var(--color-before-bg);
+    color: var(--color-before-text);
+    border-radius: 12px;
+  }
+
+  /* ---- A missing skill with a hand-drawn line through it ------------- */
+  /* Give each .strike its own angle with style={{ "--r": "-3deg" }}. Sizes:
+     46 px on the wide landing page, 38 px on phones, 28 px on the result. */
+  .struck {
+    position: relative;
+    display: inline-block;
+    font-family: var(--font-serif);
+    line-height: 1.15;
+    color: var(--color-ink-500);
+  }
+  .strike {
+    position: absolute;
+    left: -0.13em;
+    right: -0.13em;
+    top: 56%;
+    height: var(--strike-h, 2.5px);
+    border-radius: 3px;
+    background: var(--color-strike);
+    transform: rotate(var(--r, 0deg));
+    transform-origin: left center;
+  }
+  /* Drawn as the section scrolls into view (landing page only). Browsers
+     without scroll-driven animations get a 0 s animation: fully drawn.
+     animation-timeline must come after the animation shorthand. */
+  .strike-draw {
+    animation: strike linear both;
+    animation-timeline: view();
+    animation-range: entry 25% cover 45%;
+  }
+  @keyframes strike {
+    from {
+      transform: rotate(var(--r, 0deg)) scaleX(0);
+    }
+    to {
+      transform: rotate(var(--r, 0deg)) scaleX(1);
+    }
+  }
+
+  /* ---- Soft cloud shapes --------------------------------------------- */
+  .cloud {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0));
+    pointer-events: none;
+  }
+  .drift {
+    animation: drift 60s ease-in-out infinite alternate;
+  }
+  .drift2 {
+    animation: drift 80s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes drift {
+    from {
+      transform: translateX(-40px);
+    }
+    to {
+      transform: translateX(50px);
+    }
+  }
+
+  /* ---- The glow on the star in the closing photo --------------------- */
+  .twinkle {
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(255 250 235 / 0.95), rgb(255 236 200 / 0));
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: twinkle 3.2s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: translate(-50%, -50%) scale(0.85);
+    }
+    50% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.25);
+    }
+  }
+
+  /* ---- Running screen: the plane on the bar, the current step -------- */
+  .fly {
+    animation: fly 3s ease-in-out infinite;
+    transform: translate(-50%, -50%) rotate(-4deg);
+  }
+  @keyframes fly {
+    0%,
+    100% {
+      transform: translate(-50%, -50%) rotate(-4deg);
+    }
+    50% {
+      transform: translate(-50%, -58%) rotate(2deg);
+    }
+  }
+  .pulse {
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(11 35 64 / 0.35);
+    }
+    50% {
+      box-shadow: 0 0 0 7px rgb(11 35 64 / 0);
+    }
+  }
+
+  /* ---- The on/off switch (see Switch in parts.tsx) ------------------- */
+  .switch {
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    width: 52px;
+    height: 30px;
+    padding: 3px;
+    border-radius: 999px;
+  }
+  .switch[data-size="large"] {
+    width: 54px;
+    height: 32px;
+  }
+  /* The tap area: 44 px or more, around the visible pill. */
+  .switch::after {
+    content: "";
+    position: absolute;
+    inset: -7px -4px;
+  }
+  .switch[aria-checked="true"] {
+    justify-content: flex-end;
+  }
+  .switch[aria-checked="false"] {
+    justify-content: flex-start;
+    background: rgb(11 35 64 / 0.18);
+    border: 1px solid rgb(255 255 255 / 0.6);
+    box-shadow: inset 0 1px 2px rgb(16 44 80 / 0.15);
+  }
+  .switch-knob {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+  }
+  .switch[data-size="large"] .switch-knob {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+/* No backdrop filter in this browser: make the glass nearly solid. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: rgb(255 255 255 / 0.85);
+  }
+}
+
+/* Only the listed things move, and none of them for visitors who asked for
+   less motion. The strikes then show fully drawn. */
+@media (prefers-reduced-motion: reduce) {
+  .drift,
+  .drift2,
+  .strike-draw,
+  .twinkle,
+  .fly,
+  .pulse {
+    animation: none;
+  }
+  .ink,
+  .lift,
+  .ink:hover,
+  .lift:hover {
+    transition: none;
+    transform: none;
+  }
+}

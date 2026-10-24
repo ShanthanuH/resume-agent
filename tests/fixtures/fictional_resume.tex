@@ -1,0 +1,82 @@
+% A fictional resume for the parser and renderer tests. Every name, number,
+% address and link in it is made up. Build it with:
+%     pdflatex fictional_resume.tex
+% It has what the tests need: a SUMMARY, two-line entry headers, entries with
+% no bullets, two projects with a link called "live", bold numbers, words with
+% fi and fl, and Education near the end.
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage[margin=0.5in]{geometry}
+\usepackage{charter}
+\usepackage[T1]{fontenc}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlist[itemize]{leftmargin=1.2em, itemsep=1pt, topsep=1pt, parsep=0pt}
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\vspace{-6pt}\rule{\textwidth}{0.4pt}]
+\titlespacing{\section}{0pt}{8pt}{4pt}
+
+% An entry header: two lines, left text and right-hand text on each.
+\newcommand{\entry}[4]{%
+  \begin{tabularx}{\textwidth}{@{}X r@{}}
+    \textbf{#1} & #2 \\
+    \textit{#3} & \textit{#4} \\
+  \end{tabularx}\vspace{-4pt}}
+% A one-line entry header.
+\newcommand{\oneline}[2]{%
+  \begin{tabularx}{\textwidth}{@{}X r@{}}
+    #1 & #2 \\
+  \end{tabularx}\vspace{-4pt}}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries Ishaan Varma}\\[2pt]
+  Nagpur, India $|$ +91-90000-12345 $|$
+  \href{mailto:ishaan.varma@example.com}{ishaan.varma@example.com} $|$
+  \href{https://linkedin.com/in/ishaan-varma-example}{linkedin.com/in/ishaan-varma-example} $|$
+  \href{https://github.com/ishaan-v-example}{github.com/ishaan-v-example}
+\end{center}
+
+\section*{SUMMARY}
+Data engineer who builds verification pipelines and flight-data tools. Shipped a
+flood alert service used by 3 district offices and cut nightly workflow runtime by
+40\%. Comfortable profiling Python services and writing efficient SQL.
+
+\section*{PROJECTS}
+\oneline{\textbf{Tidepool -- Flood Alert Service} (\href{https://tidepool.example.com}{live},
+  \href{https://github.com/ishaan-v-example/tidepool}{code}) $|$ \textit{Python, FastAPI, PostgreSQL}}{Jan 2025}
+\begin{itemize}
+  \item Built a flood alert service that sends river-level warnings to \textbf{3 district offices} within \textbf{5 minutes} of a gauge reading
+  \item Added a verification step that flags gauges whose readings drift, cutting false alerts by \textbf{62\%}
+\end{itemize}
+\oneline{\textbf{Kestrel -- Flight Log Classifier} (\href{https://kestrel.example.org}{live}) $|$ \textit{PyTorch, Streamlit}}{Aug 2024}
+\begin{itemize}
+  \item Trained a classifier that labels drone flight logs as normal or faulty with \textbf{91\% accuracy} on 4,000 logs
+\end{itemize}
+
+\section*{EXPERIENCE}
+\entry{Northwind Analytics}{Mar 2023 -- Present}{Data Engineer}{Pune, India}
+\begin{itemize}
+  \item Rebuilt the nightly workflow on Airflow, cutting runtime from \textbf{5 hours to 3 hours} for 120 reporting tables
+  \item Wrote data verification checks that catch schema drift before dashboards refresh, used by a team of \textbf{8 analysts}
+\end{itemize}
+\entry{Harbor Labs}{Jun 2022 -- Feb 2023}{Software Engineering Intern}{Remote}
+
+\section*{CERTIFICATIONS}
+AWS Certified Data Engineer -- Associate, 2024\\
+Certified Kubernetes Application Developer (CKAD), 2023
+
+\section*{EDUCATION}
+\entry{Visvesvaraya National Institute of Technology}{Jul 2018 -- May 2022}{B.Tech, Electrical Engineering $|$ CGPA 8.6/10}{Nagpur, India}
+
+\section*{TECHNICAL SKILLS}
+\textbf{Languages:} Python, SQL, Go\\
+\textbf{Data:} Airflow, Spark, PostgreSQL, dbt\\
+\textbf{Tools:} Docker, Git, Linux, profiling with py-spy
+
+\end{document}

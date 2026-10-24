@@ -1,0 +1,27 @@
+Backend Engineer, Payments Platform
+Northwind Pay (fictional company) | Bengaluru, hybrid
+
+About the role
+You will join the team that runs our payment APIs. These services handle merchant payouts and refunds, and they must be fast and correct. You will design, build and operate backend services with a small team of engineers.
+
+What you will do
+- Design and build REST APIs in Python
+- Own services in production: monitor them, fix incidents and improve response times
+- Write automated tests and review your teammates' code
+- Work with PostgreSQL and a caching layer to keep queries fast
+- Ship through CI/CD pipelines and run services in containers on Kubernetes
+
+What we are looking for
+- 3 or more years of backend engineering experience
+- Strong Python, with FastAPI or Django
+- Solid SQL and experience tuning PostgreSQL queries
+- Experience with Redis or another cache
+- Experience running services on Kubernetes
+- Infrastructure as code with Terraform
+- Experience with Kafka or another event streaming system
+- A habit of writing tests
+
+Nice to have
+- Experience in payments or fintech
+- Go
+- Experience mentoring junior engineers

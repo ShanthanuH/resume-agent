@@ -1,0 +1,535 @@
+{
+ "jd_text": "Backend Engineer, Payments Platform\nNorthwind Pay (fictional company) | Bengaluru, hybrid\n\nAbout the role\nYou will join the team that runs our payment APIs. These services handle merchant payouts and refunds, and they must be fast and correct. You will design, build and operate backend services with a small team of engineers.\n\nWhat you will do\n- Design and build REST APIs in Python\n- Own services in production: monitor them, fix incidents and improve response times\n- Write automated tests and review your teammates' code\n- Work with PostgreSQL and a caching layer to keep queries fast\n- Ship through CI/CD pipelines and run services in containers on Kubernetes\n\nWhat we are looking for\n- 3 or more years of backend engineering experience\n- Strong Python, with FastAPI or Django\n- Solid SQL and experience tuning PostgreSQL queries\n- Experience with Redis or another cache\n- Experience running services on Kubernetes\n- Infrastructure as code with Terraform\n- Experience with Kafka or another event streaming system\n- A habit of writing tests\n\nNice to have\n- Experience in payments or fintech\n- Go\n- Experience mentoring junior engineers",
+ "steps": [
+  {
+   "n": 1,
+   "kind": "read_resume",
+   "ms": 3220,
+   "count": 13,
+   "at": 5151
+  },
+  {
+   "n": 2,
+   "kind": "read_job",
+   "ms": 1931,
+   "count": 14,
+   "at": 5151
+  },
+  {
+   "n": 3,
+   "kind": "plan",
+   "ms": 10589,
+   "calls": {
+    "search_evidence": 9,
+    "reject_requirement": 5
+   },
+   "at": 15740
+  },
+  {
+   "n": 4,
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Backend engineering experience",
+   "count": 3,
+   "at": 17432
+  },
+  {
+   "n": 5,
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Python",
+   "count": 2,
+   "at": 17432
+  },
+  {
+   "n": 6,
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "FastAPI",
+   "count": 2,
+   "at": 17432
+  },
+  {
+   "n": 7,
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "SQL",
+   "count": 1,
+   "at": 17432
+  },
+  {
+   "n": 8,
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "PostgreSQL query tuning",
+   "count": 1,
+   "at": 17432
+  },
+  {
+   "n": 9,
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Redis",
+   "count": 2,
+   "at": 17432
+  },
+  {
+   "n": 10,
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Writing automated tests",
+   "count": 2,
+   "at": 17432
+  },
+  {
+   "n": 11,
+   "kind": "match_missing",
+   "ms": 188,
+   "requirement": "Experience in payments or fintech",
+   "at": 17432
+  },
+  {
+   "n": 12,
+   "kind": "match_found",
+   "ms": 188,
+   "requirement": "Mentoring junior engineers",
+   "count": 1,
+   "at": 17432
+  },
+  {
+   "n": 13,
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Django",
+   "at": 17432
+  },
+  {
+   "n": 14,
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Kubernetes",
+   "at": 17432
+  },
+  {
+   "n": 15,
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Terraform",
+   "at": 17432
+  },
+  {
+   "n": 16,
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Kafka",
+   "at": 17432
+  },
+  {
+   "n": 17,
+   "kind": "match_missing",
+   "ms": 0,
+   "requirement": "Go",
+   "at": 17432
+  },
+  {
+   "n": 18,
+   "kind": "plan",
+   "ms": 27954,
+   "calls": {
+    "rewrite_bullet": 7
+   },
+   "at": 45386
+  },
+  {
+   "n": 19,
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Built a shipment tracking API in Python and FastAPI that serves 1.2 million requests a day",
+   "at": 54192
+  },
+  {
+   "n": 20,
+   "kind": "rewrote",
+   "ms": 1258,
+   "before": "Cut median API response time from 420 ms to 150 ms by adding Redis caching and fixing slow PostgreSQL queries",
+   "after": "Tuned slow PostgreSQL queries and added Redis caching, cutting median API response time from 420 ms to 150 ms",
+   "at": 54192
+  },
+  {
+   "n": 21,
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Wrote a nightly job that reconciles 300,000 delivery records and flags mismatches for the operations team",
+   "at": 54192
+  },
+  {
+   "n": 22,
+   "kind": "rewrote",
+   "ms": 1258,
+   "before": "Added unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+   "after": "Wrote automated unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+   "at": 54192
+  },
+  {
+   "n": 23,
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Reviewed pull requests for a team of 5 engineers and wrote the team's API style guide",
+   "at": 54192
+  },
+  {
+   "n": 24,
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Languages: Python, TypeScript, SQL, Java",
+   "at": 54192
+  },
+  {
+   "n": 25,
+   "kind": "kept",
+   "ms": 1258,
+   "before": "Frameworks and tools: FastAPI, Flask, React, Docker, GitHub Actions, Redis, PostgreSQL, pytest",
+   "at": 54192
+  },
+  {
+   "n": 26,
+   "kind": "plan",
+   "ms": 3893,
+   "calls": {
+    "verify_claim": 2
+   },
+   "at": 58085
+  },
+  {
+   "n": 27,
+   "kind": "check_passed",
+   "ms": 547,
+   "at": 59179
+  },
+  {
+   "n": 28,
+   "kind": "check_passed",
+   "ms": 547,
+   "at": 59179
+  },
+  {
+   "n": 29,
+   "kind": "plan",
+   "ms": 4307,
+   "calls": {
+    "assemble_resume": 1
+   },
+   "at": 63486
+  },
+  {
+   "n": 30,
+   "kind": "assembled",
+   "ms": 0,
+   "count": 2,
+   "at": 63486
+  }
+ ],
+ "result": {
+  "header": [
+   "Meera Kulkarni",
+   "Pune, India | +91 98200 55501 | meera.kulkarni@example.com | linkedin.com/in/meera-kulkarni-example | github.com/meera-k-example"
+  ],
+  "links": [],
+  "sections": [
+   {
+    "name": "Education",
+    "entries": [
+     {
+      "title": "B.Tech in Computer Engineering",
+      "organization": "Vishwakarma Institute of Technology, Pune",
+      "dates": "2016 - 2020",
+      "lines": [
+       {
+        "evidence_id": "E1",
+        "original": "CGPA: 8.4/10",
+        "bullet_id": null
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name": "Experience",
+    "entries": [
+     {
+      "title": "Software Engineer",
+      "organization": "Lakeshore Logistics",
+      "dates": "Jul 2022 - Present",
+      "lines": [
+       {
+        "evidence_id": "E2",
+        "original": "Built a shipment tracking API in Python and FastAPI that serves 1.2 million requests a day",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E3",
+        "original": "Cut median API response time from 420 ms to 150 ms by adding Redis caching and fixing slow PostgreSQL queries",
+        "bullet_id": "B2"
+       },
+       {
+        "evidence_id": "E4",
+        "original": "Wrote a nightly job that reconciles 300,000 delivery records and flags mismatches for the operations team",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E5",
+        "original": "Added unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+        "bullet_id": "B4"
+       },
+       {
+        "evidence_id": "E6",
+        "original": "Reviewed pull requests for a team of 5 engineers and wrote the team's API style guide",
+        "bullet_id": null
+       }
+      ]
+     },
+     {
+      "title": "Associate Software Engineer",
+      "organization": "Brightpath Systems",
+      "dates": "Aug 2020 - Jun 2022",
+      "lines": [
+       {
+        "evidence_id": "E7",
+        "original": "Developed internal dashboards in React and TypeScript used by 40 support agents",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E8",
+        "original": "Moved 12 cron jobs from a single server to Docker containers deployed through GitHub Actions",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E9",
+        "original": "Fixed a data export bug that had caused duplicate invoices for 3 enterprise customers",
+        "bullet_id": null
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name": "Projects",
+    "entries": [
+     {
+      "title": "Bus Arrival Predictor",
+      "organization": "",
+      "dates": "",
+      "lines": [
+       {
+        "evidence_id": "E10",
+        "original": "Trained a gradient boosting model on 6 months of public GPS data to predict bus arrival times within 2 minutes on average",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E11",
+        "original": "Served predictions through a small Flask app and wrote a README with setup steps",
+        "bullet_id": null
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name": "Technical Skills",
+    "entries": [
+     {
+      "title": "",
+      "organization": "",
+      "dates": "",
+      "lines": [
+       {
+        "evidence_id": "E12",
+        "original": "Languages: Python, TypeScript, SQL, Java",
+        "bullet_id": null
+       },
+       {
+        "evidence_id": "E13",
+        "original": "Frameworks and tools: FastAPI, Flask, React, Docker, GitHub Actions, Redis, PostgreSQL, pytest",
+        "bullet_id": null
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "bullets": [
+   {
+    "id": "B2",
+    "text": "Tuned slow PostgreSQL queries and added Redis caching, cutting median API response time from 420 ms to 150 ms",
+    "replaces": "E3",
+    "source_ids": [
+     "E3"
+    ],
+    "requirement_ids": [
+     "R1",
+     "R6",
+     "R7"
+    ]
+   },
+   {
+    "id": "B4",
+    "text": "Wrote automated unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+    "replaces": "E5",
+    "source_ids": [
+     "E5"
+    ],
+    "requirement_ids": [
+     "R11"
+    ]
+   }
+  ],
+  "evidence": {
+   "E1": "CGPA: 8.4/10",
+   "E2": "Built a shipment tracking API in Python and FastAPI that serves 1.2 million requests a day",
+   "E3": "Cut median API response time from 420 ms to 150 ms by adding Redis caching and fixing slow PostgreSQL queries",
+   "E4": "Wrote a nightly job that reconciles 300,000 delivery records and flags mismatches for the operations team",
+   "E5": "Added unit and integration tests with pytest, raising coverage of the billing module from 35% to 80%",
+   "E6": "Reviewed pull requests for a team of 5 engineers and wrote the team's API style guide",
+   "E7": "Developed internal dashboards in React and TypeScript used by 40 support agents",
+   "E8": "Moved 12 cron jobs from a single server to Docker containers deployed through GitHub Actions",
+   "E9": "Fixed a data export bug that had caused duplicate invoices for 3 enterprise customers",
+   "E10": "Trained a gradient boosting model on 6 months of public GPS data to predict bus arrival times within 2 minutes on average",
+   "E11": "Served predictions through a small Flask app and wrote a README with setup steps",
+   "E12": "Languages: Python, TypeScript, SQL, Java",
+   "E13": "Frameworks and tools: FastAPI, Flask, React, Docker, GitHub Actions, Redis, PostgreSQL, pytest"
+  },
+  "requirements": [
+   {
+    "id": "R1",
+    "text": "Backend engineering experience",
+    "priority": "must_have",
+    "bullet_ids": [
+     "B2"
+    ],
+    "kept_line_ids": [
+     "E2",
+     "E4"
+    ]
+   },
+   {
+    "id": "R2",
+    "text": "Python",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": [
+     "E2",
+     "E12"
+    ]
+   },
+   {
+    "id": "R3",
+    "text": "FastAPI",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": [
+     "E2",
+     "E13"
+    ]
+   },
+   {
+    "id": "R4",
+    "text": "Django",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R5",
+    "text": "SQL",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": [
+     "E12"
+    ]
+   },
+   {
+    "id": "R6",
+    "text": "PostgreSQL query tuning",
+    "priority": "must_have",
+    "bullet_ids": [
+     "B2"
+    ],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R7",
+    "text": "Redis",
+    "priority": "must_have",
+    "bullet_ids": [
+     "B2"
+    ],
+    "kept_line_ids": [
+     "E13"
+    ]
+   },
+   {
+    "id": "R8",
+    "text": "Kubernetes",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R9",
+    "text": "Terraform",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R10",
+    "text": "Kafka",
+    "priority": "must_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R11",
+    "text": "Writing automated tests",
+    "priority": "must_have",
+    "bullet_ids": [
+     "B4"
+    ],
+    "kept_line_ids": [
+     "E13"
+    ]
+   },
+   {
+    "id": "R12",
+    "text": "Experience in payments or fintech",
+    "priority": "nice_to_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R13",
+    "text": "Go",
+    "priority": "nice_to_have",
+    "bullet_ids": [],
+    "kept_line_ids": []
+   },
+   {
+    "id": "R14",
+    "text": "Mentoring junior engineers",
+    "priority": "nice_to_have",
+    "bullet_ids": [],
+    "kept_line_ids": [
+     "E6"
+    ]
+   }
+  ],
+  "questions": [],
+  "stats": {
+   "seconds": 63.5,
+   "steps": 30,
+   "tokens_in": 25403,
+   "tokens_out": 8331,
+   "cost_usd": 0.04745
+  }
+ }
+}
